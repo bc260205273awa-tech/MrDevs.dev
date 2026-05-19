@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import gsap from "gsap";
 
 const NAV_LINKS = [
   { label: "Services",     href: "#services" },
@@ -12,6 +13,17 @@ export default function Navbar() {
   const [hidden, setHidden] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(".gsap-nav-logo, .gsap-nav-link, .gsap-nav-cta", 
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: "power2.out", delay: 0.1 }
+      );
+    });
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -73,7 +85,7 @@ export default function Navbar() {
       }}>
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
 
-        <a href="/" className="flex items-center gap-3 group">
+        <a href="/" className="gsap-nav-logo opacity-0 flex items-center gap-3 group">
           <div className="relative w-8 h-8 flex items-center justify-center rounded-[5px] overflow-hidden bg-transparent">
             <span className="font-syne font-black text-white text-sm leading-none z-10">M</span>
             <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -89,7 +101,7 @@ export default function Navbar() {
             const isActive = activeSection === href;
             return (
               <a key={label} href={href}
-                className={`relative font-manrope text-sm tracking-wide transition-colors duration-200 ${
+                className={`gsap-nav-link opacity-0 relative font-manrope text-sm tracking-wide transition-colors duration-200 ${
                   isActive ? 'text-[#00b4d8]' : 'text-[rgba(255,255,255,0.6)] hover:text-[#FFFFFF]'
                 }`}>
                 {label}
@@ -103,14 +115,14 @@ export default function Navbar() {
         </nav>
 
         <a href="#contact"
-          className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-manrope rounded-[5px] bg-[#00b4d8] text-[#0a1628] hover:bg-[#00d4aa] transition-colors" style={{ boxShadow: "0 0 20px rgba(0,180,216,0.3)" }}>
+          className="gsap-nav-cta opacity-0 hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-manrope rounded-[5px] bg-[#00b4d8] text-[#0a1628] hover:bg-[#00d4aa] transition-colors" style={{ boxShadow: "0 0 20px rgba(0,180,216,0.3)" }}>
           Let&apos;s Talk
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
             <path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </a>
 
-        <button onClick={() => setOpen(v => !v)} className="md:hidden flex flex-col gap-[5px] p-2" aria-label="Toggle navigation">
+        <button onClick={() => setOpen(v => !v)} className="gsap-nav-cta opacity-0 md:hidden flex flex-col gap-[5px] p-2" aria-label="Toggle navigation">
           <span className={`block h-px w-6 bg-[#00b4d8] origin-center transition-transform duration-300 ${open ? "rotate-45 translate-y-[7px]" : ""}`} />
           <span className={`block h-px w-6 bg-[#00b4d8] transition-opacity duration-300 ${open ? "opacity-0" : ""}`} />
           <span className={`block h-px w-6 bg-[#00b4d8] origin-center transition-transform duration-300 ${open ? "-rotate-45 -translate-y-[7px]" : ""}`} />

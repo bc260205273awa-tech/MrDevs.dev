@@ -29,15 +29,15 @@ function TechCard({ tech, delay }: { tech: typeof TECHNOLOGIES[0]; delay: number
     obs.observe(el); return () => obs.disconnect();
   }, []);
   return (
-    <div ref={ref} className="reveal group relative card-glow rounded-[8px] p-5 flex flex-col gap-3 cursor-default"
+    <div ref={ref} className="reveal group relative rounded-[8px] p-5 flex flex-col gap-3 cursor-default bg-[#112240] border border-[rgba(0,180,216,0.2)] hover:border-[#00b4d8] transition-colors duration-300"
       style={{ transitionDelay: `${delay}ms` }}>
-      <div className="w-9 h-9 rounded-[6px] flex items-center justify-center text-sm font-bold font-syne transition-all duration-300"
-        style={{ background: `${tech.accent}12`, color: tech.accent }}>{tech.icon}</div>
-      <p className="font-syne font-bold text-[13px] text-white leading-none">{tech.name}</p>
-      <span className="font-manrope text-[10px] font-semibold tracking-widest uppercase"
-        style={{ color: `${tech.accent}88` }}>{tech.category}</span>
-      <div className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: tech.accent, boxShadow: `0 0 6px ${tech.accent}` }} />
+      <div className="w-9 h-9 rounded-[6px] flex items-center justify-center text-sm font-bold font-syne transition-all duration-300 text-[rgba(255,255,255,0.75)] group-hover:text-white bg-transparent">
+        {tech.icon}
+      </div>
+      <p className="font-syne font-bold text-[13px] text-[rgba(255,255,255,0.75)] group-hover:text-white leading-none">{tech.name}</p>
+      <span className="font-manrope text-[10px] font-semibold tracking-widest uppercase text-[rgba(255,255,255,0.45)] group-hover:text-[rgba(255,255,255,0.75)]">
+        {tech.category}
+      </span>
     </div>
   );
 }
@@ -51,14 +51,14 @@ export default function Technologies() {
     obs.observe(el); return () => obs.disconnect();
   }, []);
   return (
-    <section id="technologies" className="py-28 relative">
+    <section id="technologies" className="py-28 relative bg-[#0a1628]">
       <hr className="hr-gradient max-w-6xl mx-auto mb-28" />
       <div className="max-w-6xl mx-auto px-6">
         <div ref={headerRef} className="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
           <div>
             <p className="section-label mb-4">Tech Stack</p>
-            <h2 className="font-syne font-bold text-4xl md:text-[2.8rem] leading-[1.1] tracking-tight">
-              Modern Technologies,<br /><span className="gradient-text">Real-World Results</span>
+            <h2 className="font-syne font-bold text-4xl md:text-[2.8rem] leading-[1.1] tracking-tight text-white">
+              Modern Technologies,<br /><span className="bg-gradient-to-r from-[#00b4d8] to-[#00d4aa] bg-clip-text text-transparent">Real-World Results</span>
             </h2>
           </div>
           <p className="font-manrope text-[#8892a4] max-w-xs leading-relaxed text-sm">

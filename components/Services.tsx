@@ -39,24 +39,23 @@ function ServiceCard({ service, delay }: { service: Service; delay: number }) {
     obs.observe(el); return () => obs.disconnect();
   }, []);
   return (
-    <div ref={ref} className="reveal card-glow rounded-[10px] p-7 cursor-default group"
+    <div ref={ref} className="reveal rounded-[10px] p-7 cursor-default group bg-[#112240] border border-[rgba(0,180,216,0.15)] hover:border-[rgba(0,180,216,0.6)] hover:shadow-[0_8px_32px_rgba(0,180,216,0.1)] transition-all duration-300"
       style={{ transitionDelay: `${delay}ms` }}>
-      <span className="absolute top-5 right-6 font-syne font-black text-[4rem] leading-none select-none pointer-events-none"
-        style={{ color: `${service.accent}08` }}>{service.num}</span>
-      <div className="w-11 h-11 rounded-full flex items-center justify-center mb-6 transition-all duration-300"
-        style={{ background: `${service.accent}12` }}>
-        <Icon size={18} style={{ color: service.accent }} strokeWidth={1.75} />
+      <span className="absolute top-5 right-6 font-syne font-black text-[4rem] leading-none select-none pointer-events-none text-[#00b4d8] opacity-30">
+        {service.num}
+      </span>
+      <div className="w-11 h-11 rounded-full flex items-center justify-center mb-6 transition-all duration-300 bg-[rgba(0,180,216,0.12)]">
+        <Icon size={18} className="text-[#00b4d8]" strokeWidth={1.75} />
       </div>
       <h3 className="font-syne font-bold text-[1.1rem] text-white mb-3 leading-snug">{service.title}</h3>
-      <p className="font-manrope text-[#8892a4] text-sm leading-relaxed mb-6">{service.description}</p>
+      <p className="font-manrope text-[rgba(255,255,255,0.6)] text-sm leading-relaxed mb-6">{service.description}</p>
       <div className="flex flex-wrap gap-2">
         {service.tags.map(tag => (
-          <span key={tag} className="text-[10px] font-manrope font-semibold px-2.5 py-1 rounded-full tracking-wide"
-            style={{ border: `1px solid ${service.accent}18`, color: "#4a5568" }}>{tag}</span>
+          <span key={tag} className="text-[10px] font-manrope font-semibold px-2.5 py-1 rounded-full tracking-wide bg-[rgba(0,180,216,0.1)] border border-[rgba(0,180,216,0.25)] text-[#00b4d8]">
+            {tag}
+          </span>
         ))}
       </div>
-      <div className="absolute bottom-0 left-0 h-px w-0 group-hover:w-full transition-all duration-500 rounded-b-[10px]"
-        style={{ background: `linear-gradient(90deg, ${service.accent}, transparent)` }} />
     </div>
   );
 }
@@ -77,8 +76,8 @@ export default function Services() {
         <div ref={headerRef} className="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
           <div>
             <p className="section-label mb-4">What We Do</p>
-            <h2 className="font-syne font-bold text-4xl md:text-[2.8rem] leading-[1.1] tracking-tight">
-              Services Built for<br /><span className="gradient-text">Modern Businesses</span>
+            <h2 className="font-syne font-bold text-4xl md:text-[2.8rem] leading-[1.1] tracking-tight text-white">
+              Services Built for<br /><span className="bg-gradient-to-r from-[#00b4d8] to-[#00d4aa] bg-clip-text text-transparent">Modern Businesses</span>
             </h2>
           </div>
           <p className="font-manrope text-[#8892a4] max-w-xs leading-relaxed text-sm">

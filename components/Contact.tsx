@@ -40,10 +40,10 @@ export default function Contact() {
     setLoading(false); setSubmitted(true);
   };
 
-  const inputClass = "w-full px-4 py-3 rounded-[6px] font-manrope text-sm text-white placeholder-[#2e3a4e] focus:outline-none transition-all duration-200 border focus:border-[rgba(0,180,216,0.5)] bg-[#0d1b36] border-[rgba(0,180,216,0.12)] focus:bg-[#112240]";
+  const inputClass = "w-full px-4 py-3 rounded-[6px] font-manrope text-sm text-white placeholder-[rgba(255,255,255,0.35)] focus:outline-none transition-all duration-200 border bg-[#0a1628] border-[rgba(0,180,216,0.2)] focus:border-[#00b4d8] focus:shadow-[0_0_0_3px_rgba(0,180,216,0.12)]";
 
   return (
-    <section id="contact" className="py-28 relative overflow-hidden">
+    <section id="contact" className="py-28 relative overflow-hidden bg-[#0a1628]">
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none"
         style={{ background: "radial-gradient(ellipse, rgba(0,212,170,0.06) 0%, transparent 70%)", filter: "blur(80px)" }} />
       <hr className="hr-gradient max-w-6xl mx-auto mb-28" />
@@ -52,10 +52,10 @@ export default function Contact() {
 
           <div ref={leftRef} className="reveal">
             <p className="section-label mb-4">Get In Touch</p>
-            <h2 className="font-syne font-bold text-4xl md:text-[2.8rem] leading-[1.1] tracking-tight mb-6">
-              Let&apos;s Build<br />Something <span className="gradient-text">Great</span><br />Together.
+            <h2 className="font-syne font-bold text-4xl md:text-[2.8rem] leading-[1.1] tracking-tight mb-6 text-white">
+              Let&apos;s Build<br />Something <span className="bg-gradient-to-r from-[#00b4d8] to-[#00d4aa] bg-clip-text text-transparent">Great</span><br />Together.
             </h2>
-            <p className="font-manrope text-[#8892a4] leading-relaxed max-w-xs mb-10 text-sm">
+            <p className="font-manrope text-[rgba(255,255,255,0.6)] leading-relaxed max-w-xs mb-10 text-sm">
               Have a project in mind? Drop us a message and we&apos;ll get back to you within 24 hours.
             </p>
             <div className="flex flex-col gap-3 mb-10">
@@ -69,9 +69,9 @@ export default function Contact() {
                   className="inline-flex items-center gap-3 group w-fit">
                   <div className="w-9 h-9 rounded-[6px] flex items-center justify-center transition-all duration-300 group-hover:border-[rgba(0,180,216,0.4)] group-hover:bg-[rgba(0,180,216,0.1)]"
                     style={{ border: "1px solid rgba(0,180,216,0.15)", background: "rgba(0,180,216,0.04)" }}>
-                    <Icon size={14} className="text-[#00b4d8]" strokeWidth={1.75} />
+                    <Icon size={14} className="text-[#00b4d8] group-hover:text-[#00d4aa] transition-colors" strokeWidth={1.75} />
                   </div>
-                  <span className="font-manrope text-sm text-[#8892a4] group-hover:text-white transition-colors duration-200">{label}</span>
+                  <span className="font-manrope text-sm text-[#00b4d8] group-hover:text-[#00d4aa] transition-colors duration-200">{label}</span>
                 </a>
               ))}
             </div>
@@ -85,7 +85,7 @@ export default function Contact() {
           </div>
 
           <div ref={rightRef} className="reveal rounded-[12px] p-8"
-            style={{ border: "1px solid rgba(0,180,216,0.15)", background: "rgba(11,27,54,0.8)", backdropFilter: "blur(12px)" }}>
+            style={{ border: "1px solid rgba(0,180,216,0.15)", background: "#112240", backdropFilter: "blur(12px)" }}>
             {submitted ? (
               <div className="flex flex-col items-center text-center py-10 gap-4">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2"
@@ -138,7 +138,7 @@ export default function Contact() {
                     placeholder="Tell us about your project, goals, and timeline..." className={`${inputClass} resize-none`} />
                 </div>
                 <button type="submit" disabled={loading}
-                  className="btn-primary group inline-flex items-center justify-center gap-2.5 px-7 py-4 font-manrope font-semibold text-sm rounded-[6px] disabled:opacity-60 disabled:cursor-not-allowed mt-1">
+                  className="group inline-flex items-center justify-center gap-2.5 px-7 py-4 font-manrope font-semibold text-sm rounded-[6px] disabled:opacity-60 disabled:cursor-not-allowed mt-1 bg-[#00b4d8] text-[#0a1628] hover:bg-[#00d4aa] transition-colors">
                   {loading ? (
                     <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

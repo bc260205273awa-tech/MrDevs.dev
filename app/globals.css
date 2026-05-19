@@ -5,14 +5,14 @@
 :root {
   --bg:        #0a1628;
   --surface:   #112240;
-  --surface2:  #0d1b36;
+  --surface2:  #112240;
   --accent:    #00b4d8;
   --teal:      #00d4aa;
-  --border:    rgba(0, 180, 216, 0.12);
-  --border-dim: rgba(255, 255, 255, 0.06);
+  --border:    rgba(0, 180, 216, 0.15);
+  --border-dim: rgba(0, 180, 216, 0.1);
   --text-primary:   #ffffff;
-  --text-secondary: #8892a4;
-  --text-dim:       #4a5568;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-dim:       rgba(255, 255, 255, 0.45);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,7 +50,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--teal) 100%);
+  background: linear-gradient(90deg, #00b4d8, #00d4aa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -153,18 +153,17 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #00b4d8;
 }
 .section-label::before {
   content: '';
   display: block;
   width: 24px; height: 1px;
-  background: var(--accent);
-  opacity: 0.6;
+  background: #00b4d8;
 }
 
 .hr-gradient {

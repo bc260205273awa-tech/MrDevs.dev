@@ -24,28 +24,27 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
 
         <a href="/" className="flex items-center gap-3 group">
-          <div className="relative w-8 h-8 flex items-center justify-center rounded-[5px] overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #00b4d8, #00d4aa)" }}>
-            <span className="font-syne font-black text-[#0a1628] text-sm leading-none z-10">M</span>
+          <div className="relative w-8 h-8 flex items-center justify-center rounded-[5px] overflow-hidden bg-transparent">
+            <span className="font-syne font-black text-white text-sm leading-none z-10">M</span>
             <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%)" }} />
           </div>
           <span className="font-syne font-bold text-white tracking-tight text-[15px]">
-            Mr<span className="text-[#00b4d8]">Devs</span>
+            MrDevs
           </span>
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map(({ label, href }) => (
             <a key={label} href={href}
-              className="animated-underline font-manrope text-sm text-[#8892a4] hover:text-white transition-colors duration-200 tracking-wide">
+              className="font-manrope text-sm text-[rgba(255,255,255,0.6)] hover:text-[#FFFFFF] transition-colors duration-200 tracking-wide">
               {label}
             </a>
           ))}
         </nav>
 
         <a href="#contact"
-          className="hidden md:inline-flex btn-primary items-center gap-2 px-5 py-2.5 text-sm font-manrope rounded-[5px]">
+          className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-manrope rounded-[5px] bg-[#00b4d8] text-[#0a1628] hover:bg-[#00d4aa] transition-colors" style={{ boxShadow: "0 0 20px rgba(0,180,216,0.3)" }}>
           Let&apos;s Talk
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
             <path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
@@ -67,8 +66,7 @@ export default function Navbar() {
               onClick={() => setOpen(false)}>{label}</a>
           ))}
           <a href="#contact"
-            className="mt-3 py-3.5 text-center text-sm font-manrope font-semibold rounded-[5px] text-white"
-            style={{ background: "linear-gradient(135deg, #00b4d8, #0077cc)" }}
+            className="mt-3 py-3.5 text-center text-sm font-manrope font-semibold rounded-[5px] bg-[#00b4d8] text-[#0a1628] hover:bg-[#00d4aa] transition-colors shadow-[0_0_20px_rgba(0,180,216,0.3)]"
             onClick={() => setOpen(false)}>
             Let&apos;s Talk
           </a>

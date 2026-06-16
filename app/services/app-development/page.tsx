@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Mobile app development Pakistan | MrDevs",
+  title: "Mobile app development company in Pakistan",
   description: "Bring your business directly to your customers' phones with our mobile app development Pakistan services. Easy to use, fast, and designed to increase your sales.",
+  alternates: {
+    canonical: "/services/app-development",
+  },
+  openGraph: {
+    title: "Mobile app development company in Pakistan",
+    description: "Bring your business directly to your customers' phones with our mobile app development Pakistan services. Easy to use, fast, and designed to increase your sales.",
+    url: "/services/app-development",
+  },
 };
 
 const pageData: ServicePageProps = {

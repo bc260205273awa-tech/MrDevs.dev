@@ -2,8 +2,16 @@ import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLay
 import { Image as ImageIcon, Video, FileText } from "lucide-react";
 
 export const metadata = {
-  title: "Branding agency in Pakistan | MrDevs",
+  title: "Branding agency in Pakistan",
   description: "Stand out from competitors with a branding agency in Pakistan. We design professional logos, posters, and visual guides that make your business instantly recognizable.",
+  alternates: {
+    canonical: "/services/design-branding",
+  },
+  openGraph: {
+    title: "Branding agency in Pakistan",
+    description: "Stand out from competitors with a branding agency in Pakistan. We design professional logos, posters, and visual guides that make your business instantly recognizable.",
+    url: "/services/design-branding",
+  },
 };
 
 const pageData: ServicePageProps = {

@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 const NAV_LINKS = [
   { label: "Services", href: "#services" },
   { label: "Work", href: "#work" },
@@ -43,10 +45,12 @@ export default function Footer() {
               onClick={(e) => handleScrollTo(e, "#hero")}
               className="flex items-center select-none mb-3"
             >
-              <img
+              <Image
                 src="/logo.png"
                 alt="mrdevs logo"
-                className="h-[28px] w-auto block object-contain"
+                width={73}
+                height={28}
+                className="block object-contain"
               />
             </a>
             <p className="text-[#888780] text-xs max-w-[280px] leading-relaxed">

@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Graphic design services in Pakistan | MrDevs",
+  title: "Professional graphic design services",
   description: "Attract more followers and buyers with graphic design services in Pakistan. We craft beautiful social media posts, ads, flyers, and banners for your brand.",
+  alternates: {
+    canonical: "/services/social-media/graphic-design",
+  },
+  openGraph: {
+    title: "Professional graphic design services",
+    description: "Attract more followers and buyers with graphic design services in Pakistan. We craft beautiful social media posts, ads, flyers, and banners for your brand.",
+    url: "/services/social-media/graphic-design",
+  },
 };
 
 const pageData: ServicePageProps = {

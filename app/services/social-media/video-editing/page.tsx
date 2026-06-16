@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Video editing services in Pakistan | MrDevs",
+  title: "Professional video editing services",
   description: "Tell your business story with high-quality video editing services in Pakistan. Professional edits for social media reels, TikTok, YouTube, and business promo videos.",
+  alternates: {
+    canonical: "/services/social-media/video-editing",
+  },
+  openGraph: {
+    title: "Professional video editing services",
+    description: "Tell your business story with high-quality video editing services in Pakistan. Professional edits for social media reels, TikTok, YouTube, and business promo videos.",
+    url: "/services/social-media/video-editing",
+  },
 };
 
 const pageData: ServicePageProps = {

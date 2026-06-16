@@ -35,6 +35,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://mrdevs.dev",
   },
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     title: "MrDevs — Premium digital agency | Web & app development",
     description:

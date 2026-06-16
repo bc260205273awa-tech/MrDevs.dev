@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowRight, Code2, Smartphone, Shield, Zap, MapPin, Palette } from "lucide-react";
+import Image from "next/image";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -98,10 +99,13 @@ export default function Navbar() {
           href="/"
           className="flex items-center select-none"
         >
-          <img
+          <Image
             src="/logo.png"
             alt="mrdevs logo"
-            className="h-[30px] w-auto block object-contain"
+            width={78}
+            height={30}
+            priority
+            className="block object-contain"
           />
         </a>
 

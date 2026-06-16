@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Content writing company in Pakistan | MrDevs",
+  title: "Professional content scripting services",
   description: "Speak directly to your target audience with a content writing company in Pakistan. High-converting scripts and captions for your social media videos and posts.",
+  alternates: {
+    canonical: "/services/social-media/content-scripting",
+  },
+  openGraph: {
+    title: "Professional content scripting services",
+    description: "Speak directly to your target audience with a content writing company in Pakistan. High-converting scripts and captions for your social media videos and posts.",
+    url: "/services/social-media/content-scripting",
+  },
 };
 
 const pageData: ServicePageProps = {

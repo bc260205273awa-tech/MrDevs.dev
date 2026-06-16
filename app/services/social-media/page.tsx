@@ -3,8 +3,16 @@ import Footer from "@/components/Footer";
 import { ArrowRight, Image as ImageIcon, Video, FileText } from "lucide-react";
 
 export const metadata = {
-  title: "Social media agency in Pakistan | MrDevs",
+  title: "Social media agency in Pakistan",
   description: "Grow your online presence with a premium social media agency in Pakistan. Learn about our graphic design, video editing, and content scripting services.",
+  alternates: {
+    canonical: "/services/social-media",
+  },
+  openGraph: {
+    title: "Social media agency in Pakistan",
+    description: "Grow your online presence with a premium social media agency in Pakistan. Learn about our graphic design, video editing, and content scripting services.",
+    url: "/services/social-media",
+  },
 };
 
 const SUB_SERVICES = [

@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Web development company in Pakistan | MrDevs",
+  title: "Web development company in Pakistan",
   description: "Looking for an affordable web development company in Pakistan? We build custom websites that look great on every device and turn visitors into regular customers.",
+  alternates: {
+    canonical: "/services/web-development",
+  },
+  openGraph: {
+    title: "Web development company in Pakistan",
+    description: "Looking for an affordable web development company in Pakistan? We build custom websites that look great on every device and turn visitors into regular customers.",
+    url: "/services/web-development",
+  },
 };
 
 const pageData: ServicePageProps = {

@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Business automation company in Pakistan | MrDevs",
+  title: "Business automation company in Pakistan",
   description: "Save hours of manual messaging with a business automation company in Pakistan. Automatically reply to customers on WhatsApp and notify them about orders instantly.",
+  alternates: {
+    canonical: "/services/whatsapp-automation",
+  },
+  openGraph: {
+    title: "Business automation company in Pakistan",
+    description: "Save hours of manual messaging with a business automation company in Pakistan. Automatically reply to customers on WhatsApp and notify them about orders instantly.",
+    url: "/services/whatsapp-automation",
+  },
 };
 
 const pageData: ServicePageProps = {

@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Custom software developer Pakistan | MrDevs",
+  title: "Hospital software systems and custom ERP",
   description: "Manage your clinic, hospital, or enterprise effortlessly with a custom software developer Pakistan. Simplify booking, patient billing, and staff records today.",
+  alternates: {
+    canonical: "/services/hospital-software-systems",
+  },
+  openGraph: {
+    title: "Hospital software systems and custom ERP",
+    description: "Manage your clinic, hospital, or enterprise effortlessly with a custom software developer Pakistan. Simplify booking, patient billing, and staff records today.",
+    url: "/services/hospital-software-systems",
+  },
 };
 
 const pageData: ServicePageProps = {

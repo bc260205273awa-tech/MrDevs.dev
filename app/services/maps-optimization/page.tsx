@@ -1,8 +1,16 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
 
 export const metadata = {
-  title: "Google maps SEO services Pakistan | MrDevs",
+  title: "Google Maps optimization services",
   description: "Rank higher on local searches with google maps SEO services Pakistan. Get more phone calls, web clicks, and store visits from customers near you.",
+  alternates: {
+    canonical: "/services/maps-optimization",
+  },
+  openGraph: {
+    title: "Google Maps optimization services",
+    description: "Rank higher on local searches with google maps SEO services Pakistan. Get more phone calls, web clicks, and store visits from customers near you.",
+    url: "/services/maps-optimization",
+  },
 };
 
 const pageData: ServicePageProps = {

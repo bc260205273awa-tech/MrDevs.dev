@@ -35,7 +35,7 @@ export interface ServicePageProps {
   schemaUrl: string;
 }
 
-export default function ServicePageLayout({ data }: { data: ServicePageProps }) {
+export default function ServicePageLayout({ data, children }: { data: ServicePageProps; children?: React.ReactNode }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const toggleFaq = (idx: number) => {
@@ -118,6 +118,15 @@ export default function ServicePageLayout({ data }: { data: ServicePageProps }) 
             </div>
           </div>
         </section>
+
+        {/* Custom Child Elements (such as Design Sub-cards) */}
+        {children && (
+          <section className="py-8 bg-[#0a0f1a]">
+            <div className="max-w-3xl mx-auto px-6">
+              {children}
+            </div>
+          </section>
+        )}
 
         {/* Who This Is For Section */}
         <section className="py-16 bg-[#0a0f1a]">

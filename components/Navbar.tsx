@@ -24,6 +24,17 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".services-dropdown-container")) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
     if (!isHome) return;
 
     const sections = ["hero", "services", "work", "process", "contact"];
@@ -98,11 +109,15 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           {/* Hover Dropdown for Services */}
           <div
-            className="relative"
+            className="relative services-dropdown-container"
             onMouseEnter={() => setDropdownOpen(true)}
             onMouseLeave={() => setDropdownOpen(false)}
           >
             <button
+              onClick={(e) => {
+                e.preventDefault();
+                setDropdownOpen((prev) => !prev);
+              }}
               className={`text-sm font-medium transition-colors duration-200 relative py-1 flex items-center gap-1 ${
                 pathname.startsWith("/services") ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
               }`}
@@ -112,101 +127,103 @@ export default function Navbar() {
             </button>
 
             {dropdownOpen && (
-              <div className="absolute left-0 mt-2 w-72 rounded-xl bg-[#0f1729]/95 backdrop-blur-[16px] border border-[rgba(133,183,235,0.15)] shadow-2xl p-3 flex flex-col gap-1 z-50 text-left animate-[fade-up_0.2s_ease-out_forwards]">
-                <a
-                  href="/services/web-development"
-                  className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                    <Code2 size={12} />
-                  </div>
-                  <span>web development</span>
-                </a>
-                <a
-                  href="/services/app-development"
-                  className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                    <Smartphone size={12} />
-                  </div>
-                  <span>app development</span>
-                </a>
-                <a
-                  href="/services/hospital-software-systems"
-                  className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                    <Shield size={12} />
-                  </div>
-                  <span>hospital & software systems</span>
-                </a>
-                <a
-                  href="/services/whatsapp-automation"
-                  className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                    <Zap size={12} />
-                  </div>
-                  <span>whatsapp & automation</span>
-                </a>
-                <a
-                  href="/services/maps-optimization"
-                  className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                    <MapPin size={12} />
-                  </div>
-                  <span>google maps optimization</span>
-                </a>
-                <a
-                  href="/services/design-branding"
-                  className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                    <Palette size={12} />
-                  </div>
-                  <span>design & branding</span>
-                </a>
-                
-                <div className="border-t border-[rgba(133,183,235,0.06)] pt-2 mt-1">
+              <div className="absolute left-0 top-full pt-2 w-72 z-50 text-left animate-[fade-up_0.2s_ease-out_forwards]">
+                <div className="rounded-xl bg-[#0f1729]/95 backdrop-blur-[16px] border border-[rgba(133,183,235,0.15)] shadow-2xl p-3 flex flex-col gap-1">
                   <a
-                    href="/services/social-media"
-                    className="group flex items-center gap-3 text-xs font-medium text-[#f1efe8] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
+                    href="/services/web-development"
+                    className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
                     onClick={() => setDropdownOpen(false)}
                   >
                     <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
-                      <ArrowRight size={12} />
+                      <Code2 size={12} />
                     </div>
-                    <span className="flex-1">social media</span>
+                    <span>web development</span>
                   </a>
-                  <div className="pl-8 flex flex-col gap-1 mt-1 border-l border-[rgba(133,183,235,0.08)] ml-5">
+                  <a
+                    href="/services/app-development"
+                    className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
+                      <Smartphone size={12} />
+                    </div>
+                    <span>app development</span>
+                  </a>
+                  <a
+                    href="/services/hospital-software-systems"
+                    className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
+                      <Shield size={12} />
+                    </div>
+                    <span>hospital & software systems</span>
+                  </a>
+                  <a
+                    href="/services/whatsapp-automation"
+                    className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
+                      <Zap size={12} />
+                    </div>
+                    <span>whatsapp & automation</span>
+                  </a>
+                  <a
+                    href="/services/maps-optimization"
+                    className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
+                      <MapPin size={12} />
+                    </div>
+                    <span>google maps optimization</span>
+                  </a>
+                  <a
+                    href="/services/design-branding"
+                    className="group flex items-center gap-3 text-xs text-[#888780] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
+                      <Palette size={12} />
+                    </div>
+                    <span>design & branding</span>
+                  </a>
+                  
+                  <div className="border-t border-[rgba(133,183,235,0.06)] pt-2 mt-1">
                     <a
-                      href="/services/social-media/graphic-design"
-                      className="text-[11px] text-[#888780] hover:text-[#378ADD] transition-colors py-1 block"
+                      href="/services/social-media"
+                      className="group flex items-center gap-3 text-xs font-medium text-[#f1efe8] hover:text-[#378ADD] hover:bg-white/[0.02] p-2 rounded-lg transition-all"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      graphic design
+                      <div className="w-6 h-6 rounded bg-[#378ADD]/10 flex items-center justify-center text-[#378ADD] group-hover:bg-[#378ADD]/20 transition-colors">
+                        <ArrowRight size={12} />
+                      </div>
+                      <span className="flex-1">social media</span>
                     </a>
-                    <a
-                      href="/services/social-media/video-editing"
-                      className="text-[11px] text-[#888780] hover:text-[#378ADD] transition-colors py-1 block"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      video editing
-                    </a>
-                    <a
-                      href="/services/social-media/content-scripting"
-                      className="text-[11px] text-[#888780] hover:text-[#378ADD] transition-colors py-1 block"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      content scripting
-                    </a>
+                    <div className="pl-8 flex flex-col gap-1 mt-1 border-l border-[rgba(133,183,235,0.08)] ml-5">
+                      <a
+                        href="/services/social-media/graphic-design"
+                        className="text-[11px] text-[#888780] hover:text-[#378ADD] transition-colors py-1 block"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        graphic design
+                      </a>
+                      <a
+                        href="/services/social-media/video-editing"
+                        className="text-[11px] text-[#888780] hover:text-[#378ADD] transition-colors py-1 block"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        video editing
+                      </a>
+                      <a
+                        href="/services/social-media/content-scripting"
+                        className="text-[11px] text-[#888780] hover:text-[#378ADD] transition-colors py-1 block"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        content scripting
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import ServicePageLayout, { ServicePageProps } from "@/components/ServicePageLayout";
+import { Image as ImageIcon, Video, FileText } from "lucide-react";
 
 export const metadata = {
   title: "Branding agency in Pakistan | MrDevs",
@@ -57,5 +58,62 @@ const pageData: ServicePageProps = {
 };
 
 export default function DesignBranding() {
-  return <ServicePageLayout data={pageData} />;
+  return (
+    <ServicePageLayout data={pageData}>
+      <div className="mt-8 flex flex-col items-center gap-6">
+        <h3 className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase select-none text-center">
+          our specialized design services
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+          {/* Card 1: Graphic Design */}
+          <a
+            href="/services/social-media/graphic-design"
+            className="group flex flex-col items-center text-center p-6 border border-[#7C3AED]/25 bg-[#7C3AED]/10 rounded-xl hover:border-[#7C3AED]/50 hover:bg-[#7C3AED]/15 hover:-translate-y-1 active:scale-[0.97] transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-lg bg-[#7C3AED]/20 text-[#A78BFA] flex items-center justify-center mb-4 group-hover:bg-[#7C3AED]/30 transition-colors">
+              <ImageIcon size={18} strokeWidth={1.5} />
+            </div>
+            <h4 className="font-sans font-medium text-[13px] text-[#A78BFA] mb-1.5 group-hover:brightness-110 transition-all">
+              graphic design
+            </h4>
+            <p className="text-[11px] text-[#888780] leading-relaxed">
+              stunning banners and brand visual layouts.
+            </p>
+          </a>
+
+          {/* Card 2: Video Editing */}
+          <a
+            href="/services/social-media/video-editing"
+            className="group flex flex-col items-center text-center p-6 border border-[#E11D48]/25 bg-[#E11D48]/10 rounded-xl hover:border-[#E11D48]/50 hover:bg-[#E11D48]/15 hover:-translate-y-1 active:scale-[0.97] transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-lg bg-[#E11D48]/20 text-[#F43F5E] flex items-center justify-center mb-4 group-hover:bg-[#E11D48]/30 transition-colors">
+              <Video size={18} strokeWidth={1.5} />
+            </div>
+            <h4 className="font-sans font-medium text-[13px] text-[#F43F5E] mb-1.5 group-hover:brightness-110 transition-all">
+              video editing
+            </h4>
+            <p className="text-[11px] text-[#888780] leading-relaxed">
+              engaging promotional reels and business edits.
+            </p>
+          </a>
+
+          {/* Card 3: Content Scripting */}
+          <a
+            href="/services/social-media/content-scripting"
+            className="group flex flex-col items-center text-center p-6 border border-[#059669]/25 bg-[#059669]/10 rounded-xl hover:border-[#059669]/50 hover:bg-[#059669]/15 hover:-translate-y-1 active:scale-[0.97] transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-lg bg-[#059669]/20 text-[#34D399] flex items-center justify-center mb-4 group-hover:bg-[#059669]/30 transition-colors">
+              <FileText size={18} strokeWidth={1.5} />
+            </div>
+            <h4 className="font-sans font-medium text-[13px] text-[#34D399] mb-1.5 group-hover:brightness-110 transition-all">
+              content scripting
+            </h4>
+            <p className="text-[11px] text-[#888780] leading-relaxed">
+              compelling scripts that turn viewers into clients.
+            </p>
+          </a>
+        </div>
+      </div>
+    </ServicePageLayout>
+  );
 }

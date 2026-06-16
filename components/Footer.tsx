@@ -1,57 +1,72 @@
+"use client";
+
 const NAV_LINKS = [
   { label: "Services", href: "#services" },
-  { label: "Technologies", href: "#technologies" },
+  { label: "Work", href: "#work" },
+  { label: "Process", href: "#process" },
   { label: "Contact", href: "#contact" },
 ];
 
 const SOCIALS = [
-  { label: "GH", title: "GitHub", href: "https://github.com/mrdevs" },
+  { label: "gh", title: "GitHub", href: "https://github.com/mrdevs" },
   {
-    label: "LI",
+    label: "li",
     title: "LinkedIn",
     href: "https://linkedin.com/company/mrdevs",
   },
-  { label: "TW", title: "Twitter / X", href: "https://x.com/mrdevs" },
+  { label: "tw", title: "Twitter / X", href: "https://x.com/mrdevs" },
 ];
 
 export default function Footer() {
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      const navHeight = 80;
+      const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navHeight;
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
-    <footer className="border-t border-white/5 py-12">
-      <div className="max-w-6xl mx-auto px-6">
+    <footer className="border-t border-[rgba(133,183,235,0.06)] py-12 bg-[#0a0f1a] font-sans">
+      <div className="max-w-4xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10 mb-10">
           {/* Brand */}
           <div>
-            <a href="/" className="flex items-center gap-2.5 mb-3">
-              <div className="w-7 h-7 bg-[#00D4FF] flex items-center justify-center rounded-[3px]">
-                <span className="font-syne font-black text-black text-xs leading-none">
-                  M
-                </span>
-              </div>
-              <span className="font-syne font-bold text-white tracking-tight text-[15px]">
-                MrDevs
-              </span>
+            <a
+              href="#hero"
+              onClick={(e) => handleScrollTo(e, "#hero")}
+              className="flex items-center gap-0.5 font-sans font-medium text-base tracking-tight select-none mb-3"
+            >
+              <span className="text-[#f1efe8]">mr</span>
+              <span className="text-[#378ADD]">devs</span>
             </a>
-            <p className="font-manrope text-[#333] text-xs max-w-[240px] leading-relaxed">
-              Premium digital agency building websites, apps &amp; software for
-              ambitious businesses.
+            <p className="text-[#888780] text-xs max-w-[280px] leading-relaxed">
+              Your trusted dev team — building digital solutions for local businesses and beyond.
             </p>
           </div>
 
           {/* Nav links */}
-          <nav className="flex gap-8">
+          <nav className="flex flex-wrap gap-x-8 gap-y-2">
             {NAV_LINKS.map(({ label, href }) => (
               <a
                 key={label}
                 href={href}
-                className="font-manrope text-sm text-[#444] hover:text-white transition-colors duration-200"
+                onClick={(e) => handleScrollTo(e, href)}
+                className="text-xs text-[#888780] hover:text-[#378ADD] transition-colors duration-200"
               >
-                {label}
+                {label.toLowerCase()}
               </a>
             ))}
           </nav>
 
           {/* Socials */}
-          <div className="flex gap-2">
+          <div className="flex gap-2.5">
             {SOCIALS.map(({ label, title, href }) => (
               <a
                 key={label}
@@ -59,9 +74,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={title}
-                className="w-8 h-8 border border-white/7 rounded-[4px] flex items-center justify-center text-[#3a3a3a] hover:text-white hover:border-white/15 transition-all duration-200"
+                className="w-7 h-7 border border-[rgba(133,183,235,0.1)] rounded flex items-center justify-center text-[#888780] hover:text-[#378ADD] hover:border-[#378ADD]/30 transition-all duration-200"
               >
-                <span className="font-syne font-bold text-[10px] tracking-tight">
+                <span className="font-sans font-medium text-[10px] tracking-tight uppercase">
                   {label}
                 </span>
               </a>
@@ -70,11 +85,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-6 border-t border-white/5">
-          <p className="font-manrope text-[#2e2e2e] text-xs">
-            © {new Date().getFullYear()} MrDevs. All rights reserved.
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-[rgba(133,183,235,0.06)]">
+          <p className="text-[#5F5E5A] text-[11px]">
+            © {new Date().getFullYear()} mrdevs. all rights reserved.
           </p>
-          <p className="font-manrope text-[#2e2e2e] text-xs tracking-wide">
+          <p className="text-[#5F5E5A] text-[11px] tracking-wide select-all">
             mrdevs.dev
           </p>
         </div>

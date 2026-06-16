@@ -1,61 +1,54 @@
 import type { Metadata } from "next";
-import { Syne, Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-syne",
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+  weight: ["400", "500"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "MrDevs — Premium Digital Agency | Web & App Development",
+    default: "MrDevs — Premium digital agency | Web & app development",
     template: "%s | MrDevs"
   },
   description:
-    "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software solutions for ambitious businesses worldwide. Specialized in Next.js, React, React Native, and Node.js.",
+    "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
   keywords: [
-    "MrDevs",
-    "Digital Agency",
-    "Web Development",
-    "Mobile App Development",
-    "Custom Software",
-    "Next.js Agency",
-    "React Native Developers",
-    "UI/UX Design Pakistan",
-    "Software Agency Lahore",
-    "E-commerce Development"
+    "mrdevs",
+    "digital agency",
+    "web development",
+    "mobile app development",
+    "custom software",
+    "next.js agency",
+    "react native developers",
+    "ui/ux design",
+    "software systems",
+    "e-commerce development"
   ],
-  authors: [{ name: "MrDevs", url: "https://mrdevs.dev" }],
-  creator: "MrDevs",
-  publisher: "MrDevs",
+  authors: [{ name: "mrdevs", url: "https://mrdevs.dev" }],
+  creator: "mrdevs",
+  publisher: "mrdevs",
   metadataBase: new URL("https://mrdevs.dev"),
   alternates: {
     canonical: "https://mrdevs.dev",
   },
   openGraph: {
-    title: "MrDevs — Premium Digital Agency | Web & App Development",
+    title: "MrDevs — Premium digital agency | Web & app development",
     description:
-      "We craft premium websites, mobile apps, and custom software for ambitious businesses. Specialized in Next.js, React, React Native, and Node.js.",
+      "We craft premium websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
     url: "https://mrdevs.dev",
-    siteName: "MrDevs",
+    siteName: "mrdevs",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "MrDevs — Premium Digital Agency | Web & App Development",
+    title: "MrDevs — Premium digital agency | Web & app development",
     description:
-      "We craft premium websites, mobile apps, and custom software for ambitious businesses.",
+      "We craft premium websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
     creator: "@mrdevs",
   },
   robots: {
@@ -77,8 +70,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${syne.variable} ${manrope.variable}`}>
-      <body className="bg-[#070707] text-[#F5F5F5] antialiased font-manrope overflow-x-hidden">
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <body className="bg-[#0a0f1a] text-[#f1efe8] antialiased font-sans overflow-x-hidden">
         {children}
       </body>
     </html>

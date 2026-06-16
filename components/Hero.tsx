@@ -1,129 +1,71 @@
-const STATS = [
-  { value: "50+", label: "Projects Delivered" },
-  { value: "30+", label: "Happy Clients" },
-  { value: "3+", label: "Years of Excellence" },
-];
+"use client";
 
 export default function Hero() {
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      const navHeight = 80;
+      const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navHeight;
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Subtle grid overlay */}
-      <div className="absolute inset-0 grid-pattern pointer-events-none" />
-
-      {/* Top radial glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full bg-[#00D4FF] opacity-[0.04] blur-[160px] pointer-events-none" />
-
-      {/* Bottom-right accent */}
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-[#0044FF] opacity-[0.04] blur-[120px] pointer-events-none" />
-
-      <div className="relative max-w-6xl mx-auto px-6 pt-36 pb-24 w-full">
-        {/* Availability badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 border border-white/8 rounded-full bg-white/[0.03] backdrop-blur-sm mb-10">
+    <section
+      id="hero"
+      className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden pt-24 font-sans bg-[#0a0f1a] text-center"
+    >
+      <div className="relative max-w-2xl mx-auto px-6 py-16 flex flex-col items-center gap-8">
+        {/* Availability Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(93,202,165,0.1)] border border-[rgba(93,202,165,0.15)] shadow-sm">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4FF] opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
+            <span className="absolute inline-flex h-full w-full rounded-full bg-[#5DCAA5] opacity-75 animate-ping-slow" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5DCAA5] animate-pulse-slow" />
           </span>
-          <span className="font-manrope text-[11px] font-medium text-[#888] tracking-widest uppercase">
+          <span className="text-[11px] font-medium text-[#5DCAA5] tracking-[0.08em] uppercase">
             Available for new projects
           </span>
         </div>
 
-        {/* Main headline */}
-        <h1 className="font-syne font-bold text-[clamp(2.6rem,6.5vw,5.5rem)] leading-[1.02] tracking-tight mb-6 max-w-4xl">
-          We Build Digital{" "}
-          <span
-            style={{
-              background: "linear-gradient(135deg, #00D4FF 0%, #0066FF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Products
-          </span>
-          <br />
-          That Drive{" "}
-          <span className="relative inline-block">
-            Results
-            {/* Underline accent */}
-            <svg
-              className="absolute -bottom-1 left-0 w-full"
-              viewBox="0 0 100 8"
-              preserveAspectRatio="none"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 6 Q25 2 50 5 Q75 8 100 4"
-                stroke="#00D4FF"
-                strokeWidth="1.5"
-                strokeOpacity="0.45"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
-          .
+        {/* Main Headline */}
+        <h1 className="text-3xl md:text-5xl font-medium text-[#f1efe8] leading-[1.15] tracking-tight max-w-xl">
+          Your business,{" "}
+          <span className="text-[#378ADD]">rebuilt to close more sales.</span>
         </h1>
 
-        {/* Subtext */}
-        <p className="font-manrope text-[#666] text-lg md:text-xl leading-relaxed max-w-lg mb-10">
-          MrDevs is a full-service digital agency building premium websites,
-          software, and mobile apps — crafted with modern tech for businesses
-          that mean business.
+        {/* Subhead */}
+        <p className="text-[15px] text-[#888780] max-w-[480px] leading-relaxed">
+          One agency. Web, app, and software systems engineered around one outcome — your revenue.
         </p>
 
-        {/* CTA buttons */}
-        <div className="flex flex-wrap gap-3 mb-24">
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-2">
           <a
             href="#contact"
-            className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-[#00D4FF] text-black font-manrope font-semibold text-sm rounded-[3px] hover:bg-white transition-all duration-200"
+            onClick={(e) => handleScrollTo(e, "contact")}
+            className="inline-flex items-center justify-center px-6 py-3 bg-[#378ADD] text-[#042C53] font-medium text-sm rounded shadow hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200"
           >
-            Start a Project
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 14 14"
-              fill="none"
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
-            >
-              <path
-                d="M1 7h12M7 1l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            Start a project
           </a>
           <a
-            href="#services"
-            className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/10 text-[#F5F5F5] font-manrope font-medium text-sm rounded-[3px] hover:border-[#00D4FF]/40 hover:bg-[#00D4FF]/5 transition-all duration-200"
+            href="#work"
+            onClick={(e) => handleScrollTo(e, "work")}
+            className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-[rgba(133,183,235,0.3)] text-[#f1efe8] font-medium text-sm rounded hover:border-[rgba(133,183,235,0.5)] hover:bg-[#378ADD]/5 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200"
           >
-            Our Services
+            See the work
           </a>
         </div>
 
-        {/* Stats */}
-        <div className="flex flex-wrap gap-10 sm:gap-16 pt-8 border-t border-white/5">
-          {STATS.map(({ value, label }) => (
-            <div key={label} className="flex flex-col gap-1">
-              <span className="font-syne font-bold text-[2rem] text-white leading-none">
-                {value}
-              </span>
-              <span className="font-manrope text-[11px] text-[#555] tracking-wider uppercase mt-1">
-                {label}
-              </span>
-            </div>
-          ))}
+        {/* Scroll Hint */}
+        <div className="mt-8 flex flex-col items-center gap-1 select-none pointer-events-none">
+          <span className="text-[11px] text-[#5F5E5A] tracking-[0.15em] uppercase font-medium">
+            scroll to feel the build ↓
+          </span>
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-25 pointer-events-none">
-        <span className="font-manrope text-[10px] text-[#666] tracking-[0.2em] uppercase">
-          Scroll
-        </span>
-        <div className="w-px h-8 bg-gradient-to-b from-[#666] to-transparent" />
       </div>
     </section>
   );

@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --accent: #00d4ff;
-  --bg: #070707;
-  --surface: #0d0d0d;
-  --border: rgba(255, 255, 255, 0.07);
-  --text-primary: #f5f5f5;
-  --text-secondary: #666666;
+  --accent: #378ADD;
+  --teal: #5DCAA5;
+  --bg: #0a0f1a;
+  --text-primary: #f1efe8;
+  --text-muted: #888780;
+  --text-muted-dark: #5F5E5A;
 }
 
 * {
@@ -19,49 +19,76 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg);
 }
 
 body {
   background: var(--bg);
   color: var(--text-primary);
-  font-family: var(--font-manrope), sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a1a1a;
+  background: #1b263b;
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
 
-/* Subtle grid overlay */
-.grid-pattern {
-  background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.025) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 72px 72px;
-}
-
 /* Selection */
 ::selection {
-  background: rgba(0, 212, 255, 0.2);
-  color: #fff;
+  background: rgba(55, 138, 221, 0.2);
+  color: #f1efe8;
 }
 
-/* Form element resets */
+/* Section divider gradient line */
+.section-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(133, 183, 235, 0.25) 50%,
+    transparent
+  );
+}
+
+/* Scroll reveal classes */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1), transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  * {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* Form resets */
 input,
 textarea,
 select {
@@ -71,6 +98,7 @@ select {
 }
 
 select option {
-  background: #0d0d0d;
-  color: #f5f5f5;
+  background: #0c1424;
+  color: #f1efe8;
 }
+

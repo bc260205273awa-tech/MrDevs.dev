@@ -7,6 +7,7 @@ interface Service {
   icon: LucideIcon;
   title: string;
   description: string;
+  href: string;
   isPrimary?: boolean;
 }
 
@@ -15,41 +16,48 @@ const SERVICES: Service[] = [
     icon: Code2,
     title: "Web development",
     description: "Fast, SEO-optimized, and premium websites built with Next.js and Tailwind CSS.",
+    href: "/services/web-development",
     isPrimary: true,
   },
   {
     icon: Smartphone,
     title: "App development",
     description: "Beautiful iOS and Android apps powered by React Native and Expo.",
+    href: "/services/app-development",
     isPrimary: true,
   },
   {
     icon: Shield,
     title: "Hospital & software systems",
     description: "Custom clinic, hospital, and enterprise software systems designed for scale.",
+    href: "/services/hospital-software-systems",
   },
   {
     icon: Zap,
     title: "WhatsApp & automation",
     description: "Automate customer support and notifications with custom WhatsApp API integrations.",
+    href: "/services/whatsapp-automation",
   },
   {
     icon: MapPin,
     title: "Google Maps optimization",
     description: "Improve your local search rankings and drive foot traffic to your business.",
+    href: "/services/maps-optimization",
   },
   {
     icon: Palette,
     title: "Design & branding",
     description: "Premium identity design and visual interfaces built around your company values.",
+    href: "/services/design-branding",
   },
 ];
 
 function ServiceCard({ service }: { service: Service }) {
   const Icon = service.icon;
   return (
-    <div
-      className={`group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] hover:-translate-y-1 active:scale-[0.97] transition-all duration-200 cursor-default flex flex-col justify-between ${
+    <a
+      href={service.href}
+      className={`group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] hover:-translate-y-1 active:scale-[0.97] transition-all duration-200 cursor-pointer flex flex-col justify-between ${
         service.isPrimary ? "md:col-span-1 border-[rgba(133,183,235,0.22)]" : ""
       }`}
     >
@@ -72,7 +80,7 @@ function ServiceCard({ service }: { service: Service }) {
           {service.description}
         </p>
       </div>
-    </div>
+    </a>
   );
 }
 

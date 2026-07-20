@@ -33,13 +33,13 @@ export default function Hero() {
 
         {/* Main Headline */}
         <h1 className="text-3xl md:text-5xl font-medium text-[#f1efe8] leading-[1.15] tracking-tight max-w-xl">
-          Your business,{" "}
-          <span className="text-[#378ADD]">rebuilt to close more sales.</span>
+          Everything your business needs to grow —{" "}
+          <span className="text-[#378ADD]">under one roof.</span>
         </h1>
 
         {/* Subhead */}
         <p className="text-[15px] text-[#888780] max-w-[480px] leading-relaxed">
-          One agency. Web, app, and software systems engineered around one outcome — your revenue.
+          A technical partner that designs and engineers high-converting web systems, mobile apps, and automated workflows built directly to drive your revenue.
         </p>
 
         {/* CTA Buttons */}
@@ -49,7 +49,7 @@ export default function Hero() {
             onClick={(e) => handleScrollTo(e, "contact")}
             className="inline-flex items-center justify-center px-6 py-3 bg-[#378ADD] text-[#042C53] font-medium text-sm rounded shadow hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200"
           >
-            Start a project
+            Book a Free Strategy Call
           </a>
           <a
             href="#work"

@@ -13,10 +13,10 @@ interface FounderProps {
 }
 
 export default function Founder({
-  name = "Hammad Mirza",
+  name = "Mubeen Ahmad",
   role = "Founder & Lead Developer",
   story = "I started MrDevs to build software with total alignment and direct developer contact. When you hire me, there are no account managers, translation delays, or outsourced contractors. Every line of code, database index, and user interface element is written directly by me.",
-  imageUrl
+  imageUrl = "/founder.webp"
 }: FounderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);

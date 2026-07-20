@@ -13,12 +13,12 @@ export default function Work() {
       <div className="max-w-4xl mx-auto px-6 flex flex-col items-center">
         
         {/* Section Label */}
-        <span className="text-[10px] font-medium text-[#5DCAA5] tracking-[0.15em] uppercase mb-3 select-none scroll-reveal opacity-0 translate-y-3 transition-all">
+        <span className="text-[10px] font-medium text-[#5DCAA5] tracking-[0.15em] uppercase mb-3 select-none scroll-reveal">
           Proof, not promises
         </span>
 
         {/* Headline */}
-        <h2 className="text-2xl md:text-3xl font-medium text-[#f1efe8] mb-12 text-center scroll-reveal opacity-0 translate-y-3 transition-all">
+        <h2 className="text-2xl md:text-3xl font-medium text-[#f1efe8] mb-12 text-center scroll-reveal">
           Featured case study
         </h2>
 
@@ -27,7 +27,7 @@ export default function Work() {
           href="https://www.khanhub.com.pk/"
           target="_blank"
           rel="noopener noreferrer"
-          className="scroll-reveal opacity-0 translate-y-3 transition-all duration-300 group block w-full border border-[rgba(133,183,235,0.15)] rounded-xl overflow-hidden bg-[#0c1424] cursor-pointer hover:border-[rgba(133,183,235,0.3)] hover:scale-[0.98] active:scale-[0.97] shadow-2xl"
+          className="scroll-reveal group block w-full border border-[rgba(133,183,235,0.15)] rounded-xl overflow-hidden bg-[#0c1424] cursor-pointer hover:border-[rgba(133,183,235,0.3)] hover:scale-[0.98] active:scale-[0.97] shadow-2xl"
         >
           {/* Browser Chrome Top Bar */}
           <div className="flex items-center justify-between px-4 py-3 bg-[#000000] border-b border-[rgba(133,183,235,0.08)]">
@@ -104,7 +104,7 @@ export default function Work() {
         </a>
 
         {/* Caption */}
-        <p className="scroll-reveal opacity-0 translate-y-3 transition-all mt-6 text-[12px] text-[#888780] leading-relaxed text-center max-w-[360px]" style={{ transitionDelay: "150ms" }}>
+        <p className="scroll-reveal mt-6 text-[12px] text-[#888780] leading-relaxed text-center max-w-[360px]" style={{ transitionDelay: "150ms" }}>
           Built solo, end-to-end, by the same engineer you&apos;d be working with.
         </p>
 

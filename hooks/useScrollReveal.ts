@@ -10,8 +10,7 @@ export function useScrollReveal(containerRef: RefObject<HTMLElement | null>, thr
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("opacity-100", "translate-y-0");
-            entry.target.classList.remove("opacity-0", "translate-y-3");
+            entry.target.classList.add("revealed");
             observer.unobserve(entry.target);
           }
         });

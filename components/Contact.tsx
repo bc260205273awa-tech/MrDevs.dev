@@ -60,12 +60,12 @@ export default function Contact() {
       <div className="max-w-md mx-auto px-6 flex flex-col items-center">
         
         {/* Section Label */}
-        <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none scroll-reveal opacity-0 translate-y-3 transition-all">
+        <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none scroll-reveal">
           Contact
         </span>
 
         {/* Headline */}
-        <h2 className="text-[17px] font-medium text-[#f1efe8] mb-6 text-center scroll-reveal opacity-0 translate-y-3 transition-all" style={{ transitionDelay: "50ms" }}>
+        <h2 className="text-[17px] font-medium text-[#f1efe8] mb-6 text-center scroll-reveal" style={{ transitionDelay: "50ms" }}>
           Let&apos;s build yours next.
         </h2>
 
@@ -74,7 +74,7 @@ export default function Contact() {
           href="https://wa.me/923218492868"
           target="_blank"
           rel="noopener noreferrer"
-          className="scroll-reveal opacity-0 translate-y-3 transition-all w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-[#378ADD] text-[#042C53] font-medium text-xs rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow mb-6 text-center select-none"
+          className="scroll-reveal w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-[#378ADD] text-[#042C53] font-medium text-xs rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow mb-6 text-center select-none"
           style={{ transitionDelay: "100ms" }}
         >
           <MessageSquare size={14} />
@@ -82,7 +82,7 @@ export default function Contact() {
         </a>
 
         {/* Separator */}
-        <div className="scroll-reveal opacity-0 translate-y-3 transition-all w-full flex items-center justify-center gap-3 mb-6 select-none" style={{ transitionDelay: "150ms" }}>
+        <div className="scroll-reveal w-full flex items-center justify-center gap-3 mb-6 select-none" style={{ transitionDelay: "150ms" }}>
           <div className="h-px flex-1 bg-[rgba(133,183,235,0.08)]" />
           <span className="text-[10px] text-[#5F5E5A] tracking-wider uppercase font-medium">
             or send an email
@@ -91,7 +91,7 @@ export default function Contact() {
         </div>
 
         {/* Secondary Form (Low Visual Weight) */}
-        <div className="scroll-reveal opacity-0 translate-y-3 transition-all w-full p-6 border border-[rgba(133,183,235,0.08)] rounded-xl bg-[#0f1729]/30 backdrop-blur-sm" style={{ transitionDelay: "200ms" }}>
+        <div className="scroll-reveal w-full p-6 border border-[rgba(133,183,235,0.08)] rounded-xl bg-[#0f1729]/30 backdrop-blur-sm" style={{ transitionDelay: "200ms" }}>
           {submitted ? (
             <div className="flex flex-col items-center text-center py-6 gap-3 select-none">
               <div className="w-10 h-10 rounded-full border border-[#5DCAA5]/30 bg-[#5DCAA5]/5 flex items-center justify-center mb-1">

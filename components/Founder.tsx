@@ -32,7 +32,7 @@ export default function Founder({
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal opacity-0 translate-y-3 transition-all">
+        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
           <span className="text-[10px] font-medium text-[#5DCAA5] tracking-[0.15em] uppercase mb-3 select-none">
             Trust & Craftsmanship
           </span>
@@ -42,7 +42,7 @@ export default function Founder({
         </div>
 
         {/* Founder Card */}
-        <div className="scroll-reveal opacity-0 translate-y-3 transition-all duration-300 relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-8 md:p-12 overflow-hidden shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div className="scroll-reveal relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-8 md:p-12 overflow-hidden shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-12">
           {/* Accent glow */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#378ADD]/5 rounded-full blur-3xl pointer-events-none" />
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const STEPS = [
   {
@@ -37,38 +38,14 @@ const STEPS = [
 
 export default function Process() {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("opacity-100", "translate-y-0");
-            entry.target.classList.remove("opacity-0", "translate-y-4");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.05,
-        rootMargin: "0px 0px -50px 0px",
-      }
-    );
-
-    const elements = containerRef.current?.querySelectorAll(".scroll-reveal");
-    elements?.forEach((el) => observer.observe(el));
-
-    return () => {
-      elements?.forEach((el) => observer.unobserve(el));
-    };
-  }, []);
+  useScrollReveal(containerRef);
 
   return (
-    <section id="process" className="py-20 bg-[#0a0f1a] font-sans overflow-hidden">
-      <div ref={containerRef} className="max-w-4xl mx-auto px-6">
+    <section id="process" ref={containerRef} className="py-20 bg-[#0a0f1a] font-sans overflow-hidden">
+      <div className="max-w-4xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-16 text-center">
+        <div className="flex flex-col items-center mb-16 text-center scroll-reveal">
           <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none">
             Our workflow
           </span>
@@ -91,7 +68,7 @@ export default function Process() {
             {STEPS.map((step, idx) => (
               <div
                 key={step.num}
-                className="scroll-reveal opacity-0 translate-y-4 transition-all duration-500 ease-out flex flex-row md:flex-col gap-4 md:gap-3 p-4 md:p-3 md:bg-transparent bg-[#0f1729]/30 border border-transparent md:border-transparent border-[rgba(133,183,235,0.06)] rounded-xl relative"
+                className="scroll-reveal flex flex-row md:flex-col gap-4 md:gap-3 p-4 md:p-3 md:bg-transparent bg-[#0f1729]/30 border border-transparent md:border-transparent border-[rgba(133,183,235,0.06)] rounded-xl relative"
                 style={{ transitionDelay: `${idx * 100}ms` }}
               >
                 {/* Node Indicator */}

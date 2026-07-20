@@ -40,7 +40,7 @@ export default function WhyMrDevs() {
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal opacity-0 translate-y-3 transition-all">
+        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
           <span className="text-[10px] font-medium text-[#5DCAA5] tracking-[0.15em] uppercase mb-3 select-none">
             Why Us
           </span>
@@ -56,7 +56,7 @@ export default function WhyMrDevs() {
             return (
               <div
                 key={index}
-                className="scroll-reveal opacity-0 translate-y-3 transition-all group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] hover:-translate-y-1 duration-200 flex flex-col gap-4"
+                className="scroll-reveal group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] hover:-translate-y-1 duration-200 flex flex-col gap-4"
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {/* Icon */}

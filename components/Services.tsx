@@ -81,7 +81,7 @@ export default function Services() {
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal opacity-0 translate-y-3 transition-all">
+        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
           <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none">
             3-Step Growth Plan
           </span>
@@ -95,7 +95,7 @@ export default function Services() {
           {STEPS.map((step, idx) => (
             <div
               key={step.num}
-              className="scroll-reveal opacity-0 translate-y-3 transition-all group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-6 hover:border-[rgba(133,183,235,0.3)] duration-200 flex flex-col justify-between"
+              className="scroll-reveal group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-6 hover:border-[rgba(133,183,235,0.3)] duration-200 flex flex-col justify-between"
               style={{ transitionDelay: `${idx * 100}ms` }}
             >
               <div>

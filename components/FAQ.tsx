@@ -42,7 +42,7 @@ export default function FAQ() {
       <div className="max-w-2xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal opacity-0 translate-y-3 transition-all">
+        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
           <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none">
             FAQ
           </span>
@@ -52,7 +52,7 @@ export default function FAQ() {
         </div>
 
         {/* FAQ List */}
-        <div className="flex flex-col gap-3 scroll-reveal opacity-0 translate-y-3 transition-all duration-300" style={{ transitionDelay: "100ms" }}>
+        <div className="flex flex-col gap-3 scroll-reveal" style={{ transitionDelay: "100ms" }}>
           {FAQS.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (

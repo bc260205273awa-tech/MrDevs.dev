@@ -12,14 +12,24 @@ const config: Config = {
         sans: ["var(--font-inter)", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
       },
       colors: {
-        brand: {
-          bg: "#0a0f1a",
-          primary: "#f1efe8",
-          muted: "#888780",
-          "muted-dark": "#5F5E5A",
-          accent: "#378ADD",
-          teal: "#5DCAA5",
+        // [CHANGED] Replace old brand colors with new tokens mapped to CSS variables
+        bg: {
+          main: "var(--bg-main)",
+          deep: "var(--bg-deep)",
         },
+        accent: {
+          primary: "var(--accent-primary)",
+          cyan: "var(--accent-cyan)",
+        },
+        text: {
+          heading: "var(--text-heading)",
+          body: "var(--text-body)",
+        }
+      },
+      // [NEW] Box shadows for the glow effects
+      boxShadow: {
+        glow: "var(--shadow-glow-primary)",
+        'glow-cyan': "var(--shadow-glow-cyan)",
       },
       keyframes: {
         marquee: {

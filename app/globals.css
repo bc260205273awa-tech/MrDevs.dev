@@ -3,12 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --accent: #378ADD;
-  --teal: #5DCAA5;
-  --bg: #0a0f1a;
-  --text-primary: #f1efe8;
-  --text-muted: #888780;
-  --text-muted-dark: #5F5E5A;
+  /* [NEW] Main background color */
+  --bg-main: #0A0F1C;
+  /* [NEW] Deep background color for sections */
+  --bg-deep: #050B14;
+  /* [NEW] Electric blue primary accent */
+  --accent-primary: #2FA8FF;
+  /* [NEW] Cyan glow accent */
+  --accent-cyan: #00D4FF;
+  /* [NEW] Heading text color */
+  --text-heading: #FFFFFF;
+  /* [NEW] Body text color */
+  --text-body: #8B94A8;
+  /* [NEW] Primary box shadow glow effect */
+  --shadow-glow-primary: 0 0 15px rgba(47, 168, 255, 0.3), 0 0 4px rgba(47, 168, 255, 0.4);
+  /* [NEW] Cyan box shadow glow effect */
+  --shadow-glow-cyan: 0 0 15px rgba(0, 212, 255, 0.3), 0 0 4px rgba(0, 212, 255, 0.4);
 }
 
 * {
@@ -19,15 +29,23 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: var(--bg);
+  /* [CHANGED] Use new bg-main variable */
+  background-color: var(--bg-main);
 }
 
 body {
-  background: var(--bg);
-  color: var(--text-primary);
+  /* [CHANGED] Use new bg-main variable */
+  background: var(--bg-main);
+  /* [CHANGED] Use new text-body variable */
+  color: var(--text-body);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* [NEW] Heading color inheritance */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
 }
 
 /* Custom scrollbar */
@@ -35,20 +53,24 @@ body {
   width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  /* [CHANGED] Use new bg-main variable */
+  background: var(--bg-main);
 }
 ::-webkit-scrollbar-thumb {
   background: #1b263b;
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  /* [CHANGED] Use new accent-primary variable */
+  background: var(--accent-primary);
 }
 
 /* Selection */
 ::selection {
-  background: rgba(55, 138, 221, 0.2);
-  color: #f1efe8;
+  /* [CHANGED] Updated selection background */
+  background: rgba(47, 168, 255, 0.2);
+  /* [CHANGED] Updated selection text */
+  color: var(--text-heading);
 }
 
 /* Section divider gradient line */
@@ -103,7 +125,9 @@ select {
 }
 
 select option {
-  background: #0c1424;
-  color: #f1efe8;
+  /* [CHANGED] Use new bg-deep variable */
+  background: var(--bg-deep);
+  /* [CHANGED] Use new text-body variable */
+  color: var(--text-body);
 }
 

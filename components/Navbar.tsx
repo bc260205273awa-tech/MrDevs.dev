@@ -7,6 +7,10 @@ import Image from "next/image";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  // [NEW] Track whether navbar should be hidden
+  const [hidden, setHidden] = useState(false);
+  // [NEW] Track previous scroll position to determine direction
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileAccordionOpen, setMobileAccordionOpen] = useState(false);
@@ -17,12 +21,22 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
+      // [CHANGED] Get current scroll position
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 80);
+
+      // [NEW] Hide on scroll down past 200px, reveal on scroll up
+      if (currentScrollY > lastScrollY && currentScrollY > 200) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+      setLastScrollY(currentScrollY);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -87,12 +101,20 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 font-sans ${
-        scrolled
-          ? "py-4 bg-[#0a0f1a]/85 backdrop-blur-[12px] border-b border-[rgba(133,183,235,0.12)] shadow-lg"
-          : "py-6 bg-transparent border-b border-transparent"
+      // [CHANGED] Added translate transform based on hidden state, increased duration
+      className={`fixed inset-x-0 top-0 z-50 transition-transform duration-500 font-sans ${
+        hidden ? "-translate-y-full" : "translate-y-0"
       }`}
     >
+      <div 
+        // [NEW] Inner div for the background/blur transition to prevent text glitching on transform
+        className={`w-full transition-all duration-300 ${
+          scrolled
+            // [CHANGED] Heavier glassmorphism (backdrop-blur-xl bg-bg-main/70) and subtle cyan glow border
+            ? "py-4 bg-bg-main/70 backdrop-blur-xl border-b border-accent-cyan/20 shadow-lg"
+            : "py-6 bg-transparent border-b border-transparent"
+        }`}
+      >
       <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
         {/* Logo Image */}
         <a
@@ -381,6 +403,7 @@ export default function Navbar() {
             let&apos;s talk
           </a>
         </div>
+      </div>
       </div>
     </header>
   );

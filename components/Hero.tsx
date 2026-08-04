@@ -1,6 +1,58 @@
 "use client";
 
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 export default function Hero() {
+  const containerRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subtextRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    // 1. Initial reveal animation for headline, subtext, and CTA
+    const tl = gsap.timeline();
+    
+    tl.from(headlineRef.current, {
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      delay: 0.2
+    })
+    .from(subtextRef.current, {
+      y: 20,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    }, "-=0.6")
+    .from(ctaRef.current, {
+      y: 20,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    }, "-=0.6");
+
+    // 2. Scroll-triggered Pinning
+    // [NEW] Pin the hero briefly on scroll before releasing into the next section
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: 'top top',
+      end: '+=1000', // Pin for 1000px of scrolling
+      pin: true,
+      anticipatePin: 1,
+    });
+
+  }, { scope: containerRef });
+
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
     const targetElement = document.getElementById(targetId);
@@ -17,55 +69,73 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden pt-24 font-sans bg-[#0a0f1a] text-center"
+      ref={containerRef}
+      // [CHANGED] Updated to use locked design tokens: bg-main
+      className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main text-center"
     >
-      <div className="relative max-w-2xl mx-auto px-6 py-16 flex flex-col items-center gap-8">
-        {/* Availability Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(93,202,165,0.1)] border border-[rgba(93,202,165,0.15)] shadow-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-[#5DCAA5] opacity-75 animate-ping-slow" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5DCAA5] animate-pulse-slow" />
+      {/* [NEW] Placeholder area for the frame-sequence/video background */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-40 border-b border-accent-primary/20">
+        <div className="border border-dashed border-accent-primary/40 bg-bg-deep px-8 py-12 rounded-lg flex flex-col items-center gap-2">
+          <span className="text-accent-primary text-sm tracking-widest uppercase font-bold">
+            [ Cinematic Scroll Background ]
           </span>
-          <span className="text-[11px] font-medium text-[#5DCAA5] tracking-[0.08em] uppercase">
-            Available for new projects
+          <span className="text-text-body text-xs">
+            Placeholder for frame-sequence or looping video
           </span>
         </div>
+      </div>
 
+      {/* Content Container */}
+      <div ref={contentRef} className="relative z-10 max-w-3xl mx-auto px-6 flex flex-col items-center gap-8 -mt-16">
+        
         {/* Main Headline */}
-        <h1 className="text-3xl md:text-5xl font-medium text-[#f1efe8] leading-[1.15] tracking-tight max-w-xl">
+        <h1 
+          ref={headlineRef}
+          // [CHANGED] Updated headline to use text-heading and accent-primary
+          className="text-4xl md:text-6xl font-bold text-text-heading leading-[1.15] tracking-tight max-w-2xl opacity-100"
+        >
           Everything your business needs to grow —{" "}
-          <span className="text-[#378ADD]">under one roof.</span>
+          <span className="text-accent-primary" style={{ textShadow: '0 0 15px rgba(47,168,255,0.4)' }}>
+            under one roof.
+          </span>
         </h1>
 
         {/* Subhead */}
-        <p className="text-[15px] text-[#888780] max-w-[480px] leading-relaxed">
+        <p 
+          ref={subtextRef}
+          // [CHANGED] Updated subtext to use text-body
+          className="text-[17px] text-text-body max-w-[540px] leading-relaxed opacity-100"
+        >
           A technical partner that designs and engineers high-converting web systems, mobile apps, and automated workflows built directly to drive your revenue.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-2">
+        <div ref={ctaRef} className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto mt-4 opacity-100">
           <a
             href="#contact"
             onClick={(e) => handleScrollTo(e, "contact")}
-            className="inline-flex items-center justify-center px-6 py-3 bg-[#378ADD] text-[#042C53] font-medium text-sm rounded shadow hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200"
+            // [CHANGED] "Let's talk" CTA with electric blue glow (shadow-glow)
+            className="inline-flex items-center justify-center px-8 py-3.5 bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded-md shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
           >
-            Book a Free Strategy Call
+            Let's Talk
           </a>
           <a
             href="#work"
             onClick={(e) => handleScrollTo(e, "work")}
-            className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-[rgba(133,183,235,0.3)] text-[#f1efe8] font-medium text-sm rounded hover:border-[rgba(133,183,235,0.5)] hover:bg-[#378ADD]/5 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200"
+            // [CHANGED] Secondary CTA matching the dark navy/electric blue theme
+            className="inline-flex items-center justify-center px-8 py-3.5 bg-transparent border border-accent-primary/30 text-text-heading font-medium text-[15px] rounded-md hover:border-accent-primary hover:bg-accent-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
           >
             See the work
           </a>
         </div>
-
-        {/* Scroll Hint */}
-        <div className="mt-8 flex flex-col items-center gap-1 select-none pointer-events-none">
-          <span className="text-[11px] text-[#5F5E5A] tracking-[0.15em] uppercase font-medium">
-            scroll to feel the build ↓
-          </span>
-        </div>
+      </div>
+      
+      {/* Scroll Hint */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 select-none pointer-events-none opacity-80 z-10">
+        <span className="text-[10px] text-accent-primary tracking-[0.2em] uppercase font-bold" style={{ textShadow: '0 0 10px rgba(47,168,255,0.5)' }}>
+          Scroll to explore
+        </span>
+        <div className="w-[1px] h-10 bg-gradient-to-b from-accent-primary to-transparent"></div>
       </div>
     </section>
   );

@@ -21,17 +21,20 @@ export default function CondensedCTA() {
 
           {/* Elevated Typography */}
           <div className="relative z-10 flex flex-col items-center gap-4">
+            {/* [CHANGED] Branded H3 mentioning MR Devs */}
             <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter">
-              Ready to move fast?
+              Ready to move fast with MR Devs?
             </h3>
+            {/* [CHANGED] Updated subtext for stronger branding */}
             <p className="text-sm md:text-lg text-text-body font-medium max-w-md mx-auto">
-              Skip the forms. Talk directly to the founder on WhatsApp.
+              Skip the forms. Connect directly with our founders on WhatsApp and start scaling your product today.
             </p>
           </div>
           
           {/* Premium CTA Button */}
           <a
-            href="https://wa.me/923218492868"
+            // [CHANGED] Updated to company number and added pre-filled text parameter
+            href="https://wa.me/923219565657?text=Hi%20MR%20Devs,%20I'd%20like%20to%20talk%20about%20a%20project."
             target="_blank"
             rel="noopener noreferrer"
             // [CHANGED] Elevated button with hover-only shine sweep

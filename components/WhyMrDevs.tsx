@@ -13,16 +13,23 @@ export default function WhyMrDevs() {
       icon: UserCheck,
       title: "Direct Founder Access",
       description: "Speak directly to the developer building your system. No account managers or sales representatives. You get direct access and 5x faster iteration cycles.",
+      // [NEW] Grid spanning rules for Bento layout
+      gridClass: "lg:col-span-2 lg:row-span-2 min-h-[400px] lg:min-h-[500px]",
+      iconSize: 140,
     },
     {
       icon: ShieldCheck,
       title: "Single-Point Accountability",
       description: "One person responsible for your design, databases, code, and deployment. No hand-offs, no communication gaps, and 100% project ownership.",
+      gridClass: "lg:col-span-1 lg:row-span-1 min-h-[300px]",
+      iconSize: 90,
     },
     {
       icon: BuiltAtScale,
       title: "Proven Operational Scale",
       description: "We build deep operational software, not template websites. Engineered KhanHub — a 16-department healthcare ERP running 24/7 for 50,000+ people.",
+      gridClass: "lg:col-span-1 lg:row-span-1 min-h-[300px]",
+      iconSize: 90,
     },
   ];
 
@@ -35,51 +42,63 @@ export default function WhyMrDevs() {
     <section
       id="why-us"
       ref={containerRef}
-      className="py-20 bg-[#0a0f1a] font-sans border-t border-[rgba(133,183,235,0.03)] overflow-hidden"
+      // [CHANGED] Use bg-main
+      className="py-24 md:py-32 bg-bg-main font-sans border-t border-accent-primary/5 overflow-hidden"
     >
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
-          <span className="text-[10px] font-medium text-[#5DCAA5] tracking-[0.15em] uppercase mb-3 select-none">
-            Why Us
-          </span>
-          <h2 className="text-2xl md:text-3xl font-medium text-[#f1efe8] tracking-tight max-w-lg leading-tight">
-            Why hire MrDevs over the other 10 agencies?
+        <div className="flex flex-col mb-16 scroll-reveal">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,0.8)]"></span>
+            <span className="text-[11px] font-bold text-accent-cyan tracking-[0.2em] uppercase select-none">
+              Why Us
+            </span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl leading-[1.05]">
+            Why hire MrDevs over the other{" "}
+            <span className="text-accent-primary" style={{ textShadow: '0 0 20px rgba(47,168,255,0.3)' }}>
+              10 agencies?
+            </span>
           </h2>
         </div>
 
-        {/* 3-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-6">
           {PILLARS.map((pillar, index) => {
             const Icon = pillar.icon;
             return (
               <div
                 key={index}
-                className="scroll-reveal group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] hover:-translate-y-1 duration-200 flex flex-col gap-4"
+                // [CHANGED] Glassmorphism card, editorial layout, inner top highlight
+                className={`scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 hover:border-white/10 hover:bg-white/10 transition-colors duration-500 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                {/* Icon */}
-                <div className="w-10 h-10 rounded-lg bg-[#378ADD]/10 flex items-center justify-center group-hover:bg-[#378ADD]/20 transition-colors duration-200">
-                  <Icon size={18} className="text-[#378ADD]" strokeWidth={1.5} />
+                {/* [CHANGED] Massive Watermark Icon */}
+                <div className="absolute top-8 right-8 text-accent-primary opacity-[0.07] group-hover:opacity-[0.15] group-hover:scale-110 transition-all duration-700 pointer-events-none">
+                  <Icon size={pillar.iconSize} strokeWidth={1} />
                 </div>
 
-                {/* Content */}
-                <div>
-                  <h3 className="font-sans font-medium text-[13px] text-[#f1efe8] mb-1.5">
+                {/* Content anchored to bottom */}
+                <div className="relative z-10 mt-auto max-w-md">
+                  <h3 className="font-sans font-semibold text-2xl lg:text-3xl text-text-heading mb-3 tracking-tight">
                     {pillar.title}
                   </h3>
-                  <p className="font-sans text-[#888780] text-xs leading-relaxed">
+                  <p className="font-sans text-text-body text-[15px] leading-relaxed">
                     {pillar.description}
                   </p>
                 </div>
+                
+                {/* Subtle bottom gradient glow on hover */}
+                <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-accent-primary/20 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
               </div>
             );
           })}
         </div>
 
         {/* Section Divider */}
-        <div className="section-divider mt-24" />
+        <div className="section-divider mt-32 opacity-50" />
       </div>
     </section>
   );

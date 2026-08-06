@@ -1,7 +1,16 @@
 "use client";
 
 import { useRef } from "react";
+// [NEW] Added GSAP imports for scroll-drawing animation
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+
+// [NEW] Register ScrollTrigger
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const STEPS = [
   {
@@ -38,7 +47,27 @@ const STEPS = [
 
 export default function Process() {
   const containerRef = useRef<HTMLDivElement>(null);
+  // [NEW] Ref for the inner gradient line to animate
+  const lineRef = useRef<HTMLDivElement>(null);
+  
   useScrollReveal(containerRef);
+
+  // [NEW] ScrollTrigger animation to draw the timeline spine downward
+  useGSAP(() => {
+    // Start with the line completely scaled up to 0 height
+    gsap.set(lineRef.current, { scaleY: 0 });
+
+    gsap.to(lineRef.current, {
+      scaleY: 1,
+      ease: "none",
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top 70%", // Starts drawing when section top is 70% down the viewport
+        end: "bottom 80%", // Finishes drawing near the bottom of the section
+        scrub: 1, // Ties progress smoothly to scroll position
+      },
+    });
+  }, { scope: containerRef }); // Automatic cleanup on unmount
 
   return (
     <section id="process" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
@@ -67,9 +96,12 @@ export default function Process() {
             <div className="absolute inset-0 bg-white/5" />
             {/* 
               Inner gradient line prepped for future GSAP scroll-draw animation.
-              Currently fully scaled (scale-y-100). When animating later, use scale-y-0 to scale-y-100.
+              [CHANGED] Added lineRef and changed scale-y-100 to scale-y-0 initially 
             */}
-            <div className="absolute top-0 w-full h-full bg-gradient-to-b from-accent-cyan via-accent-primary to-transparent origin-top scale-y-100" />
+            <div 
+              ref={lineRef} 
+              className="absolute top-0 w-full h-full bg-gradient-to-b from-accent-cyan via-accent-primary to-transparent origin-top scale-y-0" 
+            />
           </div>
 
           {/* Steps Loop */}

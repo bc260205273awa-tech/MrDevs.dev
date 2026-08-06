@@ -19,6 +19,8 @@ export default function Hero() {
 
   useGSAP(() => {
     // 1. Initial reveal animation for headline, subtext, and CTA
+    // The useGSAP hook automatically handles cleanup/revert for this timeline, 
+    // ensuring no stray animations are left behind during Strict Mode double-mounts.
     const tl = gsap.timeline();
     
     tl.from(headlineRef.current, {
@@ -41,15 +43,10 @@ export default function Hero() {
       ease: 'power3.out'
     }, "-=0.6");
 
-    // 2. Scroll-triggered Pinning
-    // [NEW] Pin the hero briefly on scroll before releasing into the next section
-    ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: 'top top',
-      end: '+=1000', // Pin for 1000px of scrolling
-      pin: true,
-      anticipatePin: 1,
-    });
+    // [CHANGED] Removed the ScrollTrigger.create() pin here.
+    // Pinning the root React node caused GSAP's pin-spacer to fight with React Strict Mode,
+    // resulting in duplicated DOM elements (overlapping text) and a frozen scroll state.
+    // We will reintroduce a pin on an *inner* wrapper when the cinematic background is built.
 
   }, { scope: containerRef });
 

@@ -22,79 +22,97 @@ export default function Founder({
   useScrollReveal(containerRef);
 
   const TRUST_BADGES = [
-    "Direct communication — no account managers",
-    "You work with the person who builds it",
-    "Solo-built systems, end-to-end"
+    "Direct communication",
+    "Solo-built systems",
+    "No outsourced contractors"
   ];
 
   return (
-    <section id="founder" ref={containerRef} className="py-20 bg-[#0a0f1a] font-sans border-t border-[rgba(133,183,235,0.03)] overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6">
+    <section id="founder" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
-          <span className="text-[10px] font-medium text-[#5DCAA5] tracking-[0.15em] uppercase mb-3 select-none">
-            Trust & Craftsmanship
-          </span>
-          <h2 className="text-2xl md:text-3xl font-medium text-[#f1efe8] tracking-tight">
+        <div className="flex flex-col items-center mb-16 md:mb-24 text-center scroll-reveal">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,0.8)]"></span>
+            <span className="text-[11px] font-bold text-accent-cyan tracking-[0.2em] uppercase select-none">
+              Trust & Craftsmanship
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl text-center leading-[1.05]">
             Direct Partnership, No Middlemen
           </h2>
         </div>
 
-        {/* Founder Card */}
-        <div className="scroll-reveal relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-8 md:p-12 overflow-hidden shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          {/* Accent glow */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#378ADD]/5 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Photo Placeholder */}
-          <div className="shrink-0 flex flex-col items-center gap-3">
+        {/* Editorial Glass Container */}
+        <div className="scroll-reveal relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
+          
+          {/* Left Side: Dramatic Vertical Portrait */}
+          <div className="w-full md:w-2/5 shrink-0 relative aspect-square md:aspect-auto md:min-h-[500px]">
             {imageUrl ? (
-              <div className="relative w-36 h-36 rounded-full overflow-hidden border border-[rgba(133,183,235,0.2)] bg-[#0a0f1a]">
-                <Image src={imageUrl} alt={name} fill className="object-cover" />
-              </div>
+              <Image 
+                src={imageUrl} 
+                alt={name} 
+                fill 
+                className="object-cover object-top md:object-center grayscale hover:grayscale-0 transition-all duration-700" 
+                sizes="(max-width: 768px) 100vw, 40vw"
+              />
             ) : (
-              <div className="w-36 h-36 rounded-full border border-dashed border-[rgba(133,183,235,0.3)] bg-[#0a0f1a] flex flex-col items-center justify-center p-4 text-center text-[10px] text-[#888780] gap-2">
-                <User size={24} className="text-[#378ADD]/65" />
-                <span>Founder Photo<br />(300x300px)</span>
+              <div className="w-full h-full bg-white/5 flex flex-col items-center justify-center text-[#888780] gap-4">
+                <User size={48} className="text-accent-cyan/50" />
+                <span className="text-xs uppercase tracking-widest">Portrait Slot</span>
               </div>
             )}
-            <div className="text-center">
-              <h3 className="font-medium text-sm text-[#f1efe8]">{name}</h3>
-              <p className="text-[10px] text-[#378ADD] font-mono mt-0.5">{role}</p>
-            </div>
+            
+            {/* Subtle inner shadow for depth against the image */}
+            <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.4)] pointer-events-none" />
           </div>
 
-          {/* Founder Bio / Story */}
-          <div className="flex-1 flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] font-medium text-[#5F5E5A] tracking-wider uppercase select-none">
-                Founder Story
-              </span>
-              <p className="text-xs text-[#888780] leading-relaxed italic">
-                &ldquo;{story}&rdquo;
-              </p>
+          {/* Right Side: Pull-Quote & Content */}
+          <div className="flex-1 flex flex-col justify-between p-8 md:p-12 lg:p-16 relative">
+            
+            {/* Ambient Glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col gap-6">
+              {/* Giant Stylized Quotation Mark */}
+              <div className="text-accent-cyan/20 text-8xl md:text-9xl font-serif absolute -top-8 -left-4 md:-top-12 md:-left-8 select-none pointer-events-none">
+                &ldquo;
+              </div>
+              
+              {/* Massive Pull Quote */}
+              <div className="relative z-10">
+                <p className="text-2xl md:text-3xl lg:text-[32px] font-medium text-white italic leading-relaxed tracking-tight">
+                  {story}
+                </p>
+              </div>
+
+              {/* Founder Bio Line */}
+              <div className="mt-4 md:mt-8 flex flex-col">
+                <h3 className="font-semibold text-lg text-text-heading">{name}</h3>
+                <p className="text-sm text-accent-cyan tracking-wide font-medium mt-1">{role}</p>
+              </div>
             </div>
 
-            {/* Trust Badges */}
-            <div className="flex flex-col gap-2 pt-4 border-t border-[rgba(133,183,235,0.06)]">
-              <span className="text-[10px] font-medium text-[#5F5E5A] tracking-wider uppercase select-none mb-1">
-                How We Operate:
-              </span>
-              <div className="flex flex-col gap-2">
+            {/* Horizontal Trust Badges Ribbon */}
+            <div className="relative z-10 mt-12 md:mt-24 pt-6 md:pt-8 border-t border-white/10">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
                 {TRUST_BADGES.map((badge, idx) => (
-                  <div key={idx} className="flex items-center gap-2.5">
-                    <CheckCircle2 size={12} className="text-[#5DCAA5]" />
-                    <span className="text-[11px] text-[#f1efe8]">{badge}</span>
+                  <div key={idx} className="flex items-center gap-3">
+                    <CheckCircle2 size={18} className="text-accent-cyan shrink-0" />
+                    <span className="text-[13px] md:text-sm text-text-body font-medium tracking-wide">
+                      {badge}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
 
         {/* Section Divider */}
-        <div className="section-divider mt-24" />
+        <div className="section-divider mt-32 opacity-50" />
       </div>
     </section>
   );

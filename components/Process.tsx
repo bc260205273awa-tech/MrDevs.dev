@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef } from "react";
-// [NEW] Added GSAP imports for scroll-drawing animation
+// [CHANGED] Standard GSAP imports maintained
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-// [NEW] Register ScrollTrigger
+// Register ScrollTrigger securely
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -47,33 +47,65 @@ const STEPS = [
 
 export default function Process() {
   const containerRef = useRef<HTMLDivElement>(null);
-  // [NEW] Ref for the inner gradient line to animate
-  const lineRef = useRef<HTMLDivElement>(null);
   
+  // Keep CSS reveal for the static header only
   useScrollReveal(containerRef);
 
-  // [NEW] ScrollTrigger animation to draw the timeline spine downward
+  // [CHANGED] Upgraded scroll animation using SVG path dash-offset and independent card triggers
   useGSAP(() => {
-    // Start with the line completely scaled up to 0 height
-    gsap.set(lineRef.current, { scaleY: 0 });
+    // 1. SVG Spine Drawing Animation (Shared logic for both Desktop and Mobile paths)
+    const paths = gsap.utils.toArray('.gsap-spine-path') as SVGPathElement[];
+    
+    paths.forEach((path) => {
+      // Get the exact mathematical length of the SVG path (whether curved or straight)
+      const length = path.getTotalLength();
+      
+      // Set initial state: stroke completely dashed out (invisible), opacity 0
+      gsap.set(path, { 
+        strokeDasharray: length, 
+        strokeDashoffset: length,
+        opacity: 0
+      });
 
-    gsap.to(lineRef.current, {
-      scaleY: 1,
-      ease: "none",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 70%", // Starts drawing when section top is 70% down the viewport
-        end: "bottom 80%", // Finishes drawing near the bottom of the section
-        scrub: 1, // Ties progress smoothly to scroll position
-      },
+      // Scrubbed timeline tied to the container's scroll position
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 70%", // Starts drawing when section is 70% down viewport
+          end: "bottom 60%", // Finishes drawing near bottom
+          scrub: 1, // Smooth scrub
+        }
+      });
+
+      // Fade opacity to 1 rapidly (first 10%), then continuously draw the stroke to 0 offset
+      tl.to(path, { opacity: 1, duration: 0.1, ease: "none" })
+        .to(path, { strokeDashoffset: 0, duration: 0.9, ease: "none" });
     });
-  }, { scope: containerRef }); // Automatic cleanup on unmount
+
+    // 2. Independent Card Reveals
+    // Decoupled from the line's scrub — each card triggers itself when it enters the viewport
+    const cards = gsap.utils.toArray('.gsap-step-card') as HTMLDivElement[];
+    
+    cards.forEach((card) => {
+      gsap.from(card, {
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: card,
+          start: "top 75%", // Card triggers when it hits 75% down viewport
+        }
+      });
+    });
+
+  }, { scope: containerRef }); // Auto cleanup on unmount
 
   return (
     <section id="process" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         
-        {/* Section Header */}
+        {/* Section Header (Still using simple CSS scroll-reveal) */}
         <div className="flex flex-col items-center mb-24 scroll-reveal">
           <div className="flex items-center gap-2 mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,0.8)]"></span>
@@ -90,18 +122,45 @@ export default function Process() {
         {/* Vertical Timeline Container */}
         <div className="relative">
           
-          {/* The Connecting Spine (Desktop centered, Mobile left) */}
-          <div className="absolute top-0 bottom-0 left-[36px] md:left-1/2 w-[2px] -translate-x-1/2 z-0">
-            {/* Static background track */}
-            <div className="absolute inset-0 bg-white/5" />
-            {/* 
-              Inner gradient line prepped for future GSAP scroll-draw animation.
-              [CHANGED] Added lineRef and changed scale-y-100 to scale-y-0 initially 
-            */}
-            <div 
-              ref={lineRef} 
-              className="absolute top-0 w-full h-full bg-gradient-to-b from-accent-cyan via-accent-primary to-transparent origin-top scale-y-0" 
-            />
+          {/* [CHANGED] SVG Connecting Spine Wrapper */}
+          {/* Desktop is 400px wide to allow the S-curve; Mobile is 2px wide for a straight line */}
+          <div className="absolute top-0 bottom-0 left-[36px] md:left-1/2 w-[2px] md:w-[400px] -translate-x-1/2 z-0 pointer-events-none">
+            
+            {/* Reusable SVG Gradient Definition */}
+            <svg className="w-0 h-0 absolute">
+              <defs>
+                <linearGradient id="spine-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="var(--accent-cyan)" />
+                  <stop offset="50%" stopColor="var(--accent-primary)" />
+                  <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+              </defs>
+            </svg>
+
+            {/* Desktop Curved Spine (S-Curve intersecting X=50 at exactly 6 intervals) */}
+            <svg className="hidden md:block absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path 
+                className="gsap-spine-path"
+                // Gentle cubic bezier snaking left (20) and right (80), always crossing center (50)
+                d="M 50 0 C 50 5, 20 10, 50 17 S 80 25, 50 33 S 20 42, 50 50 S 80 58, 50 67 S 20 75, 50 83 S 80 92, 50 100" 
+                vectorEffect="non-scaling-stroke" 
+                stroke="url(#spine-grad)" 
+                strokeWidth="2" 
+                fill="none" 
+              />
+            </svg>
+
+            {/* Mobile Straight Spine */}
+            <svg className="block md:hidden absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path 
+                className="gsap-spine-path"
+                d="M 50 0 L 50 100" 
+                vectorEffect="non-scaling-stroke" 
+                stroke="url(#spine-grad)" 
+                strokeWidth="2" 
+                fill="none" 
+              />
+            </svg>
           </div>
 
           {/* Steps Loop */}
@@ -112,8 +171,8 @@ export default function Process() {
               return (
                 <div 
                   key={step.num} 
-                  className={`flex flex-col md:flex-row items-start md:items-center w-full scroll-reveal ${!isEven ? 'md:flex-row-reverse' : ''}`}
-                  style={{ transitionDelay: `${idx * 100}ms` }}
+                  // [CHANGED] Replaced css-based scroll-reveal with .gsap-step-card target for independent GSAP reveals
+                  className={`gsap-step-card flex flex-col md:flex-row items-start md:items-center w-full ${!isEven ? 'md:flex-row-reverse' : ''}`}
                 >
                   
                   {/* Mobile Node Indicator (sits exactly on the left spine) */}

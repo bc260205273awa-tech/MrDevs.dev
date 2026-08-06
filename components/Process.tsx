@@ -87,9 +87,14 @@ export default function Process() {
     });
 
     // 2. Synchronize Dots and Cards to the Path
-    const refPath = paths[0]; // Use desktop path for coordinate math (Y values are identical to mobile)
-    const pathLength = refPath.getTotalLength();
-    const resolution = pathLength / 500; // Granular stepping resolution
+    // Safely find the active path to do our coordinate math (ignoring the display:none one)
+    const activePath = paths.find(p => getComputedStyle(p).display !== 'none');
+    if (!activePath) return; // Safety abort if neither is rendered yet
+    
+    const pathLength = activePath.getTotalLength();
+    if (!pathLength || pathLength <= 0) return; // Safety abort against 0-length crash
+    
+    const resolution = Math.max(1, pathLength / 500); // Strict safety against infinite loops
     
     const cards = gsap.utils.toArray('.gsap-step-card') as HTMLDivElement[];
     
@@ -101,7 +106,7 @@ export default function Process() {
       // Trace the SVG path length until its Y coordinate hits our target
       let targetLength = pathLength; 
       for (let l = 0; l <= pathLength; l += resolution) {
-        if (refPath.getPointAtLength(l).y >= targetYPercentage) {
+        if (activePath.getPointAtLength(l).y >= targetYPercentage) {
           targetLength = l;
           break;
         }

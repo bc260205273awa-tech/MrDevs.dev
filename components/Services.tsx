@@ -77,76 +77,88 @@ export default function Services() {
   useScrollReveal(containerRef);
 
   return (
-    <section id="services" ref={containerRef} className="py-20 bg-[#0a0f1a] font-sans overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6">
+    <section id="services" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
-          <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none">
-            3-Step Growth Plan
-          </span>
-          <h2 className="text-2xl md:text-3xl font-medium text-[#f1efe8] tracking-tight">
+        <div className="flex flex-col items-center mb-16 md:mb-24 scroll-reveal">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,0.8)]"></span>
+            <span className="text-[11px] font-bold text-accent-cyan tracking-[0.2em] uppercase select-none">
+              3-Step Growth Plan
+            </span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl text-center leading-[1.05]">
             How We Scale Your Business
           </h2>
         </div>
 
-        {/* 3-Step Flow Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Stacked Feature Blocks */}
+        <div className="flex flex-col gap-8 md:gap-12 relative z-10">
           {STEPS.map((step, idx) => (
             <div
               key={step.num}
-              className="scroll-reveal group relative bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-6 hover:border-[rgba(133,183,235,0.3)] duration-200 flex flex-col justify-between"
+              // [CHANGED] Swapped small box for massive, full-width glassmorphism block matching Phase 2 Bento tokens
+              className="scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
               style={{ transitionDelay: `${idx * 100}ms` }}
             >
-              <div>
-                {/* Step Number Badge */}
-                <div className="inline-block px-2.5 py-0.5 rounded bg-[#378ADD]/10 border border-[#378ADD]/15 mb-4 select-none">
-                  <span className="text-[10px] font-mono font-medium text-[#378ADD] tracking-wider">
-                    STEP {step.num}
-                  </span>
+              {/* Subtle background glow on hover */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-accent-primary/10 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+              {/* Internal Split (Left: Content, Right: Command Palette Links) */}
+              <div className="relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-24">
+                
+                {/* Left Side: Number, Title, Outcome */}
+                <div className="lg:w-5/12 flex flex-col justify-center">
+                  {/* [CHANGED] Massive glowing step number replacing tiny badge */}
+                  <div className="text-[5rem] lg:text-[7rem] font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-accent-cyan/20 to-transparent leading-none mb-4 select-none pointer-events-none group-hover:from-accent-cyan/30 transition-all duration-500">
+                    {step.num}
+                  </div>
+                  <h3 className="font-sans font-semibold text-3xl lg:text-4xl text-text-heading mb-4 tracking-tight group-hover:text-accent-cyan transition-colors duration-500">
+                    {step.title}
+                  </h3>
+                  <p className="font-sans text-text-body text-[16px] leading-relaxed">
+                    {step.outcome}
+                  </p>
                 </div>
 
-                {/* Step Title */}
-                <h3 className="font-sans font-medium text-[15px] text-[#f1efe8] mb-3">
-                  {step.title}
-                </h3>
+                {/* Right Side: Command Palette Service Links */}
+                <div className="lg:w-7/12 flex flex-col gap-3 justify-center mt-4 lg:mt-0">
+                  <div className="text-[10px] font-bold text-accent-cyan/70 tracking-[0.2em] uppercase select-none mb-2">
+                    Available Services
+                  </div>
+                  
+                  {step.services.map((service, sIdx) => {
+                    const Icon = service.icon;
+                    return (
+                      <a
+                        key={sIdx}
+                        href={service.href}
+                        // [CHANGED] Replaced tiny links with high-end, wide command palette rows
+                        className="group/link flex items-center justify-between w-full p-4 lg:p-5 bg-white/[0.02] border border-white/5 hover:border-accent-primary/40 hover:bg-accent-primary/5 rounded-2xl transition-all duration-300"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/link:bg-accent-primary/10 transition-colors">
+                            <Icon size={18} className="text-text-body group-hover/link:text-accent-cyan transition-colors" />
+                          </div>
+                          <span className="font-semibold text-[15px] lg:text-[17px] text-text-heading group-hover/link:text-accent-cyan transition-colors">
+                            {service.title}
+                          </span>
+                        </div>
+                        <ArrowRight size={20} className="text-text-body/50 group-hover/link:text-accent-cyan group-hover/link:translate-x-1 transition-all" />
+                      </a>
+                    );
+                  })}
+                </div>
 
-                {/* Step Outcome */}
-                <p className="font-sans text-[#888780] text-xs leading-relaxed">
-                  {step.outcome}
-                </p>
-              </div>
-
-              {/* Sub-services links */}
-              <div className="flex flex-col gap-2 mt-6">
-                <span className="text-[9px] font-medium text-[#5F5E5A] tracking-wider uppercase select-none mb-1">
-                  Available Services:
-                </span>
-                {step.services.map((service, sIdx) => {
-                  const Icon = service.icon;
-                  return (
-                    <a
-                      key={sIdx}
-                      href={service.href}
-                      className="group/btn inline-flex items-center justify-between w-full px-3 py-2 bg-[#0a0f1a]/85 border border-[rgba(133,183,235,0.06)] hover:border-[#378ADD]/45 hover:bg-[#378ADD]/5 rounded-lg transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Icon size={12} className="text-[#378ADD]" />
-                        <span className="font-sans text-[11px] text-[#888780] group-hover/btn:text-[#f1efe8] transition-colors">
-                          {service.title.toLowerCase()}
-                        </span>
-                      </div>
-                      <ArrowRight size={10} className="text-[#5F5E5A] group-hover/btn:text-[#378ADD] group-hover/btn:translate-x-0.5 transition-all" />
-                    </a>
-                  );
-                })}
               </div>
             </div>
           ))}
         </div>
 
         {/* Section Divider */}
-        <div className="section-divider mt-24" />
+        <div className="section-divider mt-32 opacity-50" />
       </div>
     </section>
   );

@@ -64,6 +64,10 @@ export default function LogoReveal() {
     // Cap devicePixelRatio at 2x to save mobile GPU memory/performance
     const dpr = Math.min(window.devicePixelRatio || 1, 2); 
     
+    // GSAP proxy object to animate the frame index. 
+    // MUST be declared before resizeCanvas to avoid Temporal Dead Zone ReferenceError!
+    const frameState = { frame: 1 };
+    
     // Resize handler for responsive canvas
     const resizeCanvas = () => {
       const parent = canvas.parentElement;
@@ -116,9 +120,6 @@ export default function LogoReveal() {
 
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
-
-    // GSAP proxy object to animate the frame index
-    const frameState = { frame: 1 };
 
     // Master pinning timeline
     const tl = gsap.timeline({

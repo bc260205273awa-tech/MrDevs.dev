@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import WhyMrDevs from "@/components/WhyMrDevs";
 import Work from "@/components/Work";
+import LogoReveal from "@/components/LogoReveal";
 import CondensedCTA from "@/components/CondensedCTA";
 import Services from "@/components/Services";
 import Process from "@/components/Process";
@@ -18,6 +19,7 @@ export default function Home() {
         <Hero />
         <WhyMrDevs />
         <Work />
+        <LogoReveal />
         <CondensedCTA />
         <Services />
         <Process />

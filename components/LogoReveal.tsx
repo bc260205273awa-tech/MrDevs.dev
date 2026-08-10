@@ -54,8 +54,11 @@ export default function LogoReveal() {
   }, []);
 
   useGSAP(() => {
-    // Only initialize the canvas scrub if all frames are fully loaded
-    if (imagesLoaded < FRAME_COUNT || !canvasRef.current || !containerRef.current || !sectionRef.current) return;
+    // [BUG 2 FIX] Initialize GSAP immediately on mount, BEFORE frames finish loading.
+    // This instantly creates the 2000px pin-spacer, ensuring the entire page height is accurate 
+    // from the start. It guarantees downstream sections (like Process) get correct absolute 
+    // scroll offsets immediately, eliminating the need for a layout-snapping ScrollTrigger.refresh() later!
+    if (!canvasRef.current || !containerRef.current || !sectionRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -144,7 +147,7 @@ export default function LogoReveal() {
     });
 
     return () => window.removeEventListener("resize", resizeCanvas);
-  }, { dependencies: [imagesLoaded], scope: sectionRef });
+  }, { scope: sectionRef });
 
   const isLoading = imagesLoaded < FRAME_COUNT;
   const loadingProgress = Math.round((imagesLoaded / FRAME_COUNT) * 100);

@@ -70,9 +70,9 @@ export default function LogoReveal() {
     
     // Resize handler for responsive canvas
     const resizeCanvas = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const { width, height } = parent.getBoundingClientRect();
+      // [BUG 1 FIX] Use explicit window dimensions to bypass any CSS max-width/height constraints
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -81,6 +81,8 @@ export default function LogoReveal() {
       
       // Reset transform before scaling, otherwise scales compound on resize
       ctx.setTransform(1, 0, 0, 1, 0, 0); 
+      // [BUG 1 VERIFICATION] Scale is applied exactly ONCE here to the context. 
+      // All subsequent drawImage math will use the unscaled window dimensions.
       ctx.scale(dpr, dpr);
       
       renderFrame(frameState.frame);
@@ -93,9 +95,9 @@ export default function LogoReveal() {
       const img = imagesRef.current[safeIndex];
       if (!img) return;
 
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const { width, height } = parent.getBoundingClientRect();
+      // [BUG 1 FIX] Use true window dimensions to ensure edge-to-edge coverage
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       
       const imgAspect = img.width / img.height;
       const canvasAspect = width / height;
@@ -105,7 +107,7 @@ export default function LogoReveal() {
       let offsetX = 0;
       let offsetY = 0;
 
-      // Emulate CSS object-cover behavior
+      // Emulate CSS object-cover behavior mathematically
       if (canvasAspect > imgAspect) {
         drawHeight = width / imgAspect;
         offsetY = (height - drawHeight) / 2;
@@ -115,6 +117,7 @@ export default function LogoReveal() {
       }
 
       ctx.clearRect(0, 0, width, height);
+      // Math uses unscaled width/height because ctx.scale(dpr) handles the physical pixel mapping automatically
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
 

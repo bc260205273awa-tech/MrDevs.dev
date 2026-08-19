@@ -53,7 +53,7 @@ export default function Contact() {
   };
 
   const inputClass =
-    "w-full px-3 py-2 bg-[#0f1729] border border-[rgba(133,183,235,0.1)] rounded font-sans text-xs text-[#f1efe8] placeholder-[#5F5E5A] focus:outline-none focus:border-[#378ADD]/40 focus:bg-[#0f1729]/80 transition-all duration-200";
+    "w-full px-3.5 py-3 min-h-[44px] bg-[#0f1729] border border-[rgba(133,183,235,0.1)] rounded font-sans text-base md:text-sm text-[#f1efe8] placeholder-[#5F5E5A] focus:outline-none focus:border-[#378ADD]/40 focus:bg-[#0f1729]/80 transition-all duration-200";
 
   return (
     <section id="contact" ref={containerRef} className="py-20 bg-[#0a0f1a] font-sans overflow-hidden">
@@ -74,10 +74,10 @@ export default function Contact() {
           href="https://wa.me/923218492868"
           target="_blank"
           rel="noopener noreferrer"
-          className="scroll-reveal w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-[#378ADD] text-[#042C53] font-medium text-xs rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow mb-6 text-center select-none"
+          className="scroll-reveal w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 min-h-[44px] bg-[#378ADD] text-[#042C53] font-medium text-sm rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow mb-6 text-center select-none"
           style={{ transitionDelay: "100ms" }}
         >
-          <MessageSquare size={14} />
+          <MessageSquare size={16} />
           Book a Free Strategy Call on WhatsApp
         </a>
 

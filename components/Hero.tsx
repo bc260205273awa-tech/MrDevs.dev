@@ -94,8 +94,7 @@ export default function Hero() {
         {/* Main Headline */}
         <h1 
           ref={headlineRef}
-          // [CHANGED] Massive tight-tracking H1
-          className="text-5xl md:text-7xl lg:text-[5.5rem] font-bold text-text-heading leading-[1.05] tracking-tighter max-w-4xl opacity-100"
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-text-heading leading-[1.08] sm:leading-[1.05] tracking-tighter max-w-4xl opacity-100 px-2 sm:px-0"
         >
           Everything your business needs to grow —{" "}
           <span className="text-accent-primary" style={{ textShadow: '0 0 20px rgba(47,168,255,0.3)' }}>
@@ -106,27 +105,24 @@ export default function Hero() {
         {/* Subhead */}
         <p 
           ref={subtextRef}
-          // [CHANGED] Narrower constrained subtext
-          className="text-[17px] md:text-lg text-text-body max-w-lg leading-relaxed opacity-100 mt-2"
+          className="text-base sm:text-[17px] md:text-lg text-text-body max-w-lg leading-relaxed opacity-100 mt-2 px-2 sm:px-0"
         >
           A technical partner that designs and engineers high-converting web systems, mobile apps, and automated workflows built directly to drive your revenue.
         </p>
 
         {/* CTA Buttons */}
-        <div ref={ctaRef} className="flex flex-col sm:flex-row items-center gap-8 mt-6 opacity-100">
+        <div ref={ctaRef} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mt-6 opacity-100 w-full sm:w-auto px-4 sm:px-0">
           <a
             href="#contact"
             onClick={(e) => handleScrollTo(e, "contact")}
-            // [CHANGED] Primary glowing CTA button
-            className="inline-flex items-center justify-center px-8 py-4 bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:-translate-y-0.5 transition-all duration-300"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 min-h-[44px] bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:-translate-y-0.5 transition-all duration-300"
           >
             Let's Talk
           </a>
           <a
             href="#work"
             onClick={(e) => handleScrollTo(e, "work")}
-            // [CHANGED] Secondary text-link-with-arrow for hierarchy
-            className="group inline-flex items-center gap-2 text-text-heading font-medium text-[15px] hover:text-accent-primary transition-colors duration-300"
+            className="group inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 text-text-heading font-medium text-[15px] hover:text-accent-primary transition-colors duration-300"
           >
             See the work 
             <span className="group-hover:translate-x-1 transition-transform duration-300">↗</span>

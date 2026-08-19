@@ -39,7 +39,7 @@ export default function Founder({
               Trust & Craftsmanship
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl text-center leading-[1.05]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl text-center leading-[1.05]">
             Direct Partnership, No Middlemen
           </h2>
         </div>
@@ -48,11 +48,11 @@ export default function Founder({
         <div className="scroll-reveal relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
           
           {/* Left Side: Dramatic Vertical Portrait */}
-          <div className="w-full md:w-2/5 shrink-0 relative aspect-square md:aspect-auto md:min-h-[500px]">
+          <div className="w-full md:w-2/5 shrink-0 relative aspect-[4/3] sm:aspect-square md:aspect-auto md:min-h-[500px]">
             {imageUrl ? (
               <Image 
                 src={imageUrl} 
-                alt={name} 
+                alt={`${name} - ${role}`} 
                 fill 
                 className="object-cover object-top md:object-center grayscale hover:grayscale-0 transition-all duration-700" 
                 sizes="(max-width: 768px) 100vw, 40vw"
@@ -69,38 +69,38 @@ export default function Founder({
           </div>
 
           {/* Right Side: Pull-Quote & Content */}
-          <div className="flex-1 flex flex-col justify-between p-8 md:p-12 lg:p-16 relative">
+          <div className="flex-1 flex flex-col justify-between p-6 sm:p-8 md:p-12 lg:p-16 relative">
             
             {/* Ambient Glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col gap-6">
+            <div className="relative z-10 flex flex-col gap-4 sm:gap-6">
               {/* Giant Stylized Quotation Mark */}
-              <div className="text-accent-cyan/20 text-8xl md:text-9xl font-serif absolute -top-8 -left-4 md:-top-12 md:-left-8 select-none pointer-events-none">
+              <div className="text-accent-cyan/20 text-6xl sm:text-8xl md:text-9xl font-serif absolute -top-6 -left-3 sm:-top-8 sm:-left-4 md:-top-12 md:-left-8 select-none pointer-events-none">
                 &ldquo;
               </div>
               
               {/* Massive Pull Quote */}
               <div className="relative z-10">
-                <p className="text-2xl md:text-3xl lg:text-[32px] font-medium text-white italic leading-relaxed tracking-tight">
+                <p className="text-lg sm:text-2xl md:text-3xl lg:text-[32px] font-medium text-white italic leading-relaxed tracking-tight">
                   {story}
                 </p>
               </div>
 
               {/* Founder Bio Line */}
-              <div className="mt-4 md:mt-8 flex flex-col">
-                <h3 className="font-semibold text-lg text-text-heading">{name}</h3>
-                <p className="text-sm text-accent-cyan tracking-wide font-medium mt-1">{role}</p>
+              <div className="mt-2 sm:mt-4 md:mt-8 flex flex-col">
+                <h3 className="font-semibold text-base sm:text-lg text-text-heading">{name}</h3>
+                <p className="text-xs sm:text-sm text-accent-cyan tracking-wide font-medium mt-1">{role}</p>
               </div>
             </div>
 
             {/* Horizontal Trust Badges Ribbon */}
-            <div className="relative z-10 mt-12 md:mt-24 pt-6 md:pt-8 border-t border-white/10">
-              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div className="relative z-10 mt-8 sm:mt-12 md:mt-24 pt-6 md:pt-8 border-t border-white/10">
+              <div className="flex flex-wrap items-center gap-x-6 sm:gap-x-8 gap-y-3">
                 {TRUST_BADGES.map((badge, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <CheckCircle2 size={18} className="text-accent-cyan shrink-0" />
-                    <span className="text-[13px] md:text-sm text-text-body font-medium tracking-wide">
+                  <div key={idx} className="flex items-center gap-2 sm:gap-3">
+                    <CheckCircle2 size={16} className="text-accent-cyan shrink-0 sm:w-[18px] sm:h-[18px]" />
+                    <span className="text-xs sm:text-[13px] md:text-sm text-text-body font-medium tracking-wide">
                       {badge}
                     </span>
                   </div>

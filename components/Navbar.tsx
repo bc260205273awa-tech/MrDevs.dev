@@ -309,7 +309,7 @@ export default function Navbar() {
         {/* Hamburger */}
         <button
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden flex flex-col justify-center gap-1.5 p-1.5 z-10 w-8 h-8 rounded hover:bg-white/5 active:scale-95 transition-all duration-200"
+          className="md:hidden flex flex-col justify-center items-center gap-1.5 p-2.5 z-10 w-11 h-11 rounded hover:bg-white/5 active:scale-95 transition-all duration-200"
           aria-label="Toggle navigation"
         >
           <span

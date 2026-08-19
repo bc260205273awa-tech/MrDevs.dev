@@ -9,7 +9,6 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// 90 frames total extracted via ffmpeg (8 seconds at 11.25fps)
 const FRAME_COUNT = 90;
 
 export default function LogoReveal() {
@@ -20,9 +19,22 @@ export default function LogoReveal() {
   const [imagesLoaded, setImagesLoaded] = useState(0);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const hasStartedLoading = useRef(false);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  // Check prefers-reduced-motion on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      setIsReducedMotion(mediaQuery.matches);
+    }
+  }, []);
 
   // Preload frames when the section approaches the viewport
   useEffect(() => {
+    // 1. Immediately load initial poster frame (frame-0045.webp) for instantaneous rendering
+    const posterImg = new Image();
+    posterImg.src = `/frames/logo-reveal/frame-0045.webp`;
+    
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !hasStartedLoading.current) {
@@ -30,7 +42,7 @@ export default function LogoReveal() {
           const loadedImages: HTMLImageElement[] = [];
           let loadedCount = 0;
 
-          // Aggressively download frames into memory
+          // Progressively load all 90 frames
           for (let i = 1; i <= FRAME_COUNT; i++) {
             const img = new Image();
             img.src = `/frames/logo-reveal/frame-${i.toString().padStart(4, '0')}.webp`;
@@ -43,8 +55,7 @@ export default function LogoReveal() {
           imagesRef.current = loadedImages;
         }
       },
-      // Trigger loading 1200px before the user scrolls to it
-      { rootMargin: "1200px" } 
+      { rootMargin: "800px" } 
     );
 
     if (sectionRef.current) {
@@ -54,10 +65,6 @@ export default function LogoReveal() {
   }, []);
 
   useGSAP(() => {
-    // [BUG 2 FIX] Initialize GSAP immediately on mount, BEFORE frames finish loading.
-    // This instantly creates the 2000px pin-spacer, ensuring the entire page height is accurate 
-    // from the start. It guarantees downstream sections (like Process) get correct absolute 
-    // scroll offsets immediately, eliminating the need for a layout-snapping ScrollTrigger.refresh() later!
     if (!canvasRef.current || !containerRef.current || !sectionRef.current) return;
 
     const canvas = canvasRef.current;
@@ -66,39 +73,14 @@ export default function LogoReveal() {
 
     // Cap devicePixelRatio at 2x to save mobile GPU memory/performance
     const dpr = Math.min(window.devicePixelRatio || 1, 2); 
+    const frameState = { frame: isReducedMotion ? 45 : 1 };
     
-    // GSAP proxy object to animate the frame index. 
-    // MUST be declared before resizeCanvas to avoid Temporal Dead Zone ReferenceError!
-    const frameState = { frame: 1 };
-    
-    // Resize handler for responsive canvas
-    const resizeCanvas = () => {
-      // [BUG 1 FIX] Use explicit window dimensions to bypass any CSS max-width/height constraints
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      
-      // Reset transform before scaling, otherwise scales compound on resize
-      ctx.setTransform(1, 0, 0, 1, 0, 0); 
-      // [BUG 1 VERIFICATION] Scale is applied exactly ONCE here to the context. 
-      // All subsequent drawImage math will use the unscaled window dimensions.
-      ctx.scale(dpr, dpr);
-      
-      renderFrame(frameState.frame);
-    };
-
     // Draw specific frame using object-cover logic
     const renderFrame = (index: number) => {
-      // Math.max/min guarantees we don't request frame -1 or 90+ out of bounds
       const safeIndex = Math.max(0, Math.min(FRAME_COUNT - 1, Math.round(index) - 1));
       const img = imagesRef.current[safeIndex];
       if (!img) return;
 
-      // [BUG 1 FIX] Use true window dimensions to ensure edge-to-edge coverage
       const width = window.innerWidth;
       const height = window.innerHeight;
       
@@ -110,7 +92,6 @@ export default function LogoReveal() {
       let offsetX = 0;
       let offsetY = 0;
 
-      // Emulate CSS object-cover behavior mathematically
       if (canvasAspect > imgAspect) {
         drawHeight = width / imgAspect;
         offsetY = (height - drawHeight) / 2;
@@ -120,26 +101,44 @@ export default function LogoReveal() {
       }
 
       ctx.clearRect(0, 0, width, height);
-      // Math uses unscaled width/height because ctx.scale(dpr) handles the physical pixel mapping automatically
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    };
+
+    const resizeCanvas = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      
+      ctx.setTransform(1, 0, 0, 1, 0, 0); 
+      ctx.scale(dpr, dpr);
+      
+      renderFrame(frameState.frame);
     };
 
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Master pinning timeline
+    // If user prefers reduced motion, render static poster frame without pinning timeline
+    if (isReducedMotion) {
+      renderFrame(45);
+      return () => window.removeEventListener("resize", resizeCanvas);
+    }
+
+    // Master pinning timeline for normal motion
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        // Pin the inner wrapper, not the section root, per Phase 5 standard
         pin: containerRef.current,
         start: "top top",
         end: "+=2000",
-        scrub: 1, // Smooth dampening
+        scrub: 1, // Smooth dampening for jank-free scroll scrubbing
       }
     });
 
-    // Animate from frame 1 to 90 over the pinned duration
     tl.to(frameState, {
       frame: FRAME_COUNT,
       ease: "none",
@@ -147,20 +146,19 @@ export default function LogoReveal() {
     });
 
     return () => window.removeEventListener("resize", resizeCanvas);
-  }, { scope: sectionRef });
+  }, { scope: sectionRef, dependencies: [isReducedMotion] });
 
-  const isLoading = imagesLoaded < FRAME_COUNT;
+  const isLoading = imagesLoaded < FRAME_COUNT && !isReducedMotion;
   const loadingProgress = Math.round((imagesLoaded / FRAME_COUNT) * 100);
 
   return (
     <section ref={sectionRef} className="relative bg-[#0a0f1a]">
-      {/* Pinned inner container */}
+      {/* Pinned inner container maintaining zero-CLS aspect ratio */}
       <div ref={containerRef} className="h-screen w-full overflow-hidden relative flex items-center justify-center">
         
         {/* Fallback Loading State */}
         {isLoading && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0f1a]">
-            {/* Using the confirmed locked glass tokens */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 md:p-12 shadow-2xl flex flex-col items-center gap-6">
               <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_12px_rgba(0,212,255,1)]"></span>
               <span className="text-[11px] font-bold text-accent-cyan tracking-[0.2em] uppercase select-none">

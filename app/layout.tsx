@@ -74,9 +74,34 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "MrDevs",
+    "image": "https://mrdevs.dev/logo.png",
+    "url": "https://mrdevs.dev",
+    "description":
+      "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
+    "priceRange": "$$$",
+    "telephone": "+923219565657",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "PK"
+    },
+    "sameAs": [
+      "https://github.com/mrdevs",
+      "https://linkedin.com/company/mrdevs",
+      "https://x.com/mrdevs"
+    ]
+  };
+
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
       <body className="bg-[#0a0f1a] text-[#f1efe8] antialiased font-sans overflow-x-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         {children}
       </body>
     </html>

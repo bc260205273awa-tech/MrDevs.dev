@@ -52,13 +52,13 @@ export default function Footer() {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[rgba(133,183,235,0.18)] to-transparent" />
 
       <div className="max-w-5xl mx-auto px-6 pt-16 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-16">
           {/* Column 1: Brand Info */}
-          <div className="flex flex-col items-start gap-4">
+          <div className="col-span-2 md:col-span-1 flex flex-col items-start gap-4">
             <a
               href={isHome ? "#hero" : "/"}
               onClick={(e) => handleScrollTo(e, "#hero")}
-              className="flex items-center select-none"
+              className="flex items-center select-none min-h-[44px]"
             >
               <Image
                 src="/logo.png"
@@ -68,7 +68,7 @@ export default function Footer() {
                 className="block object-contain"
               />
             </a>
-            <p className="text-[#888780] text-[12px] leading-relaxed max-w-[240px]">
+            <p className="text-[#888780] text-[12px] leading-relaxed max-w-[280px] md:max-w-[240px]">
               Your trusted engineering team. Building premium websites, mobile apps, and custom software systems designed to drive your revenue.
             </p>
             {/* Glow Availability status */}
@@ -93,7 +93,7 @@ export default function Footer() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-xs text-[#888780] hover:text-[#378ADD] transition-colors duration-200"
+                  className="text-xs text-[#888780] hover:text-[#378ADD] transition-colors duration-200 py-1"
                 >
                   {link.label}
                 </a>
@@ -112,7 +112,7 @@ export default function Footer() {
                   key={link.label}
                   href={isHome ? link.href : `/${link.href}`}
                   onClick={(e) => handleScrollTo(e, link.href)}
-                  className="text-xs text-[#888780] hover:text-[#378ADD] transition-colors duration-200"
+                  className="text-xs text-[#888780] hover:text-[#378ADD] transition-colors duration-200 py-1"
                 >
                   {link.label}
                 </a>
@@ -121,7 +121,7 @@ export default function Footer() {
           </div>
 
           {/* Column 4: Contact & Socials */}
-          <div className="flex flex-col gap-4">
+          <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <span className="text-[10px] font-medium text-[#f1efe8]/40 tracking-wider uppercase select-none">
                 get in touch
@@ -129,7 +129,7 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 <a
                   href="mailto:hello@mrdevs.dev"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#888780] hover:text-[#378ADD] transition-colors group"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#888780] hover:text-[#378ADD] transition-colors group py-1 min-h-[36px]"
                 >
                   <Mail size={12} className="text-[#5F5E5A] group-hover:text-[#378ADD] transition-colors" />
                   hello@mrdevs.dev
@@ -138,7 +138,7 @@ export default function Footer() {
                   href="https://wa.me/923218492868"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#888780] hover:text-[#378ADD] transition-colors group"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#888780] hover:text-[#378ADD] transition-colors group py-1 min-h-[36px]"
                 >
                   <MessageSquare size={12} className="text-[#5F5E5A] group-hover:text-[#378ADD] transition-colors" />
                   chat on WhatsApp
@@ -157,9 +157,9 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={soc.title}
-                    className="w-8 h-8 border border-[rgba(133,183,235,0.1)] rounded bg-[#0f1729]/30 flex items-center justify-center text-[#888780] hover:text-[#378ADD] hover:border-[#378ADD]/30 hover:bg-[#378ADD]/5 transition-all duration-200"
+                    className="w-11 h-11 border border-[rgba(133,183,235,0.1)] rounded-lg bg-[#0f1729]/30 flex items-center justify-center text-[#888780] hover:text-[#378ADD] hover:border-[#378ADD]/30 hover:bg-[#378ADD]/5 transition-all duration-200"
                   >
-                    <Icon size={14} />
+                    <Icon size={16} />
                   </a>
                 );
               })}

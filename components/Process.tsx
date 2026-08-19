@@ -177,7 +177,7 @@ export default function Process() {
             </span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl text-center leading-[1.05]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl text-center leading-[1.05]">
             How We Build
           </h2>
         </div>
@@ -186,7 +186,7 @@ export default function Process() {
         <div className="relative" ref={timelineRef}>
           
           {/* SVG Connecting Spine Wrapper */}
-          <div className="absolute top-0 bottom-0 left-[36px] md:left-1/2 w-[2px] md:w-[400px] -translate-x-1/2 z-0 pointer-events-none">
+          <div className="absolute top-0 bottom-0 left-[24px] sm:left-[36px] md:left-1/2 w-[2px] md:w-[400px] -translate-x-1/2 z-0 pointer-events-none">
             
             <svg className="w-0 h-0 absolute">
               <defs>
@@ -222,7 +222,7 @@ export default function Process() {
           </div>
 
           {/* Steps Loop */}
-          <div className="relative z-10 flex flex-col gap-12 md:gap-24">
+          <div className="relative z-10 flex flex-col gap-10 md:gap-24">
             {STEPS.map((step, idx) => {
               const isEven = idx % 2 === 0;
               
@@ -233,24 +233,24 @@ export default function Process() {
                 >
                   
                   {/* Mobile Node Indicator */}
-                  <div className="md:hidden absolute left-[36px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center z-20">
+                  <div className="md:hidden absolute left-[24px] sm:left-[36px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-20">
                     <div className="gsap-center-dot w-3.5 h-3.5 rounded-full bg-bg-main border-2 border-accent-cyan opacity-0" />
                   </div>
                   
                   {/* Glass Card Half */}
-                  <div className={`gsap-card-content w-full md:w-1/2 pl-[72px] md:pl-0 ${isEven ? 'md:pr-16 lg:pr-24' : 'md:pl-16 lg:pl-24'} opacity-0`}>
-                    <div className="bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 lg:p-10 hover:bg-white/10 transition-colors duration-500 relative group overflow-hidden">
+                  <div className={`gsap-card-content w-full md:w-1/2 pl-[48px] sm:pl-[72px] md:pl-0 ${isEven ? 'md:pr-16 lg:pr-24' : 'md:pl-16 lg:pl-24'} opacity-0`}>
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 lg:p-10 hover:bg-white/10 transition-colors duration-500 relative group overflow-hidden">
                       
                       {/* Massive Typographic Glow Watermark */}
-                      <div className={`absolute -top-8 ${isEven ? 'md:-right-4 right-4' : 'md:-left-4 right-4'} text-[8rem] font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-accent-cyan/10 to-transparent select-none pointer-events-none group-hover:from-accent-cyan/20 transition-all duration-700`}>
+                      <div className={`absolute -top-6 sm:-top-8 ${isEven ? 'md:-right-4 right-3' : 'md:-left-4 right-3'} text-[6rem] sm:text-[8rem] font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-accent-cyan/10 to-transparent select-none pointer-events-none group-hover:from-accent-cyan/20 transition-all duration-700`}>
                         {step.num}
                       </div>
                       
                       <div className="relative z-10">
-                        <h3 className="font-sans font-semibold text-2xl lg:text-3xl text-text-heading mb-3 tracking-tight group-hover:text-accent-cyan transition-colors duration-500">
+                        <h3 className="font-sans font-semibold text-xl sm:text-2xl lg:text-3xl text-text-heading mb-2 sm:mb-3 tracking-tight group-hover:text-accent-cyan transition-colors duration-500">
                           {step.label}
                         </h3>
-                        <p className="font-sans text-text-body text-[15px] leading-relaxed">
+                        <p className="font-sans text-text-body text-xs sm:text-[15px] leading-relaxed">
                           {step.description}
                         </p>
                       </div>

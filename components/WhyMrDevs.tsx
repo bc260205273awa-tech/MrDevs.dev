@@ -14,21 +14,21 @@ export default function WhyMrDevs() {
       title: "Direct Founder Access",
       description: "Speak directly to the developer building your system. No account managers or sales representatives. You get direct access and 5x faster iteration cycles.",
       // [NEW] Grid spanning rules for Bento layout
-      gridClass: "lg:col-span-2 lg:row-span-2 min-h-[400px] lg:min-h-[500px]",
+      gridClass: "lg:col-span-2 lg:row-span-2 min-h-0 sm:min-h-[350px] lg:min-h-[500px]",
       iconSize: 140,
     },
     {
       icon: ShieldCheck,
       title: "Single-Point Accountability",
       description: "One person responsible for your design, databases, code, and deployment. No hand-offs, no communication gaps, and 100% project ownership.",
-      gridClass: "lg:col-span-1 lg:row-span-1 min-h-[300px]",
+      gridClass: "lg:col-span-1 lg:row-span-1 min-h-0 sm:min-h-[260px] lg:min-h-[300px]",
       iconSize: 90,
     },
     {
       icon: BuiltAtScale,
       title: "Proven Operational Scale",
       description: "We build deep operational software, not template websites. Engineered KhanHub — a 16-department healthcare ERP running 24/7 for 50,000+ people.",
-      gridClass: "lg:col-span-1 lg:row-span-1 min-h-[300px]",
+      gridClass: "lg:col-span-1 lg:row-span-1 min-h-0 sm:min-h-[260px] lg:min-h-[300px]",
       iconSize: 90,
     },
   ];
@@ -42,7 +42,6 @@ export default function WhyMrDevs() {
     <section
       id="why-us"
       ref={containerRef}
-      // [CHANGED] Use bg-main
       className="py-24 md:py-32 bg-bg-main font-sans border-t border-accent-primary/5 overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-6">
@@ -56,7 +55,7 @@ export default function WhyMrDevs() {
             </span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl leading-[1.05]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-heading tracking-tighter max-w-3xl leading-[1.05]">
             Why hire MrDevs over the other{" "}
             <span className="text-accent-primary" style={{ textShadow: '0 0 20px rgba(47,168,255,0.3)' }}>
               10 agencies?
@@ -71,8 +70,7 @@ export default function WhyMrDevs() {
             return (
               <div
                 key={index}
-                // [CHANGED] Glassmorphism card, editorial layout, inner top highlight
-                className={`scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 hover:border-white/10 hover:bg-white/10 transition-colors duration-500 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
+                className={`scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 hover:border-white/10 hover:bg-white/10 transition-colors duration-500 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {/* [CHANGED] Massive Watermark Icon */}

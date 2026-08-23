@@ -10,6 +10,9 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+import HeroGlasses3D from "./HeroGlasses3D";
+import HeroParticles from "./HeroParticles";
+
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -18,9 +21,6 @@ export default function Hero() {
   const ctaRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // 1. Initial reveal animation for headline, subtext, and CTA
-    // The useGSAP hook automatically handles cleanup/revert for this timeline, 
-    // ensuring no stray animations are left behind during Strict Mode double-mounts.
     const tl = gsap.timeline();
     
     tl.from(headlineRef.current, {
@@ -42,12 +42,6 @@ export default function Hero() {
       duration: 0.8,
       ease: 'power3.out'
     }, "-=0.6");
-
-    // [CHANGED] Removed the ScrollTrigger.create() pin here.
-    // Pinning the root React node caused GSAP's pin-spacer to fight with React Strict Mode,
-    // resulting in duplicated DOM elements (overlapping text) and a frozen scroll state.
-    // We will reintroduce a pin on an *inner* wrapper when the cinematic background is built.
-
   }, { scope: containerRef });
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
@@ -67,14 +61,14 @@ export default function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      // [CHANGED] Updated to use locked design tokens: bg-main
-      className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main text-center"
+      className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main text-center pt-16"
     >
-      {/* [CHANGED] Full-bleed background placeholder (edge-to-edge, z-index 0) */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center bg-bg-deep opacity-60">
-        <span className="text-accent-primary/20 text-2xl tracking-[0.3em] uppercase font-bold select-none">
-          [ Cinematic Scroll Sequence ]
-        </span>
+      {/* Interactive Cursor-Reactive Dust Particles */}
+      <HeroParticles />
+
+      {/* Background 3D Glasses Component */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-75 pointer-events-none">
+        <HeroGlasses3D />
       </div>
 
       {/* Content Container */}

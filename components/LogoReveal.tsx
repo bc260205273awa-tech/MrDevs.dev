@@ -49,6 +49,11 @@ export default function LogoReveal() {
             img.onload = () => {
               loadedCount++;
               setImagesLoaded(loadedCount);
+              // [FIX] As requested, refresh ScrollTrigger once the new pinned section is fully loaded
+              if (loadedCount === FRAME_COUNT) {
+                // Add a small delay to ensure React state and layout are completely settled
+                setTimeout(() => ScrollTrigger.refresh(), 100);
+              }
             };
             loadedImages.push(img);
           }

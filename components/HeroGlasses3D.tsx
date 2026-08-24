@@ -130,16 +130,16 @@ export default function HeroGlasses3D() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center select-none w-full max-w-2xl h-80 mx-auto"
+      className="relative flex items-center justify-center select-none w-full max-w-xl h-[320px] sm:h-[380px] lg:h-[420px] mx-auto"
       style={{ perspective: "1200px" }}
     >
       {/* Ambient Radial Cyan Backlight Glow */}
-      <div className="absolute w-[460px] h-[220px] bg-accent-primary/25 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute w-[360px] sm:w-[440px] h-[200px] bg-accent-primary/25 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main 3D Glasses Frame Container */}
       <div
         ref={frameRef}
-        className="relative z-10 flex items-center justify-center w-[480px] sm:w-[540px] md:w-[600px] aspect-[594/219]"
+        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[500px] aspect-[594/219]"
         style={{ transformStyle: "preserve-3d" }}
       >
         {/* Layer 0: Dark lens glass backings with subtle glow */}

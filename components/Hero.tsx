@@ -64,76 +64,81 @@ export default function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main text-center pt-16"
+      className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main pt-24 pb-16 lg:py-0"
     >
       {/* Interactive Cursor-Reactive Dust Particles */}
       <HeroParticles />
 
-      {/* Background 3D Glasses Component */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-75 pointer-events-none">
-        <HeroGlasses3D />
-      </div>
-
-      {/* Content Container */}
-      <div ref={contentRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 flex flex-col items-center gap-6 -mt-12">
+      {/* Main 2-Column Split Container */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[calc(100vh-96px)]">
         
-        {/* [NEW] Glass pill availability badge with pulsing dot */}
-        <div className="tilt-hero inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-xl mb-4 cursor-default">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-accent-cyan opacity-75 animate-ping-slow" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-cyan" />
-          </span>
-          <span className="text-xs font-medium text-text-heading tracking-wider uppercase">
-            Available for new projects
-          </span>
+        {/* Left Column: Typography & CTAs */}
+        <div ref={contentRef} className="lg:col-span-7 flex flex-col items-start text-left gap-6 z-20">
+          
+          {/* Glass pill availability badge with pulsing dot */}
+          <div className="tilt-hero inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-xl cursor-default">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-accent-cyan opacity-75 animate-ping-slow" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-cyan" />
+            </span>
+            <span className="text-xs font-medium text-text-heading tracking-wider uppercase">
+              Available for new projects
+            </span>
+          </div>
+
+          {/* Main Headline */}
+          <h1 
+            ref={headlineRef}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.2rem] xl:text-[4.75rem] font-bold text-text-heading leading-[1.08] tracking-tighter max-w-2xl"
+          >
+            Everything your business needs to grow —{" "}
+            <span className="text-accent-primary" style={{ textShadow: '0 0 24px rgba(47,168,255,0.35)' }}>
+              under one roof.
+            </span>
+          </h1>
+
+          {/* Subhead */}
+          <p 
+            ref={subtextRef}
+            className="text-base sm:text-lg text-text-body max-w-xl leading-relaxed mt-1"
+          >
+            A technical partner that designs and engineers high-converting web systems, mobile apps, and automated workflows built directly to drive your revenue.
+          </p>
+
+          {/* CTA Buttons */}
+          <div ref={ctaRef} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-4 w-full sm:w-auto">
+            <a
+              href="#contact"
+              onClick={(e) => handleScrollTo(e, "contact")}
+              className="tilt-hero w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 min-h-[48px] bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Let&apos;s Talk
+            </a>
+            <a
+              href="#work"
+              onClick={(e) => handleScrollTo(e, "work")}
+              className="group inline-flex items-center justify-center gap-2 min-h-[48px] px-5 py-2 text-text-heading font-medium text-[15px] hover:text-accent-primary transition-colors duration-300"
+            >
+              See the work 
+              <span className="group-hover:translate-x-1 transition-transform duration-300">↗</span>
+            </a>
+          </div>
+
         </div>
 
-        {/* Main Headline */}
-        <h1 
-          ref={headlineRef}
-          className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-text-heading leading-[1.08] sm:leading-[1.05] tracking-tighter max-w-4xl opacity-100 px-2 sm:px-0"
-        >
-          Everything your business needs to grow —{" "}
-          <span className="text-accent-primary" style={{ textShadow: '0 0 20px rgba(47,168,255,0.3)' }}>
-            under one roof.
-          </span>
-        </h1>
-
-        {/* Subhead */}
-        <p 
-          ref={subtextRef}
-          className="text-base sm:text-[17px] md:text-lg text-text-body max-w-lg leading-relaxed opacity-100 mt-2 px-2 sm:px-0"
-        >
-          A technical partner that designs and engineers high-converting web systems, mobile apps, and automated workflows built directly to drive your revenue.
-        </p>
-
-        {/* CTA Buttons */}
-        <div ref={ctaRef} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mt-6 opacity-100 w-full sm:w-auto px-4 sm:px-0">
-          <a
-            href="#contact"
-            onClick={(e) => handleScrollTo(e, "contact")}
-            className="tilt-hero w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 min-h-[44px] bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:-translate-y-0.5 transition-all duration-300"
-          >
-            Let's Talk
-          </a>
-          <a
-            href="#work"
-            onClick={(e) => handleScrollTo(e, "work")}
-            className="group inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 text-text-heading font-medium text-[15px] hover:text-accent-primary transition-colors duration-300"
-          >
-            See the work 
-            <span className="group-hover:translate-x-1 transition-transform duration-300">↗</span>
-          </a>
+        {/* Right Column: 3D Interactive Agency Glasses Logo */}
+        <div className="lg:col-span-5 flex items-center justify-center w-full relative z-10 py-6 lg:py-0">
+          <HeroGlasses3D />
         </div>
+
       </div>
       
       {/* Scroll Hint */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 select-none pointer-events-none opacity-80 z-10">
+      <div className="hidden lg:flex absolute bottom-4 left-1/2 -translate-x-1/2 flex-col items-center gap-3 select-none pointer-events-none opacity-70 z-10">
         <span className="text-[10px] text-accent-primary tracking-[0.2em] uppercase font-bold" style={{ textShadow: '0 0 10px rgba(47,168,255,0.5)' }}>
           Scroll to explore
         </span>
-        {/* [CHANGED] Taller scroll hint */}
-        <div className="w-[1px] h-20 bg-gradient-to-b from-accent-primary to-transparent"></div>
+        <div className="w-[1px] h-12 bg-gradient-to-b from-accent-primary to-transparent" />
       </div>
     </section>
   );

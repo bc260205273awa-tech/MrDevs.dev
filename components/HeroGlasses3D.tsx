@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { Power, Code2 } from "lucide-react";
+import Image from "next/image";
 
 export default function HeroGlasses3D() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,12 +24,12 @@ export default function HeroGlasses3D() {
     const transX = gsap.quickTo(frameRef.current, "x", { duration: 0.6, ease: "power2.out" });
     const transY = gsap.quickTo(frameRef.current, "y", { duration: 0.6, ease: "power2.out" });
 
-    // Eye Symbol Pupil Movement Setters (Left & Right Lens Symbols)
-    const leftPupilX = leftEyeRef.current ? gsap.quickTo(leftEyeRef.current, "x", { duration: 0.3, ease: "power1.out" }) : null;
-    const leftPupilY = leftEyeRef.current ? gsap.quickTo(leftEyeRef.current, "y", { duration: 0.3, ease: "power1.out" }) : null;
+    // Eye Symbol Pupil Movement Setters (Left </> and Right ⏻)
+    const leftPupilX = leftEyeRef.current ? gsap.quickTo(leftEyeRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
+    const leftPupilY = leftEyeRef.current ? gsap.quickTo(leftEyeRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
-    const rightPupilX = rightEyeRef.current ? gsap.quickTo(rightEyeRef.current, "x", { duration: 0.3, ease: "power1.out" }) : null;
-    const rightPupilY = rightEyeRef.current ? gsap.quickTo(rightEyeRef.current, "y", { duration: 0.3, ease: "power1.out" }) : null;
+    const rightPupilX = rightEyeRef.current ? gsap.quickTo(rightEyeRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
+    const rightPupilY = rightEyeRef.current ? gsap.quickTo(rightEyeRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
     // Lens Glare Highlight Movement Setters
     const leftGlareX = leftGlareRef.current ? gsap.quickTo(leftGlareRef.current, "x", { duration: 0.4, ease: "power1.out" }) : null;
@@ -55,22 +55,22 @@ export default function HeroGlasses3D() {
       const normY = deltaY / (window.innerHeight / 2);
 
       // --- 1. FULL 3D ROTATION & DEPTH (X, Y, Z Axis) ---
-      const maxRotY = 40; // Yaw angle (degrees)
-      const maxRotX = 30; // Pitch angle (degrees)
-      const maxRotZ = 15; // Roll angle (tilt outward on Z-axis)
-      const maxTransZ = 45; // Depth outward tilt toward user
+      const maxRotY = 38; // Yaw angle (degrees)
+      const maxRotX = 28; // Pitch angle (degrees)
+      const maxRotZ = 12; // Roll angle
+      const maxTransZ = 50; // Depth outward tilt toward user
 
       rotY(normX * maxRotY);
       rotX(-normY * maxRotX);
       rotZ(normX * normY * maxRotZ);
       transZ(Math.abs(normX * normY) * maxTransZ);
-      transX(normX * 25);
-      transY(normY * 20);
+      transX(normX * 22);
+      transY(normY * 18);
 
       // --- 2. EYE SYMBOL PUPIL TRACKING ---
-      // Symbols shift inside the lenses towards the cursor direction
-      const maxPupilShiftX = 18; // px shift inside lens
-      const maxPupilShiftY = 14; // px shift inside lens
+      // Shift symbols inside the lenses towards the cursor direction
+      const maxPupilShiftX = 20; // px shift inside lens
+      const maxPupilShiftY = 16; // px shift inside lens
 
       if (leftPupilX && leftPupilY) {
         leftPupilX(normX * maxPupilShiftX);
@@ -83,17 +83,16 @@ export default function HeroGlasses3D() {
 
       // --- 3. LENS GLARE PARALLAX ---
       if (leftGlareX && leftGlareY) {
-        leftGlareX(-normX * 20);
-        leftGlareY(-normY * 15);
+        leftGlareX(-normX * 24);
+        leftGlareY(-normY * 18);
       }
       if (rightGlareX && rightGlareY) {
-        rightGlareX(-normX * 20);
-        rightGlareY(-normY * 15);
+        rightGlareX(-normX * 24);
+        rightGlareY(-normY * 18);
       }
     };
 
     const handleMouseLeave = () => {
-      // Smooth reset on mouse leave
       rotY(0);
       rotX(0);
       rotZ(0);
@@ -131,115 +130,82 @@ export default function HeroGlasses3D() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center select-none w-full max-w-lg h-64 mx-auto"
+      className="relative flex items-center justify-center select-none w-full max-w-2xl h-80 mx-auto"
       style={{ perspective: "1200px" }}
     >
-      {/* Ambient Radial Cyan Backlight */}
-      <div className="absolute w-80 h-40 bg-accent-primary/25 rounded-full blur-[90px] pointer-events-none" />
+      {/* Ambient Radial Cyan Backlight Glow */}
+      <div className="absolute w-[460px] h-[220px] bg-accent-primary/25 rounded-full blur-[110px] pointer-events-none" />
 
       {/* Main 3D Glasses Frame Container */}
       <div
         ref={frameRef}
-        className="relative z-10 flex items-center justify-center transition-shadow duration-300"
+        className="relative z-10 flex items-center justify-center w-[480px] sm:w-[540px] md:w-[600px] aspect-[594/219]"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Glasses Outer Frame SVG Structure */}
-        <div className="relative flex items-center justify-center">
-          
-          {/* SVG Frame Chassis */}
-          <svg
-            width="340"
-            height="140"
-            viewBox="0 0 340 140"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="drop-shadow-[0_15px_35px_rgba(47,168,255,0.45)]"
-          >
-            {/* Top Bridge */}
-            <path
-              d="M140 45 Q170 35 200 45"
-              stroke="#2FA8FF"
-              strokeWidth="6"
-              strokeLinecap="round"
-            />
-            <path
-              d="M145 52 Q170 45 195 52"
-              stroke="#0B1528"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
+        {/* Layer 0: Dark lens glass backings with subtle glow */}
+        <div className="absolute inset-0 flex items-center justify-between px-[14%] pointer-events-none">
+          <div className="w-[36%] h-[78%] rounded-[45%] bg-[#060D1A]/90 shadow-[inset_0_0_25px_rgba(47,168,255,0.25)] blur-[1px]" />
+          <div className="w-[36%] h-[78%] rounded-[45%] bg-[#060D1A]/90 shadow-[inset_0_0_25px_rgba(0,212,255,0.25)] blur-[1px]" />
+        </div>
 
-            {/* Left Lens Outer Rim */}
-            <path
-              d="M25 35 C60 28 120 28 135 42 C150 56 135 98 120 108 C98 120 48 116 25 102 C10 88 10 52 25 35 Z"
-              fill="url(#leftLensBg)"
-              stroke="#2FA8FF"
-              strokeWidth="5"
-            />
+        {/* Layer 1: Left Eye Pupil (</> Code Symbol) */}
+        <div
+          ref={leftEyeRef}
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_18px_rgba(47,168,255,0.85)] z-10"
+        >
+          <Image
+            src="/hero-symbol-code.png"
+            alt="Code Symbol Pupil"
+            fill
+            priority
+            className="object-contain"
+          />
+        </div>
 
-            {/* Right Lens Outer Rim */}
-            <path
-              d="M205 42 C220 28 280 28 315 35 C330 52 330 88 315 102 C292 116 242 120 220 108 C205 98 190 56 205 42 Z"
-              fill="url(#rightLensBg)"
-              stroke="#2FA8FF"
-              strokeWidth="5"
-            />
+        {/* Layer 2: Right Eye Pupil (⏻ Power Symbol) */}
+        <div
+          ref={rightEyeRef}
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_18px_rgba(0,212,255,0.85)] z-10"
+        >
+          <Image
+            src="/hero-symbol-power.png"
+            alt="Power Symbol Pupil"
+            fill
+            priority
+            className="object-contain"
+          />
+        </div>
 
-            {/* Left Temple Arm */}
-            <path d="M20 42 L2 35" stroke="#378ADD" strokeWidth="6" strokeLinecap="round" />
-            
-            {/* Right Temple Arm */}
-            <path d="M320 42 L338 35" stroke="#378ADD" strokeWidth="6" strokeLinecap="round" />
+        {/* Layer 3: Realistic Metallic Glasses Outer Frame */}
+        <div className="absolute inset-0 pointer-events-none drop-shadow-[0_20px_45px_rgba(47,168,255,0.5)] z-20">
+          <Image
+            src="/hero-glasses-frame.png"
+            alt="MrDevs Metallic Glasses Frame"
+            fill
+            priority
+            className="object-contain"
+          />
+        </div>
 
-            <defs>
-              <linearGradient id="leftLensBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0B1528" stopOpacity="0.95" />
-                <stop offset="60%" stopColor="#0F2442" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#1E4575" stopOpacity="0.85" />
-              </linearGradient>
-              <linearGradient id="rightLensBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0B1528" stopOpacity="0.95" />
-                <stop offset="60%" stopColor="#0F2442" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#1E4575" stopOpacity="0.85" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          {/* LEFT LENS: Power Symbol "Eye" */}
-          <div className="absolute left-[38px] top-[32px] w-[95px] h-[70px] rounded-[30px] overflow-hidden flex items-center justify-center">
-            {/* Glass Glare Highlight */}
+        {/* Layer 4: Interactive Glass Reflections & Glare */}
+        <div className="absolute inset-0 flex items-center justify-between px-[14%] pointer-events-none z-30 overflow-hidden">
+          {/* Left Lens Glare */}
+          <div className="relative w-[36%] h-[78%] rounded-[45%] overflow-hidden">
             <div
               ref={leftGlareRef}
-              className="absolute w-12 h-20 bg-gradient-to-tr from-transparent via-white/20 to-transparent transform -rotate-45 rounded-full blur-[1px] pointer-events-none z-20"
+              className="absolute -top-1/2 -left-1/2 w-full h-[200%] bg-gradient-to-r from-transparent via-white/25 to-transparent transform -rotate-45 blur-[3px]"
             />
-
-            {/* Power Eye Icon (Left Pupil) */}
-            <div
-              ref={leftEyeRef}
-              className="relative z-10 flex items-center justify-center p-3 rounded-full bg-accent-primary/10 border border-accent-primary/40 shadow-[0_0_20px_rgba(47,168,255,0.6)] text-accent-cyan"
-            >
-              <Power className="w-8 h-8 drop-shadow-[0_0_12px_#2FA8FF] stroke-[2.5]" />
-            </div>
           </div>
 
-          {/* RIGHT LENS: Coding Symbol "Eye" */}
-          <div className="absolute right-[38px] top-[32px] w-[95px] h-[70px] rounded-[30px] overflow-hidden flex items-center justify-center">
-            {/* Glass Glare Highlight */}
+          {/* Right Lens Glare */}
+          <div className="relative w-[36%] h-[78%] rounded-[45%] overflow-hidden">
             <div
               ref={rightGlareRef}
-              className="absolute w-12 h-20 bg-gradient-to-tr from-transparent via-white/20 to-transparent transform -rotate-45 rounded-full blur-[1px] pointer-events-none z-20"
+              className="absolute -top-1/2 -left-1/2 w-full h-[200%] bg-gradient-to-r from-transparent via-white/25 to-transparent transform -rotate-45 blur-[3px]"
             />
-
-            {/* Code Eye Icon (Right Pupil) */}
-            <div
-              ref={rightEyeRef}
-              className="relative z-10 flex items-center justify-center p-3 rounded-full bg-accent-primary/10 border border-accent-primary/40 shadow-[0_0_20px_rgba(47,168,255,0.6)] text-accent-cyan"
-            >
-              <Code2 className="w-8 h-8 drop-shadow-[0_0_12px_#2FA8FF] stroke-[2.5]" />
-            </div>
           </div>
-
         </div>
+
       </div>
     </div>
   );

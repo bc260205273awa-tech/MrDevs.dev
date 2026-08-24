@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowRight, Code2, Smartphone, Shield, Zap, MapPin, Palette } from "lucide-react";
 import Image from "next/image";
@@ -19,7 +19,7 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const navRef = useRef<HTMLHeadingElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   use3DTilt(navRef, ".tilt-nav", 15, 800); // stronger tilt for smaller text items
 
   useEffect(() => {

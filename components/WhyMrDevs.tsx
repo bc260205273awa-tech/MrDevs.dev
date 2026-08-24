@@ -3,10 +3,12 @@
 import { useRef } from "react";
 import { UserCheck, ShieldCheck, Database } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 export default function WhyMrDevs() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 5, 1200);
 
   const PILLARS = [
     {
@@ -70,7 +72,7 @@ export default function WhyMrDevs() {
             return (
               <div
                 key={index}
-                className={`scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 hover:border-white/10 hover:bg-white/10 transition-colors duration-500 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
+                className={`tilt-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 hover:border-white/10 hover:bg-white/10 transition-colors duration-500 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {/* [CHANGED] Massive Watermark Icon */}

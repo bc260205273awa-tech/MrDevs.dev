@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Code2, Smartphone, Shield, Zap, MapPin, Palette, ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 interface ServiceItem {
   icon: LucideIcon;
@@ -75,6 +76,7 @@ const STEPS: Step[] = [
 export default function Services() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 4, 1200);
 
   return (
     <section id="services" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
@@ -99,7 +101,7 @@ export default function Services() {
           {STEPS.map((step, idx) => (
             <div
               key={step.num}
-              className="scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
+              className="tilt-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
               style={{ transitionDelay: `${idx * 100}ms` }}
             >
               {/* Subtle background glow on hover */}

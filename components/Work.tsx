@@ -3,10 +3,12 @@
 import { useRef } from "react";
 import { ExternalLink } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 export default function Work() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 4, 1400);
 
   return (
     <section id="work" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
@@ -27,7 +29,7 @@ export default function Work() {
 
         {/* 3D Glass Browser Mockup */}
         {/* [CHANGED] Implemented heavy glassmorphism shell and hover perspective tilt safe for mobile */}
-        <div className="scroll-reveal group w-full bg-white/[0.02] backdrop-blur-3xl ring-1 ring-white/10 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(47,168,255,0.05)] transition-all duration-700 ease-out hover:shadow-[0_0_100px_rgba(47,168,255,0.1)] md:hover:[transform:perspective(1200px)_rotateX(2deg)_translateY(-8px)]">
+        <div className="tilt-card scroll-reveal group w-full bg-white/[0.02] backdrop-blur-3xl ring-1 ring-white/10 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(47,168,255,0.05)] transition-all duration-700 ease-out hover:shadow-[0_0_100px_rgba(47,168,255,0.1)] md:hover:[transform:perspective(1200px)_rotateX(2deg)_translateY(-8px)]">
           
           {/* Browser Chrome Top Bar */}
           <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-black/40 border-b border-white/5 backdrop-blur-md">
@@ -69,7 +71,7 @@ export default function Work() {
               </div>
 
               <div className="flex flex-col gap-6 max-w-lg mt-4">
-                <div className="bg-white/5 border border-white/5 rounded-xl p-5 sm:p-6">
+                <div className="tilt-card bg-white/5 border border-white/5 rounded-xl p-5 sm:p-6">
                   <span className="inline-block px-2.5 py-1 rounded bg-red-500/10 text-red-400 text-[10px] font-bold tracking-widest uppercase mb-3 border border-red-500/20">
                     The Problem
                   </span>
@@ -78,7 +80,7 @@ export default function Work() {
                   </p>
                 </div>
                 
-                <div className="bg-white/5 border border-white/5 rounded-xl p-5 sm:p-6 relative overflow-hidden group/solution">
+                <div className="tilt-card bg-white/5 border border-white/5 rounded-xl p-5 sm:p-6 relative overflow-hidden group/solution">
                   <div className="absolute inset-0 bg-accent-primary/5 opacity-0 group-hover/solution:opacity-100 transition-opacity duration-500"></div>
                   <span className="relative z-10 inline-block px-2.5 py-1 rounded bg-accent-cyan/10 text-accent-cyan text-[10px] font-bold tracking-widest uppercase mb-3 border border-accent-cyan/20">
                     The Solution
@@ -97,7 +99,7 @@ export default function Work() {
               </span>
               
               {/* Massive Top Widget */}
-              <div className="relative bg-bg-deep border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col items-start justify-center h-36 sm:h-48 overflow-hidden group/widget">
+              <div className="tilt-card relative bg-bg-deep border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col items-start justify-center h-36 sm:h-48 overflow-hidden group/widget">
                 <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-accent-primary/20 blur-[50px] rounded-full"></div>
                 <span className="relative z-10 text-accent-primary text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mb-1">
                   50K+
@@ -109,7 +111,7 @@ export default function Work() {
 
               {/* Bottom Split Widgets */}
               <div className="flex flex-row gap-3 sm:gap-4 h-auto sm:h-40">
-                <div className="flex-1 bg-bg-deep border border-white/5 rounded-2xl p-4 sm:p-6 flex flex-col justify-end relative overflow-hidden min-h-[110px] sm:min-h-0">
+                <div className="tilt-card flex-1 bg-bg-deep border border-white/5 rounded-2xl p-4 sm:p-6 flex flex-col justify-end relative overflow-hidden min-h-[110px] sm:min-h-0">
                   <div className="absolute -top-10 -left-10 w-32 h-32 bg-accent-cyan/10 blur-[40px] rounded-full"></div>
                   <span className="relative z-10 text-text-heading text-2xl sm:text-3xl font-bold tracking-tight mb-1">
                     16+
@@ -119,7 +121,7 @@ export default function Work() {
                   </span>
                 </div>
                 
-                <div className="flex-1 bg-bg-deep border border-white/5 rounded-2xl p-4 sm:p-6 flex flex-col justify-end relative overflow-hidden min-h-[110px] sm:min-h-0">
+                <div className="tilt-card flex-1 bg-bg-deep border border-white/5 rounded-2xl p-4 sm:p-6 flex flex-col justify-end relative overflow-hidden min-h-[110px] sm:min-h-0">
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-purple-500/10 blur-[40px] rounded-full"></div>
                   <span className="relative z-10 text-text-heading text-2xl sm:text-3xl font-bold tracking-tight mb-1">
                     24/7

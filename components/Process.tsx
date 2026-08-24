@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -48,6 +49,7 @@ export default function Process() {
   const timelineRef = useRef<HTMLDivElement>(null);
   
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 3, 1500); // gentler tilt for process cards
 
   useGSAP(() => {
     if (!timelineRef.current || !containerRef.current) return;
@@ -239,7 +241,7 @@ export default function Process() {
                   
                   {/* Glass Card Half */}
                   <div className={`gsap-card-content w-full md:w-1/2 pl-[48px] sm:pl-[72px] md:pl-0 ${isEven ? 'md:pr-16 lg:pr-24' : 'md:pl-16 lg:pl-24'} opacity-0`}>
-                    <div className="bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 lg:p-10 hover:bg-white/10 transition-colors duration-500 relative group overflow-hidden">
+                    <div className="tilt-card bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 lg:p-10 hover:bg-white/10 transition-colors duration-500 relative group overflow-hidden">
                       
                       {/* Massive Typographic Glow Watermark */}
                       <div className={`absolute -top-6 sm:-top-8 ${isEven ? 'md:-right-4 right-3' : 'md:-left-4 right-3'} text-[6rem] sm:text-[8rem] font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-accent-cyan/10 to-transparent select-none pointer-events-none group-hover:from-accent-cyan/20 transition-all duration-700`}>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowRight, Code2, Smartphone, Shield, Zap, MapPin, Palette } from "lucide-react";
 import Image from "next/image";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,6 +19,8 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const navRef = useRef<HTMLHeadingElement>(null);
+  use3DTilt(navRef, ".tilt-nav", 15, 800); // stronger tilt for smaller text items
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,6 +104,7 @@ export default function Navbar() {
 
   return (
     <header
+      ref={navRef}
       // [CHANGED] Added translate transform based on hidden state, increased duration
       className={`fixed inset-x-0 top-0 z-50 transition-transform duration-500 font-sans ${
         hidden ? "-translate-y-full" : "translate-y-0"
@@ -119,7 +123,7 @@ export default function Navbar() {
         {/* Logo Image */}
         <a
           href="/"
-          className="flex items-center select-none"
+          className="tilt-nav flex items-center select-none"
         >
           <Image
             src="/logo.png"
@@ -144,7 +148,7 @@ export default function Navbar() {
                 e.preventDefault();
                 setDropdownOpen((prev) => !prev);
               }}
-              className={`text-sm font-medium transition-colors duration-200 relative py-1 flex items-center gap-1 ${
+              className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 flex items-center gap-1 ${
                 pathname.startsWith("/services") ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
               }`}
             >
@@ -260,7 +264,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#work" : "/#work"}
             onClick={(e) => handleLinkClick(e, "#work")}
-            className={`text-sm font-medium transition-colors duration-200 relative py-1 ${
+            className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 ${
               isHome && activeSection === "work" ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
             }`}
           >
@@ -273,7 +277,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#process" : "/#process"}
             onClick={(e) => handleLinkClick(e, "#process")}
-            className={`text-sm font-medium transition-colors duration-200 relative py-1 ${
+            className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 ${
               isHome && activeSection === "process" ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
             }`}
           >
@@ -286,7 +290,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#contact" : "/#contact"}
             onClick={(e) => handleLinkClick(e, "#contact")}
-            className={`text-sm font-medium transition-colors duration-200 relative py-1 ${
+            className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 ${
               isHome && activeSection === "contact" ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
             }`}
           >

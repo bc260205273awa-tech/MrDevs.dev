@@ -8,7 +8,7 @@ import { use3DTilt } from "@/hooks/use3DTilt";
 export default function Work() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
-  use3DTilt(containerRef, ".tilt-card", 4, 1400);
+  use3DTilt(containerRef, ".tilt-card", 10, 1000); // Powerful tilt
 
   return (
     <section id="work" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
@@ -28,8 +28,7 @@ export default function Work() {
         </div>
 
         {/* 3D Glass Browser Mockup */}
-        {/* [CHANGED] Implemented heavy glassmorphism shell and hover perspective tilt safe for mobile */}
-        <div className="tilt-card scroll-reveal group w-full bg-white/[0.02] backdrop-blur-3xl ring-1 ring-white/10 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(47,168,255,0.05)] transition-all duration-700 ease-out hover:shadow-[0_0_100px_rgba(47,168,255,0.1)] md:hover:[transform:perspective(1200px)_rotateX(2deg)_translateY(-8px)]">
+        <div className="tilt-card scroll-reveal group w-full bg-white/[0.02] backdrop-blur-3xl ring-1 ring-white/10 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(47,168,255,0.05)] transition-shadow duration-500 hover:shadow-[0_0_100px_rgba(47,168,255,0.15)]">
           
           {/* Browser Chrome Top Bar */}
           <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-black/40 border-b border-white/5 backdrop-blur-md">

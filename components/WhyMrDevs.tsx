@@ -8,7 +8,7 @@ import { use3DTilt } from "@/hooks/use3DTilt";
 export default function WhyMrDevs() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
-  use3DTilt(containerRef, ".tilt-card", 5, 1200);
+  use3DTilt(containerRef, ".tilt-card", 15, 1000); // Powerful tilt
 
   const PILLARS = [
     {

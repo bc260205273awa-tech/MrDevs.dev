@@ -49,7 +49,7 @@ export default function Process() {
   const timelineRef = useRef<HTMLDivElement>(null);
   
   useScrollReveal(containerRef);
-  use3DTilt(containerRef, ".tilt-card", 3, 1500); // gentler tilt for process cards
+  use3DTilt(containerRef, ".tilt-card", 10, 1000); // Powerful tilt
 
   useGSAP(() => {
     if (!timelineRef.current || !containerRef.current) return;

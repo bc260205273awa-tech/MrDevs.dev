@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Send, MessageSquare } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 const PROJECT_TYPES = [
   "Web development",
@@ -34,6 +35,7 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 10, 900);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -74,7 +76,7 @@ export default function Contact() {
           href="https://wa.me/923218492868"
           target="_blank"
           rel="noopener noreferrer"
-          className="scroll-reveal w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 min-h-[44px] bg-[#378ADD] text-[#042C53] font-medium text-sm rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow mb-6 text-center select-none"
+          className="tilt-card scroll-reveal w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 min-h-[44px] bg-[#378ADD] text-[#042C53] font-medium text-sm rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow mb-6 text-center select-none"
           style={{ transitionDelay: "100ms" }}
         >
           <MessageSquare size={16} />
@@ -91,7 +93,7 @@ export default function Contact() {
         </div>
 
         {/* Secondary Form (Low Visual Weight) */}
-        <div className="scroll-reveal w-full p-6 border border-[rgba(133,183,235,0.08)] rounded-xl bg-[#0f1729]/30 backdrop-blur-sm" style={{ transitionDelay: "200ms" }}>
+        <div className="tilt-card scroll-reveal w-full p-6 border border-[rgba(133,183,235,0.08)] rounded-xl bg-[#0f1729]/30 backdrop-blur-sm" style={{ transitionDelay: "200ms" }}>
           {submitted ? (
             <div className="flex flex-col items-center text-center py-6 gap-3 select-none">
               <div className="w-10 h-10 rounded-full border border-[#5DCAA5]/30 bg-[#5DCAA5]/5 flex items-center justify-center mb-1">

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronDown, MessageSquare, ArrowRight, CheckCircle2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 export interface FAQItem {
   question: string;
@@ -39,6 +40,8 @@ export interface ServicePageProps {
 export default function ServicePageLayout({ data, children }: { data: ServicePageProps; children?: React.ReactNode }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const pathname = usePathname();
+  const containerRef = useRef<HTMLElement>(null);
+  use3DTilt(containerRef, ".tilt-card", 12, 850);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
@@ -91,7 +94,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
   return (
     <>
       <Navbar />
-      <main className="bg-[#0a0f1a] text-[#f1efe8] font-sans min-h-screen pt-24">
+      <main ref={containerRef} className="bg-[#0a0f1a] text-[#f1efe8] font-sans min-h-screen pt-24">
         
         {/* JSON-LD Structured Data */}
         <script
@@ -137,7 +140,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
               {data.deliverables.map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] transition-all duration-200"
+                  className="tilt-card bg-[#0f1729] border border-[rgba(133,183,235,0.15)] rounded-xl p-5 hover:border-[rgba(133,183,235,0.3)] transition-all duration-200"
                 >
                   <h3 className="font-sans font-medium text-[13px] text-[#f1efe8] mb-2 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#378ADD]" />
@@ -172,7 +175,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                 <h2 className="text-xl md:text-2xl font-medium text-[#f1efe8] text-center">
                   {data.proof.title}
                 </h2>
-                <div className="w-full p-6 border border-[rgba(133,183,235,0.15)] rounded-xl bg-[#0f1729]/50 text-center max-w-xl">
+                <div className="tilt-card w-full p-6 border border-[rgba(133,183,235,0.15)] rounded-xl bg-[#0f1729]/50 text-center max-w-xl">
                   <p className="text-xs text-[#888780] leading-relaxed mb-4">
                     {data.proof.text}
                   </p>
@@ -193,7 +196,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                   Why Hire MrDevs?
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full text-left">
-                  <div className="bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-xl p-5">
+                  <div className="tilt-card bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-xl p-5">
                     <h3 className="text-xs font-medium text-[#f1efe8] mb-1.5 flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#378ADD]" />
                       Direct Founder Access
@@ -202,7 +205,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                       Speak directly to the engineer building your product. No account managers or outsourced junior developers.
                     </p>
                   </div>
-                  <div className="bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-xl p-5">
+                  <div className="tilt-card bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-xl p-5">
                     <h3 className="text-xs font-medium text-[#f1efe8] mb-1.5 flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#378ADD]" />
                       Total Accountability
@@ -211,7 +214,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                       One point of contact responsible for UI design, databases, security, and deployment end-to-end.
                     </p>
                   </div>
-                  <div className="bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-xl p-5">
+                  <div className="tilt-card bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-xl p-5">
                     <h3 className="text-xs font-medium text-[#f1efe8] mb-1.5 flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#378ADD]" />
                       Proven at Scale
@@ -239,7 +242,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                 return (
                   <div
                     key={idx}
-                    className="border border-[rgba(133,183,235,0.08)] rounded-lg bg-[#0f1729]/20 overflow-hidden transition-all duration-200"
+                    className="tilt-card border border-[rgba(133,183,235,0.08)] rounded-lg bg-[#0f1729]/20 overflow-hidden transition-all duration-200"
                   >
                     <button
                       onClick={() => toggleFaq(idx)}

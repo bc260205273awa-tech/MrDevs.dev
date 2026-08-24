@@ -3,16 +3,18 @@
 import { useRef } from "react";
 import { MessageSquare } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 export default function CondensedCTA() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 14, 850);
 
   return (
     <section ref={containerRef} className="py-24 bg-bg-main font-sans overflow-hidden">
       {/* Massive Glowing Band Container */}
       <div className="relative w-full max-w-6xl mx-auto px-6">
-        <div className="scroll-reveal relative overflow-hidden bg-white/[0.02] backdrop-blur-xl border border-white/10 py-20 px-8 flex flex-col items-center text-center gap-8 shadow-[0_0_50px_rgba(47,168,255,0.03)] rounded-3xl">
+        <div className="tilt-card scroll-reveal relative overflow-hidden bg-white/[0.02] backdrop-blur-xl border border-white/10 py-20 px-8 flex flex-col items-center text-center gap-8 shadow-[0_0_50px_rgba(47,168,255,0.03)] rounded-3xl">
           
           {/* Subtle Background Glow inside the band */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

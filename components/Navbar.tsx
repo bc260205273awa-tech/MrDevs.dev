@@ -20,7 +20,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const navRef = useRef<HTMLElement>(null);
-  use3DTilt(navRef, ".tilt-nav", 15, 800); // stronger tilt for smaller text items
+  use3DTilt(navRef, ".tilt-nav", 25, 600); // Super powerful tilt for navbar items
 
   useEffect(() => {
     const handleScroll = () => {
@@ -139,7 +139,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           {/* Hover Dropdown for Services */}
           <div
-            className="relative services-dropdown-container"
+            className="tilt-nav relative services-dropdown-container"
             onMouseEnter={() => setDropdownOpen(true)}
             onMouseLeave={() => setDropdownOpen(false)}
           >
@@ -148,7 +148,7 @@ export default function Navbar() {
                 e.preventDefault();
                 setDropdownOpen((prev) => !prev);
               }}
-              className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 flex items-center gap-1 ${
+              className={`text-sm font-medium transition-colors duration-200 relative py-1 flex items-center gap-1 ${
                 pathname.startsWith("/services") ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
               }`}
             >
@@ -305,7 +305,7 @@ export default function Navbar() {
         <a
           href={isHome ? "#contact" : "/#contact"}
           onClick={(e) => handleLinkClick(e, "#contact")}
-          className="hidden md:inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-[#378ADD] text-[#042C53] rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow-sm"
+          className="tilt-nav hidden md:inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-[#378ADD] text-[#042C53] rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow-sm"
         >
           let&apos;s talk
         </a>

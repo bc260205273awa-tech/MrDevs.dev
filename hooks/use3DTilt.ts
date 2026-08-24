@@ -2,85 +2,112 @@ import { useEffect, RefObject } from "react";
 import gsap from "gsap";
 
 /**
- * use3DTilt — Attaches GSAP-powered 3D card tilt on mousemove + elastic spring-back on mouseleave.
- * Also runs a flip-in entrance animation (rotationX from 25° → 0°) staggered across all cards.
+ * use3DTilt — Attaches high-performance GSAP 3D tilt with perspective, lift & elastic spring-back.
  *
- * @param containerRef  The ref wrapping all the tiltable cards
- * @param selector      CSS selector for the card elements within the container (default: ".tilt-card")
- * @param maxTilt       Max degrees of tilt in any direction (default: 6)
- * @param perspective   CSS perspective depth in px (default: 1200)
+ * @param containerRef  The ref wrapping all the tiltable cards/elements
+ * @param selector      CSS selector for target elements (default: ".tilt-card")
+ * @param maxTilt       Max degrees of tilt in X/Y (default: 16)
+ * @param perspective   CSS perspective depth in px (default: 800)
+ * @param scaleHover    Scale factor on hover (default: 1.025)
  */
 export function use3DTilt(
   containerRef: RefObject<HTMLElement | null>,
   selector: string = ".tilt-card",
-  maxTilt: number = 6,
-  perspective: number = 1200
+  maxTilt: number = 16,
+  perspective: number = 800,
+  scaleHover: number = 1.025
 ) {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Only apply on hover-capable devices
+    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches) {
+      return;
+    }
+
     const cards = containerRef.current.querySelectorAll<HTMLElement>(selector);
     if (!cards.length) return;
 
-    // --- Entrance: flip up from 3D ---
+    // Entrance 3D flip-in animation
     gsap.fromTo(
       Array.from(cards),
       {
         opacity: 0,
         rotationX: 25,
-        y: 30,
-        transformOrigin: "top center",
-        transformPerspective: 900,
+        y: 24,
+        transformOrigin: "center center",
+        transformPerspective: perspective,
       },
       {
         opacity: 1,
         rotationX: 0,
         y: 0,
         duration: 0.65,
-        stagger: 0.12,
+        stagger: 0.08,
         ease: "power3.out",
-        delay: 0.1,
+        clearProps: "opacity,y,transformOrigin",
       }
     );
 
-    // --- Hover: 3D tilt ---
-    const handlers: { el: HTMLElement; move: (e: MouseEvent) => void; leave: () => void }[] = [];
+    const cleanupList: (() => void)[] = [];
 
     cards.forEach((el) => {
-      const move = (e: MouseEvent) => {
+      el.style.transformStyle = "preserve-3d";
+      el.style.willChange = "transform";
+
+      let initialTransition = "";
+
+      const onEnter = () => {
+        initialTransition = el.style.transition;
+        // Temporarily disable CSS transitions on transform to prevent lag
+        el.style.transition = "none";
+      };
+
+      const onMove = (e: MouseEvent) => {
         const rect = el.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width / 2);
-        const dy = (e.clientY - cy) / (rect.height / 2);
+        const dx = (e.clientX - cx) / (rect.width / 2); // -1 to 1
+        const dy = (e.clientY - cy) / (rect.height / 2); // -1 to 1
+
         gsap.to(el, {
           rotationY: dx * maxTilt,
           rotationX: -dy * maxTilt,
+          scale: scaleHover,
           transformPerspective: perspective,
-          ease: "power1.out",
-          duration: 0.3,
+          ease: "power2.out",
+          duration: 0.22,
+          overwrite: "auto",
         });
       };
 
-      const leave = () => {
+      const onLeave = () => {
+        el.style.transition = initialTransition;
         gsap.to(el, {
           rotationY: 0,
           rotationX: 0,
-          duration: 0.6,
-          ease: "elastic.out(1, 0.5)",
+          scale: 1,
+          duration: 0.75,
+          ease: "elastic.out(1.1, 0.4)",
+          overwrite: "auto",
         });
       };
 
-      el.addEventListener("mousemove", move);
-      el.addEventListener("mouseleave", leave);
-      handlers.push({ el, move, leave });
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+
+      cleanupList.push(() => {
+        el.removeEventListener("mouseenter", onEnter);
+        el.removeEventListener("mousemove", onMove);
+        el.removeEventListener("mouseleave", onLeave);
+      });
     });
 
     return () => {
-      handlers.forEach(({ el, move, leave }) => {
-        el.removeEventListener("mousemove", move);
-        el.removeEventListener("mouseleave", leave);
-      });
+      cleanupList.forEach((fn) => fn());
     };
-  }, [containerRef, selector, maxTilt, perspective]);
+  }, [containerRef, selector, maxTilt, perspective, scaleHover]);
 }

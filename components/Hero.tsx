@@ -12,6 +12,7 @@ if (typeof window !== "undefined") {
 
 import HeroGlasses3D from "./HeroGlasses3D";
 import HeroParticles from "./HeroParticles";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -19,6 +20,8 @@ export default function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+
+  use3DTilt(containerRef, ".tilt-hero", 18, 700);
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -75,7 +78,7 @@ export default function Hero() {
       <div ref={contentRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 flex flex-col items-center gap-6 -mt-12">
         
         {/* [NEW] Glass pill availability badge with pulsing dot */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-xl mb-4">
+        <div className="tilt-hero inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-xl mb-4 cursor-default">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full rounded-full bg-accent-cyan opacity-75 animate-ping-slow" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-cyan" />
@@ -109,7 +112,7 @@ export default function Hero() {
           <a
             href="#contact"
             onClick={(e) => handleScrollTo(e, "contact")}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 min-h-[44px] bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:-translate-y-0.5 transition-all duration-300"
+            className="tilt-hero w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 min-h-[44px] bg-accent-primary text-[#050B14] font-semibold text-[15px] rounded shadow-glow hover:bg-accent-cyan hover:shadow-glow-cyan hover:-translate-y-0.5 transition-all duration-300"
           >
             Let's Talk
           </a>

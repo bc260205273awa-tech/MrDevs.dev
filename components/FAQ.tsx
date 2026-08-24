@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 interface FAQItem {
   question: string;
@@ -32,6 +33,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 10, 900);
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -58,7 +60,7 @@ export default function FAQ() {
             return (
               <div
                 key={idx}
-                className="bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-lg overflow-hidden transition-all duration-200"
+                className="tilt-card bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-lg overflow-hidden transition-all duration-200"
               >
                 <button
                   onClick={() => toggle(idx)}

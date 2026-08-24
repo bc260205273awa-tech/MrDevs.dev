@@ -76,7 +76,7 @@ const STEPS: Step[] = [
 export default function Services() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
-  use3DTilt(containerRef, ".tilt-card", 4, 1200);
+  use3DTilt(containerRef, ".tilt-card", 12, 1000); // Powerful tilt
 
   return (
     <section id="services" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
@@ -135,7 +135,7 @@ export default function Services() {
                       <a
                         key={sIdx}
                         href={service.href}
-                        className="group/link flex items-center justify-between w-full p-3.5 sm:p-4 lg:p-5 min-h-[44px] bg-white/[0.02] border border-white/5 hover:border-accent-primary/40 hover:bg-accent-primary/5 rounded-2xl transition-all duration-300"
+                        className="tilt-card group/link flex items-center justify-between w-full p-3.5 sm:p-4 lg:p-5 min-h-[44px] bg-white/[0.02] border border-white/5 hover:border-accent-primary/40 hover:bg-accent-primary/5 rounded-2xl transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 sm:gap-4">
                           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/link:bg-accent-primary/10 transition-colors shrink-0">

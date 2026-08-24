@@ -10,8 +10,6 @@ export default function HeroGlasses3D() {
   const frameRef = useRef<HTMLDivElement>(null);
   const leftEyeRef = useRef<HTMLDivElement>(null);
   const rightEyeRef = useRef<HTMLDivElement>(null);
-  const leftGlareRef = useRef<HTMLDivElement>(null);
-  const rightGlareRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     if (!containerRef.current || !frameRef.current) return;
@@ -31,46 +29,35 @@ export default function HeroGlasses3D() {
     const rightPupilX = rightEyeRef.current ? gsap.quickTo(rightEyeRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
     const rightPupilY = rightEyeRef.current ? gsap.quickTo(rightEyeRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
-    // Lens Glare Highlight Movement Setters
-    const leftGlareX = leftGlareRef.current ? gsap.quickTo(leftGlareRef.current, "x", { duration: 0.4, ease: "power1.out" }) : null;
-    const leftGlareY = leftGlareRef.current ? gsap.quickTo(leftGlareRef.current, "y", { duration: 0.4, ease: "power1.out" }) : null;
-
-    const rightGlareX = rightGlareRef.current ? gsap.quickTo(rightGlareRef.current, "x", { duration: 0.4, ease: "power1.out" }) : null;
-    const rightGlareY = rightGlareRef.current ? gsap.quickTo(rightGlareRef.current, "y", { duration: 0.4, ease: "power1.out" }) : null;
-
     const handleMouseMove = (e: MouseEvent) => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      // Screen & Frame Center
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      // Cursor offsets
       const deltaX = e.clientX - centerX;
       const deltaY = e.clientY - centerY;
 
-      // Normalized coordinates (-1 to 1)
       const normX = deltaX / (window.innerWidth / 2);
       const normY = deltaY / (window.innerHeight / 2);
 
-      // --- 1. FULL 3D ROTATION & DEPTH (X, Y, Z Axis) ---
-      const maxRotY = 38; // Yaw angle (degrees)
-      const maxRotX = 28; // Pitch angle (degrees)
-      const maxRotZ = 12; // Roll angle
-      const maxTransZ = 50; // Depth outward tilt toward user
+      // --- 1. 3D ROTATION & DEPTH ---
+      const maxRotY = 32;
+      const maxRotX = 24;
+      const maxRotZ = 10;
+      const maxTransZ = 45;
 
       rotY(normX * maxRotY);
       rotX(-normY * maxRotX);
       rotZ(normX * normY * maxRotZ);
       transZ(Math.abs(normX * normY) * maxTransZ);
-      transX(normX * 22);
-      transY(normY * 18);
+      transX(normX * 18);
+      transY(normY * 14);
 
       // --- 2. EYE SYMBOL PUPIL TRACKING ---
-      // Shift symbols inside the lenses towards the cursor direction
-      const maxPupilShiftX = 20; // px shift inside lens
-      const maxPupilShiftY = 16; // px shift inside lens
+      const maxPupilShiftX = 18;
+      const maxPupilShiftY = 14;
 
       if (leftPupilX && leftPupilY) {
         leftPupilX(normX * maxPupilShiftX);
@@ -79,16 +66,6 @@ export default function HeroGlasses3D() {
       if (rightPupilX && rightPupilY) {
         rightPupilX(normX * maxPupilShiftX);
         rightPupilY(normY * maxPupilShiftY);
-      }
-
-      // --- 3. LENS GLARE PARALLAX ---
-      if (leftGlareX && leftGlareY) {
-        leftGlareX(-normX * 24);
-        leftGlareY(-normY * 18);
-      }
-      if (rightGlareX && rightGlareY) {
-        rightGlareX(-normX * 24);
-        rightGlareY(-normY * 18);
       }
     };
 
@@ -108,14 +85,6 @@ export default function HeroGlasses3D() {
         rightPupilX(0);
         rightPupilY(0);
       }
-      if (leftGlareX && leftGlareY) {
-        leftGlareX(0);
-        leftGlareY(0);
-      }
-      if (rightGlareX && rightGlareY) {
-        rightGlareX(0);
-        rightGlareY(0);
-      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -130,28 +99,33 @@ export default function HeroGlasses3D() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center select-none w-full max-w-xl h-[320px] sm:h-[380px] lg:h-[420px] mx-auto"
+      className="relative flex items-center justify-center select-none w-full max-w-xl h-[300px] sm:h-[360px] lg:h-[400px] mx-auto"
       style={{ perspective: "1200px" }}
     >
       {/* Ambient Radial Cyan Backlight Glow */}
-      <div className="absolute w-[360px] sm:w-[440px] h-[200px] bg-accent-primary/25 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute w-[360px] sm:w-[420px] h-[180px] bg-accent-primary/20 rounded-full blur-[90px] pointer-events-none" />
 
       {/* Main 3D Glasses Frame Container */}
       <div
         ref={frameRef}
-        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[500px] aspect-[594/219]"
+        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[480px] aspect-[598/225]"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Layer 0: Dark lens glass backings with subtle glow */}
-        <div className="absolute inset-0 flex items-center justify-between px-[14%] pointer-events-none">
-          <div className="w-[36%] h-[78%] rounded-[45%] bg-[#060D1A]/90 shadow-[inset_0_0_25px_rgba(47,168,255,0.25)] blur-[1px]" />
-          <div className="w-[36%] h-[78%] rounded-[45%] bg-[#060D1A]/90 shadow-[inset_0_0_25px_rgba(0,212,255,0.25)] blur-[1px]" />
+        {/* Layer 0: Dark lens glass floor */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <Image
+            src="/hero-lens-backing.png"
+            alt="Lens Glass"
+            fill
+            priority
+            className="object-contain"
+          />
         </div>
 
         {/* Layer 1: Left Eye Pupil (</> Code Symbol) */}
         <div
           ref={leftEyeRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_18px_rgba(47,168,255,0.85)] z-10"
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_20px_rgba(47,168,255,0.9)] z-10"
         >
           <Image
             src="/hero-symbol-code.png"
@@ -165,7 +139,7 @@ export default function HeroGlasses3D() {
         {/* Layer 2: Right Eye Pupil (⏻ Power Symbol) */}
         <div
           ref={rightEyeRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_18px_rgba(0,212,255,0.85)] z-10"
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_20px_rgba(0,212,255,0.9)] z-10"
         >
           <Image
             src="/hero-symbol-power.png"
@@ -176,8 +150,8 @@ export default function HeroGlasses3D() {
           />
         </div>
 
-        {/* Layer 3: Realistic Metallic Glasses Outer Frame */}
-        <div className="absolute inset-0 pointer-events-none drop-shadow-[0_20px_45px_rgba(47,168,255,0.5)] z-20">
+        {/* Layer 3: Clean Metallic Outer Chassis Frame */}
+        <div className="absolute inset-0 pointer-events-none drop-shadow-[0_15px_35px_rgba(47,168,255,0.45)] z-20">
           <Image
             src="/hero-glasses-frame.png"
             alt="MrDevs Metallic Glasses Frame"
@@ -185,25 +159,6 @@ export default function HeroGlasses3D() {
             priority
             className="object-contain"
           />
-        </div>
-
-        {/* Layer 4: Interactive Glass Reflections & Glare */}
-        <div className="absolute inset-0 flex items-center justify-between px-[14%] pointer-events-none z-30 overflow-hidden">
-          {/* Left Lens Glare */}
-          <div className="relative w-[36%] h-[78%] rounded-[45%] overflow-hidden">
-            <div
-              ref={leftGlareRef}
-              className="absolute -top-1/2 -left-1/2 w-full h-[200%] bg-gradient-to-r from-transparent via-white/25 to-transparent transform -rotate-45 blur-[3px]"
-            />
-          </div>
-
-          {/* Right Lens Glare */}
-          <div className="relative w-[36%] h-[78%] rounded-[45%] overflow-hidden">
-            <div
-              ref={rightGlareRef}
-              className="absolute -top-1/2 -left-1/2 w-full h-[200%] bg-gradient-to-r from-transparent via-white/25 to-transparent transform -rotate-45 blur-[3px]"
-            />
-          </div>
         </div>
 
       </div>

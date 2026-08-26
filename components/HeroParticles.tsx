@@ -78,8 +78,8 @@ export default function HeroParticles() {
         particles.push({
           x,
           y,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: (Math.random() - 0.5) * 1.2,
           baseX: x,
           baseY: y,
           size,
@@ -108,8 +108,8 @@ export default function HeroParticles() {
           else if (edge === 1) { p.x = Math.random() * width; p.y = height; } // bottom
           else if (edge === 2) { p.x = 0; p.y = Math.random() * height; }     // left
           else { p.x = width; p.y = Math.random() * height; }                 // right
-          p.vx = (Math.random() - 0.5) * 0.4;
-          p.vy = (Math.random() - 0.5) * 0.4;
+          p.vx = (Math.random() - 0.5) * 1.2;
+          p.vy = (Math.random() - 0.5) * 1.2;
           p.baseX = p.x;
           p.baseY = p.y;
         }

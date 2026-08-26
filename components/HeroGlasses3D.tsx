@@ -155,19 +155,19 @@ export default function HeroGlasses3D() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center select-none w-full max-w-xl h-[300px] sm:h-[360px] lg:h-[400px] mx-auto"
+      className="relative flex items-center justify-center select-none w-full max-w-xl h-[180px] sm:h-[300px] lg:h-[400px] mx-auto"
       style={{ perspective: "1200px" }}
     >
       {/* Ambient Radial Cyan Backlight Glow (Tracks mouse in parallax) */}
       <div
         ref={glowRef}
-        className="absolute w-[380px] sm:w-[460px] h-[200px] bg-accent-primary/25 rounded-full blur-[100px] pointer-events-none"
+        className="absolute w-[260px] sm:w-[460px] h-[130px] sm:h-[200px] bg-accent-primary/25 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none"
       />
 
       {/* Main 3D Unified Glasses Frame Container */}
       <div
         ref={frameRef}
-        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225] drop-shadow-[0_20px_50px_rgba(47,168,255,0.45)] cursor-pointer"
+        className="relative z-10 flex items-center justify-center w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[490px] aspect-[598/225] drop-shadow-[0_20px_50px_rgba(47,168,255,0.45)] cursor-pointer"
         style={{ transformStyle: "preserve-3d" }}
       >
         {/* Layer 1: Left Eye Pupil (</> Code Symbol) */}

@@ -70,10 +70,15 @@ export default function Hero() {
       <HeroParticles />
 
       {/* Main 2-Column Split Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4 sm:pt-8 lg:pt-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 sm:pt-8 lg:pt-12">
         
-        {/* Left Column: Typography & CTAs */}
-        <div ref={contentRef} className="lg:col-span-7 flex flex-col items-start text-left gap-6 z-20">
+        {/* Right Column: 3D Interactive Agency Glasses Logo (Shown first on mobile) */}
+        <div className="order-1 lg:order-2 lg:col-span-5 flex items-center justify-center w-full relative z-10 py-4 lg:py-0">
+          <HeroGlasses3D />
+        </div>
+
+        {/* Left Column: Typography & CTAs (Shown below the logo on mobile) */}
+        <div ref={contentRef} className="order-2 lg:order-1 lg:col-span-7 flex flex-col items-start text-left gap-6 z-20">
           
           {/* Glass pill availability badge with pulsing dot */}
           <div className="tilt-hero inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-xl cursor-default">
@@ -124,11 +129,6 @@ export default function Hero() {
             </a>
           </div>
 
-        </div>
-
-        {/* Right Column: 3D Interactive Agency Glasses Logo */}
-        <div className="lg:col-span-5 flex items-center justify-center w-full relative z-10 py-6 lg:py-0">
-          <HeroGlasses3D />
         </div>
 
       </div>

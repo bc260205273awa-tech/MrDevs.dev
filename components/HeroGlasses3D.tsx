@@ -23,7 +23,7 @@ export default function HeroGlasses3D() {
     const transX = gsap.quickTo(frameRef.current, "x", { duration: 0.55, ease: "power2.out" });
     const transY = gsap.quickTo(frameRef.current, "y", { duration: 0.55, ease: "power2.out" });
 
-    // Restored 30% Eye Pupil Tracking (Smooth, subtle & never breaks)
+    // Eye Pupil Movement (Shifts freely across empty dark lenses)
     const leftPupilX = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
     const leftPupilY = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
@@ -59,10 +59,9 @@ export default function HeroGlasses3D() {
       transX(normX * 18);
       transY(normY * 14);
 
-      // --- 30% CONTROLLED EYE PUPIL TRACKING ---
-      // Exactly 30% intensity of original (5.5px X / 4.2px Y max travel)
-      const maxPupilShiftX = 5.5; 
-      const maxPupilShiftY = 4.2;
+      // --- EYE PUPIL TRACKING ---
+      const maxPupilShiftX = 7.5; 
+      const maxPupilShiftY = 5.5;
 
       if (leftPupilX && leftPupilY) {
         leftPupilX(normX * maxPupilShiftX);
@@ -128,21 +127,21 @@ export default function HeroGlasses3D() {
         className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225] drop-shadow-[0_20px_50px_rgba(47,168,255,0.45)] cursor-pointer"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Layer 1: Master Solid Background Logo (Ensures 100% solid backing, zero seams) */}
+        {/* Layer 1: Solid Base Metallic Chassis with Empty Dark Glass Lenses (No static symbols underneath!) */}
         <div className="absolute inset-0 pointer-events-none z-10">
           <Image
-            src="/hero-logo-full.png"
-            alt="MrDevs Official Logo"
+            src="/hero-base-empty-lenses.png"
+            alt="MrDevs Glasses Frame"
             fill
             priority
             className="object-contain"
           />
         </div>
 
-        {/* Layer 2: 30% Parallax Left Pupil (</> Code Symbol) */}
+        {/* Layer 2: Moving Left Pupil (</> Code Symbol) */}
         <div
           ref={leftPupilRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_12px_rgba(47,168,255,0.7)] z-20"
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(47,168,255,0.85)] z-20"
         >
           <Image
             src="/hero-symbol-code.png"
@@ -153,10 +152,10 @@ export default function HeroGlasses3D() {
           />
         </div>
 
-        {/* Layer 3: 30% Parallax Right Pupil (⏻ Power Symbol) */}
+        {/* Layer 3: Moving Right Pupil (⏻ Power Symbol) */}
         <div
           ref={rightPupilRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_12px_rgba(0,212,255,0.7)] z-20"
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(0,212,255,0.85)] z-20"
         >
           <Image
             src="/hero-symbol-power.png"

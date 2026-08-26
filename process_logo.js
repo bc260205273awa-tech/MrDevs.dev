@@ -39,11 +39,10 @@ async function processCleanLogo() {
 
   console.log(`Cropped canvas: ${cropW}x${cropH}`);
 
-  const fullRgba = Buffer.alloc(cropW * cropH * 4);
-  const frameRgba = Buffer.alloc(cropW * cropH * 4);
+  // Base image with empty dark lenses (Symbols removed / in-painted with dark glass)
+  const baseEmptyLensesRgba = Buffer.alloc(cropW * cropH * 4);
   const leftEyeRgba = Buffer.alloc(cropW * cropH * 4);
   const rightEyeRgba = Buffer.alloc(cropW * cropH * 4);
-  const darkLensBackingRgba = Buffer.alloc(cropW * cropH * 4);
 
   // Left & Right lens center in original image
   const leftCX = 360, leftCY = 310;
@@ -61,53 +60,54 @@ async function processCleanLogo() {
       const b = data[inIdx + 2];
       const maxVal = Math.max(r, g, b);
 
-      // Smooth transparency for black background
+      // Smooth transparency for black background around the glasses
       let alpha = 0;
       if (maxVal > 8) {
         alpha = Math.min(255, Math.floor(((maxVal - 8) / 32) * 255));
       }
 
-      // Full Master Image
-      fullRgba[outIdx] = r;
-      fullRgba[outIdx + 1] = g;
-      fullRgba[outIdx + 2] = b;
-      fullRgba[outIdx + 3] = alpha;
-
-      // Lens inner socket detection
-      // Left socket is roughly ellipse centered at leftCX, leftCY (radiusX ~105, radiusY ~62)
+      // Left lens socket ellipse
       const dxL = (ox - leftCX) / 105;
       const dyL = (oy - leftCY) / 62;
       const isInsideLeftSocket = (dxL * dxL + dyL * dyL) <= 1.0;
 
-      // Right socket is roughly ellipse centered at rightCX, rightCY (radiusX ~105, radiusY ~62)
+      // Right lens socket ellipse
       const dxR = (ox - rightCX) / 105;
       const dyR = (oy - rightCY) / 62;
       const isInsideRightSocket = (dxR * dxR + dyR * dyR) <= 1.0;
 
-      // Check if pixel belongs to the inner glowing symbol
-      // Left </> symbol: cyan/blue (b > 130, g > 60, and within symbol radius 65)
+      // Check if pixel is part of the glowing symbols
       const distL = Math.hypot(ox - leftCX, oy - leftCY);
       const isLeftSymbol = isInsideLeftSocket && distL <= 68 && (b > 80 || maxVal > 90);
 
-      // Right Power symbol: cyan/green (g > 110, b > 110, within symbol radius 62)
       const distR = Math.hypot(ox - rightCX, oy - rightCY);
       const isRightSymbol = isInsideRightSocket && distR <= 65 && (g > 70 || b > 70 || maxVal > 90);
 
-      // --- Frame Layer ---
-      // Transparent inside the lens sockets where symbols move
+      // --- 1. BASE LAYER WITH EMPTY LENSES ---
+      // If it's a symbol inside the lens, replace it with the dark glass lens floor color!
       if (isInsideLeftSocket || isInsideRightSocket) {
-        frameRgba[outIdx] = r;
-        frameRgba[outIdx + 1] = g;
-        frameRgba[outIdx + 2] = b;
-        frameRgba[outIdx + 3] = 0; // Empty lens hole!
+        if (isLeftSymbol || isRightSymbol) {
+          // Inpaint symbol with dark glossy glass color matching the surrounding lens floor
+          baseEmptyLensesRgba[outIdx] = 6;      // R
+          baseEmptyLensesRgba[outIdx + 1] = 13; // G
+          baseEmptyLensesRgba[outIdx + 2] = 26; // B
+          baseEmptyLensesRgba[outIdx + 3] = 255;// fully solid inside lens
+        } else {
+          // Natural dark glass lens reflection / floor
+          baseEmptyLensesRgba[outIdx] = r;
+          baseEmptyLensesRgba[outIdx + 1] = g;
+          baseEmptyLensesRgba[outIdx + 2] = b;
+          baseEmptyLensesRgba[outIdx + 3] = Math.max(240, alpha);
+        }
       } else {
-        frameRgba[outIdx] = r;
-        frameRgba[outIdx + 1] = g;
-        frameRgba[outIdx + 2] = b;
-        frameRgba[outIdx + 3] = alpha;
+        // Metallic Frame Chassis
+        baseEmptyLensesRgba[outIdx] = r;
+        baseEmptyLensesRgba[outIdx + 1] = g;
+        baseEmptyLensesRgba[outIdx + 2] = b;
+        baseEmptyLensesRgba[outIdx + 3] = alpha;
       }
 
-      // --- Left Pupil (</>) Layer ---
+      // --- 2. MOVING LEFT PUPIL (</> Symbol) ---
       if (isLeftSymbol) {
         leftEyeRgba[outIdx] = r;
         leftEyeRgba[outIdx + 1] = g;
@@ -117,7 +117,7 @@ async function processCleanLogo() {
         leftEyeRgba[outIdx + 3] = 0;
       }
 
-      // --- Right Pupil (Power) Layer ---
+      // --- 3. MOVING RIGHT PUPIL (Power Symbol) ---
       if (isRightSymbol) {
         rightEyeRgba[outIdx] = r;
         rightEyeRgba[outIdx + 1] = g;
@@ -126,27 +126,15 @@ async function processCleanLogo() {
       } else {
         rightEyeRgba[outIdx + 3] = 0;
       }
-
-      // --- Clean Lens Backing (Dark Glass) ---
-      if (isInsideLeftSocket || isInsideRightSocket) {
-        darkLensBackingRgba[outIdx] = 6;
-        darkLensBackingRgba[outIdx + 1] = 12;
-        darkLensBackingRgba[outIdx + 2] = 24;
-        darkLensBackingRgba[outIdx + 3] = 230; // Solid subtle dark lens glass
-      } else {
-        darkLensBackingRgba[outIdx + 3] = 0;
-      }
     }
   }
 
-  await sharp(fullRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
+  // Save the base glasses with completely empty lenses
+  await sharp(baseEmptyLensesRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
     .png()
-    .toFile(path.join(outputDir, 'hero-logo-full.png'));
+    .toFile(path.join(outputDir, 'hero-base-empty-lenses.png'));
 
-  await sharp(frameRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
-    .png()
-    .toFile(path.join(outputDir, 'hero-glasses-frame.png'));
-
+  // Save the clean moving pupils
   await sharp(leftEyeRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
     .png()
     .toFile(path.join(outputDir, 'hero-symbol-code.png'));
@@ -155,11 +143,7 @@ async function processCleanLogo() {
     .png()
     .toFile(path.join(outputDir, 'hero-symbol-power.png'));
 
-  await sharp(darkLensBackingRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
-    .png()
-    .toFile(path.join(outputDir, 'hero-lens-backing.png'));
-
-  console.log('Clean extraction complete!');
+  console.log('Generated hero-base-empty-lenses.png without symbols!');
 }
 
 processCleanLogo().catch(console.error);

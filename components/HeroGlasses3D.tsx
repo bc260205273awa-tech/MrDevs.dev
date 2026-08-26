@@ -9,8 +9,8 @@ export default function HeroGlasses3D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const leftPupilGlowRef = useRef<HTMLDivElement>(null);
-  const rightPupilGlowRef = useRef<HTMLDivElement>(null);
+  const leftPupilRef = useRef<HTMLDivElement>(null);
+  const rightPupilRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     if (!containerRef.current || !frameRef.current) return;
@@ -23,12 +23,12 @@ export default function HeroGlasses3D() {
     const transX = gsap.quickTo(frameRef.current, "x", { duration: 0.55, ease: "power2.out" });
     const transY = gsap.quickTo(frameRef.current, "y", { duration: 0.55, ease: "power2.out" });
 
-    // Reactive Pupil Glow Movement (Subtle 3D parallax without layer separation or breaking seams)
-    const leftGlowX = leftPupilGlowRef.current ? gsap.quickTo(leftPupilGlowRef.current, "x", { duration: 0.3, ease: "power1.out" }) : null;
-    const leftGlowY = leftPupilGlowRef.current ? gsap.quickTo(leftPupilGlowRef.current, "y", { duration: 0.3, ease: "power1.out" }) : null;
+    // Restored 30% Eye Pupil Tracking (Smooth, subtle & never breaks)
+    const leftPupilX = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
+    const leftPupilY = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
-    const rightGlowX = rightPupilGlowRef.current ? gsap.quickTo(rightPupilGlowRef.current, "x", { duration: 0.3, ease: "power1.out" }) : null;
-    const rightGlowY = rightPupilGlowRef.current ? gsap.quickTo(rightPupilGlowRef.current, "y", { duration: 0.3, ease: "power1.out" }) : null;
+    const rightPupilX = rightPupilRef.current ? gsap.quickTo(rightPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
+    const rightPupilY = rightPupilRef.current ? gsap.quickTo(rightPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
     const bgGlowX = glowRef.current ? gsap.quickTo(glowRef.current, "x", { duration: 0.6, ease: "power1.out" }) : null;
     const bgGlowY = glowRef.current ? gsap.quickTo(glowRef.current, "y", { duration: 0.6, ease: "power1.out" }) : null;
@@ -46,31 +46,36 @@ export default function HeroGlasses3D() {
       const normX = deltaX / (window.innerWidth / 2);
       const normY = deltaY / (window.innerHeight / 2);
 
-      // --- FULL 3D PERSPECTIVE TILT (Never breaks or separates) ---
-      const maxRotY = 34; // Yaw
-      const maxRotX = 26; // Pitch
-      const maxRotZ = 12; // Roll
-      const maxTransZ = 55; // Depth toward user
+      // --- FULL 3D FRAME TILT ---
+      const maxRotY = 32; // Yaw
+      const maxRotX = 24; // Pitch
+      const maxRotZ = 10; // Roll
+      const maxTransZ = 45; // Depth toward user
 
       rotY(normX * maxRotY);
       rotX(-normY * maxRotX);
       rotZ(normX * normY * maxRotZ);
       transZ(Math.abs(normX * normY) * maxTransZ);
-      transX(normX * 22);
-      transY(normY * 16);
+      transX(normX * 18);
+      transY(normY * 14);
 
-      // --- REACTIVE EYE PUPIL GLOW SHIFT ---
-      if (leftGlowX && leftGlowY) {
-        leftGlowX(normX * 14);
-        leftGlowY(normY * 10);
+      // --- 30% CONTROLLED EYE PUPIL TRACKING ---
+      // Exactly 30% intensity of original (5.5px X / 4.2px Y max travel)
+      const maxPupilShiftX = 5.5; 
+      const maxPupilShiftY = 4.2;
+
+      if (leftPupilX && leftPupilY) {
+        leftPupilX(normX * maxPupilShiftX);
+        leftPupilY(normY * maxPupilShiftY);
       }
-      if (rightGlowX && rightGlowY) {
-        rightGlowX(normX * 14);
-        rightGlowY(normY * 10);
+      if (rightPupilX && rightPupilY) {
+        rightPupilX(normX * maxPupilShiftX);
+        rightPupilY(normY * maxPupilShiftY);
       }
+
       if (bgGlowX && bgGlowY) {
-        bgGlowX(normX * 30);
-        bgGlowY(normY * 20);
+        bgGlowX(normX * 25);
+        bgGlowY(normY * 16);
       }
     };
 
@@ -82,13 +87,13 @@ export default function HeroGlasses3D() {
       transX(0);
       transY(0);
 
-      if (leftGlowX && leftGlowY) {
-        leftGlowX(0);
-        leftGlowY(0);
+      if (leftPupilX && leftPupilY) {
+        leftPupilX(0);
+        leftPupilY(0);
       }
-      if (rightGlowX && rightGlowY) {
-        rightGlowX(0);
-        rightGlowY(0);
+      if (rightPupilX && rightPupilY) {
+        rightPupilX(0);
+        rightPupilY(0);
       }
       if (bgGlowX && bgGlowY) {
         bgGlowX(0);
@@ -123,7 +128,7 @@ export default function HeroGlasses3D() {
         className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225] drop-shadow-[0_20px_50px_rgba(47,168,255,0.45)] cursor-pointer"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Master Authentic Agency Logo (Seamless & Indestructible in all corners) */}
+        {/* Layer 1: Master Solid Background Logo (Ensures 100% solid backing, zero seams) */}
         <div className="absolute inset-0 pointer-events-none z-10">
           <Image
             src="/hero-logo-full.png"
@@ -134,23 +139,32 @@ export default function HeroGlasses3D() {
           />
         </div>
 
-        {/* Dynamic Eye Pupil Glow Highlights (Tracks gaze inside lenses with zero breakage) */}
-        <div className="absolute inset-0 flex items-center justify-between px-[15%] pointer-events-none z-20 overflow-hidden">
-          {/* Left Lens Glow (</>) */}
-          <div className="relative w-[34%] h-[75%] flex items-center justify-center">
-            <div
-              ref={leftPupilGlowRef}
-              className="w-16 h-16 rounded-full bg-accent-primary/30 blur-[12px] mix-blend-screen"
-            />
-          </div>
+        {/* Layer 2: 30% Parallax Left Pupil (</> Code Symbol) */}
+        <div
+          ref={leftPupilRef}
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_12px_rgba(47,168,255,0.7)] z-20"
+        >
+          <Image
+            src="/hero-symbol-code.png"
+            alt="Left Eye Pupil"
+            fill
+            priority
+            className="object-contain"
+          />
+        </div>
 
-          {/* Right Lens Glow (⏻) */}
-          <div className="relative w-[34%] h-[75%] flex items-center justify-center">
-            <div
-              ref={rightPupilGlowRef}
-              className="w-16 h-16 rounded-full bg-accent-cyan/30 blur-[12px] mix-blend-screen"
-            />
-          </div>
+        {/* Layer 3: 30% Parallax Right Pupil (⏻ Power Symbol) */}
+        <div
+          ref={rightPupilRef}
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_12px_rgba(0,212,255,0.7)] z-20"
+        >
+          <Image
+            src="/hero-symbol-power.png"
+            alt="Right Eye Pupil"
+            fill
+            priority
+            className="object-contain"
+          />
         </div>
 
       </div>

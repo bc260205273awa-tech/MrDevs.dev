@@ -99,6 +99,10 @@ export default function HeroParticles() {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
+        // Ambient floating movement
+        p.x += p.vx;
+        p.y += p.vy;
+
         // If particle is pushed far off screen, respawn it at a random edge
         const margin = 80;
         if (p.x < -margin || p.x > width + margin || p.y < -margin || p.y > height + margin) {

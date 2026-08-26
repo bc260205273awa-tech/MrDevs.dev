@@ -8,8 +8,6 @@ import Image from "next/image";
 export default function HeroGlasses3D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
-  const leftPupilRef = useRef<HTMLDivElement>(null);
-  const rightPupilRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     if (!containerRef.current || !frameRef.current) return;
@@ -21,13 +19,6 @@ export default function HeroGlasses3D() {
     const transZ = gsap.quickTo(frameRef.current, "z", { duration: 0.45, ease: "power2.out" });
     const transX = gsap.quickTo(frameRef.current, "x", { duration: 0.55, ease: "power2.out" });
     const transY = gsap.quickTo(frameRef.current, "y", { duration: 0.55, ease: "power2.out" });
-
-    // Eye Pupil Movement (Left </> and Right ⏻)
-    const leftPupilX = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
-    const leftPupilY = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
-
-    const rightPupilX = rightPupilRef.current ? gsap.quickTo(rightPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
-    const rightPupilY = rightPupilRef.current ? gsap.quickTo(rightPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = containerRef.current?.getBoundingClientRect();
@@ -54,19 +45,6 @@ export default function HeroGlasses3D() {
       transZ(Math.abs(normX * normY) * maxTransZ);
       transX(normX * 18);
       transY(normY * 14);
-
-      // Pupil Movement
-      const maxPupilShiftX = 8;
-      const maxPupilShiftY = 6;
-
-      if (leftPupilX && leftPupilY) {
-        leftPupilX(normX * maxPupilShiftX);
-        leftPupilY(normY * maxPupilShiftY);
-      }
-      if (rightPupilX && rightPupilY) {
-        rightPupilX(normX * maxPupilShiftX);
-        rightPupilY(normY * maxPupilShiftY);
-      }
     };
 
     const handleMouseLeave = () => {
@@ -76,15 +54,6 @@ export default function HeroGlasses3D() {
       transZ(0);
       transX(0);
       transY(0);
-
-      if (leftPupilX && leftPupilY) {
-        leftPupilX(0);
-        leftPupilY(0);
-      }
-      if (rightPupilX && rightPupilY) {
-        rightPupilX(0);
-        rightPupilY(0);
-      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -102,34 +71,17 @@ export default function HeroGlasses3D() {
       className="relative flex items-center justify-center select-none w-full max-w-xl h-[300px] sm:h-[360px] lg:h-[400px] mx-auto"
       style={{ perspective: "1200px" }}
     >
-      {/* 3D Container showing ONLY the two symbols */}
+      {/* 3D Container showing ONLY the base glasses layer */}
       <div
         ref={frameRef}
-        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225]"
+        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225] drop-shadow-[0_20px_50px_rgba(47,168,255,0.45)] cursor-pointer"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Left Symbol (</> Code Symbol) */}
-        <div
-          ref={leftPupilRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(47,168,255,0.9)] z-20"
-        >
+        {/* Base Glasses Frame Layer */}
+        <div className="absolute inset-0 pointer-events-none z-10">
           <Image
-            src="/hero-symbol-code.png"
-            alt="Left Symbol"
-            fill
-            priority
-            className="object-contain"
-          />
-        </div>
-
-        {/* Right Symbol (⏻ Power Symbol) */}
-        <div
-          ref={rightPupilRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(0,212,255,0.9)] z-20"
-        >
-          <Image
-            src="/hero-symbol-power.png"
-            alt="Right Symbol"
+            src="/hero-glasses-frame.png"
+            alt="Base Glasses Frame"
             fill
             priority
             className="object-contain"

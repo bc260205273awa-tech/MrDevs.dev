@@ -107,50 +107,38 @@ export default function HeroGlasses3D() {
       const maxShiftX = 8;
       const maxShiftY = 6;
       
-      // Simulate human eye wandering
-      idleAnimation = gsap.timeline({ repeat: -1, delay: 1 });
+      // Sequential pattern: Left -> Right -> Up -> Down -> Repeat
+      idleAnimation = gsap.timeline({ repeat: -1 });
       
-      const createWanderStep = () => {
-        // Random normalized positions (-1 to 1)
-        const nx = (Math.random() - 0.5) * 2;
-        const ny = (Math.random() - 0.5) * 2;
-        
-        // Sometimes dart quickly (saccade), sometimes drift smoothly
-        const isSaccade = Math.random() > 0.6;
-        const duration = isSaccade ? 0.15 + Math.random() * 0.1 : 0.8 + Math.random() * 1.5;
-        const ease = isSaccade ? "power2.out" : "sine.inOut";
-        const pause = isSaccade ? 0.2 + Math.random() * 0.5 : 0;
-        
-        idleAnimation!.to([leftPupilRef.current, rightPupilRef.current], {
-          x: nx * maxShiftX,
-          y: ny * maxShiftY,
-          duration,
-          ease,
-        });
-        
-        // Tiny 3D head movement to match eyes
-        idleAnimation!.to(frameRef.current, {
-          rotateY: nx * 12,
-          rotateX: -ny * 8,
-          x: nx * 5,
-          y: ny * 3,
-          duration: duration * 1.2,
-          ease,
-        }, "<");
-        
-        idleAnimation!.to({}, { duration: pause });
-      };
+      const moveDur = 0.5;
+      const pauseDur = 0.8;
 
-      // Create a sequence of 10 random eye movements that loop
-      for (let i = 0; i < 10; i++) {
-        createWanderStep();
-        // Occasionally return to center
-        if (i % 3 === 0) {
-          idleAnimation.to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: 0, duration: 0.3, ease: "power2.out" });
-          idleAnimation.to(frameRef.current, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: 0.4, ease: "power2.out" }, "<");
-          idleAnimation.to({}, { duration: 1 + Math.random() });
-        }
-      }
+      // 1. Look Left
+      idleAnimation
+        .to([leftPupilRef.current, rightPupilRef.current], { x: -maxShiftX, y: 0, duration: moveDur, ease: "power2.inOut" }, "left")
+        .to(frameRef.current, { rotateY: -15, rotateX: 0, x: -5, y: 0, duration: moveDur, ease: "power2.inOut" }, "left")
+        .to({}, { duration: pauseDur })
+
+      // 2. Look Right
+        .to([leftPupilRef.current, rightPupilRef.current], { x: maxShiftX, y: 0, duration: moveDur, ease: "power2.inOut" }, "right")
+        .to(frameRef.current, { rotateY: 15, rotateX: 0, x: 5, y: 0, duration: moveDur, ease: "power2.inOut" }, "right")
+        .to({}, { duration: pauseDur })
+
+      // 3. Look Up
+        .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: -maxShiftY, duration: moveDur, ease: "power2.inOut" }, "up")
+        .to(frameRef.current, { rotateY: 0, rotateX: 12, x: 0, y: -3, duration: moveDur, ease: "power2.inOut" }, "up")
+        .to({}, { duration: pauseDur })
+
+      // 4. Look Down
+        .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: maxShiftY, duration: moveDur, ease: "power2.inOut" }, "down")
+        .to(frameRef.current, { rotateY: 0, rotateX: -12, x: 0, y: 3, duration: moveDur, ease: "power2.inOut" }, "down")
+        .to({}, { duration: pauseDur })
+
+      // 5. Back to Center
+        .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
+        .to(frameRef.current, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
+        .to({}, { duration: pauseDur });
+
     } else {
       // Only attach mouse listeners on devices that actually have a fine pointer
       window.addEventListener("mousemove", handleMouseMove);

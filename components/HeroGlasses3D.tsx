@@ -8,7 +8,6 @@ import Image from "next/image";
 export default function HeroGlasses3D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
   const leftPupilRef = useRef<HTMLDivElement>(null);
   const rightPupilRef = useRef<HTMLDivElement>(null);
 
@@ -23,15 +22,12 @@ export default function HeroGlasses3D() {
     const transX = gsap.quickTo(frameRef.current, "x", { duration: 0.55, ease: "power2.out" });
     const transY = gsap.quickTo(frameRef.current, "y", { duration: 0.55, ease: "power2.out" });
 
-    // Eye Pupil Movement (Shifts freely across empty dark lenses)
+    // Eye Pupil Movement (Left </> and Right ⏻)
     const leftPupilX = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
     const leftPupilY = leftPupilRef.current ? gsap.quickTo(leftPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
 
     const rightPupilX = rightPupilRef.current ? gsap.quickTo(rightPupilRef.current, "x", { duration: 0.28, ease: "power1.out" }) : null;
     const rightPupilY = rightPupilRef.current ? gsap.quickTo(rightPupilRef.current, "y", { duration: 0.28, ease: "power1.out" }) : null;
-
-    const bgGlowX = glowRef.current ? gsap.quickTo(glowRef.current, "x", { duration: 0.6, ease: "power1.out" }) : null;
-    const bgGlowY = glowRef.current ? gsap.quickTo(glowRef.current, "y", { duration: 0.6, ease: "power1.out" }) : null;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = containerRef.current?.getBoundingClientRect();
@@ -46,11 +42,11 @@ export default function HeroGlasses3D() {
       const normX = deltaX / (window.innerWidth / 2);
       const normY = deltaY / (window.innerHeight / 2);
 
-      // --- FULL 3D FRAME TILT ---
-      const maxRotY = 32; // Yaw
-      const maxRotX = 24; // Pitch
-      const maxRotZ = 10; // Roll
-      const maxTransZ = 45; // Depth toward user
+      // 3D Frame Rotation
+      const maxRotY = 32;
+      const maxRotX = 24;
+      const maxRotZ = 10;
+      const maxTransZ = 45;
 
       rotY(normX * maxRotY);
       rotX(-normY * maxRotX);
@@ -59,9 +55,9 @@ export default function HeroGlasses3D() {
       transX(normX * 18);
       transY(normY * 14);
 
-      // --- EYE PUPIL TRACKING ---
-      const maxPupilShiftX = 7.5; 
-      const maxPupilShiftY = 5.5;
+      // Pupil Movement
+      const maxPupilShiftX = 8;
+      const maxPupilShiftY = 6;
 
       if (leftPupilX && leftPupilY) {
         leftPupilX(normX * maxPupilShiftX);
@@ -70,11 +66,6 @@ export default function HeroGlasses3D() {
       if (rightPupilX && rightPupilY) {
         rightPupilX(normX * maxPupilShiftX);
         rightPupilY(normY * maxPupilShiftY);
-      }
-
-      if (bgGlowX && bgGlowY) {
-        bgGlowX(normX * 25);
-        bgGlowY(normY * 16);
       }
     };
 
@@ -94,10 +85,6 @@ export default function HeroGlasses3D() {
         rightPupilX(0);
         rightPupilY(0);
       }
-      if (bgGlowX && bgGlowY) {
-        bgGlowX(0);
-        bgGlowY(0);
-      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -115,57 +102,39 @@ export default function HeroGlasses3D() {
       className="relative flex items-center justify-center select-none w-full max-w-xl h-[300px] sm:h-[360px] lg:h-[400px] mx-auto"
       style={{ perspective: "1200px" }}
     >
-      {/* Ambient Radial Cyan Backlight Glow (Tracks mouse in parallax) */}
-      <div
-        ref={glowRef}
-        className="absolute w-[380px] sm:w-[460px] h-[200px] bg-accent-primary/25 rounded-full blur-[100px] pointer-events-none"
-      />
-
-      {/* Main 3D Unified Glasses Frame Container */}
+      {/* 3D Container showing ONLY the two symbols */}
       <div
         ref={frameRef}
-        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225] drop-shadow-[0_20px_50px_rgba(47,168,255,0.45)] cursor-pointer"
+        className="relative z-10 flex items-center justify-center w-full max-w-[420px] sm:max-w-[490px] aspect-[598/225]"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Layer 1: Solid Base Metallic Chassis with Empty Dark Glass Lenses (No static symbols underneath!) */}
-        <div className="absolute inset-0 pointer-events-none z-10">
-          <Image
-            src="/hero-base-empty-lenses.png"
-            alt="MrDevs Glasses Frame"
-            fill
-            priority
-            className="object-contain"
-          />
-        </div>
-
-        {/* Layer 2: Moving Left Pupil (</> Code Symbol) */}
+        {/* Left Symbol (</> Code Symbol) */}
         <div
           ref={leftPupilRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(47,168,255,0.85)] z-20"
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(47,168,255,0.9)] z-20"
         >
           <Image
             src="/hero-symbol-code.png"
-            alt="Left Eye Pupil"
+            alt="Left Symbol"
             fill
             priority
             className="object-contain"
           />
         </div>
 
-        {/* Layer 3: Moving Right Pupil (⏻ Power Symbol) */}
+        {/* Right Symbol (⏻ Power Symbol) */}
         <div
           ref={rightPupilRef}
-          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(0,212,255,0.85)] z-20"
+          className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(0,212,255,0.9)] z-20"
         >
           <Image
             src="/hero-symbol-power.png"
-            alt="Right Eye Pupil"
+            alt="Right Symbol"
             fill
             priority
             className="object-contain"
           />
         </div>
-
       </div>
     </div>
   );

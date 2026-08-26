@@ -54,115 +54,135 @@ export default function Process() {
   useGSAP(() => {
     if (!timelineRef.current || !containerRef.current) return;
     
-    // [FIX] The fragmentation bug was caused by a known SVG behavior: when vector-effect="non-scaling-stroke" 
-    // is used alongside stroke-dasharray in a scaled viewBox, browsers evaluate the dasharray in screen pixels 
-    // but getTotalLength in unscaled user units. This results in the dash acting like literal disconnected 
-    // dashed lines (130px dashes on a 2000px screen height), which perfectly explains the screenshot.
-    
-    // To fix this forever, we will dynamically generate the SVG path inside GSAP using EXACT physical pixels 
-    // relative to the container. No viewBox scaling, no non-scaling-stroke, no distortions. Just pure math.
-    
-    const timelineHeight = timelineRef.current.offsetHeight;
-    
-    // Grab the SVG elements (we scoped them with classes so they are easy to find)
     const desktopSvg = containerRef.current.querySelector('.gsap-desktop-svg') as SVGSVGElement;
     const mobileSvg = containerRef.current.querySelector('.gsap-mobile-svg') as SVGSVGElement;
     const desktopPath = containerRef.current.querySelector('.gsap-desktop-path') as SVGPathElement;
     const mobilePath = containerRef.current.querySelector('.gsap-mobile-path') as SVGPathElement;
+    const desktopPathBg = containerRef.current.querySelector('.gsap-desktop-path-bg') as SVGPathElement;
+    const mobilePathBg = containerRef.current.querySelector('.gsap-mobile-path-bg') as SVGPathElement;
     
-    if (!desktopSvg || !mobileSvg || !desktopPath || !mobilePath) return;
+    if (!desktopSvg || !mobileSvg || !desktopPath || !mobilePath || !desktopPathBg || !mobilePathBg) return;
 
-    // Set pixel-perfect viewBoxes
-    desktopSvg.setAttribute('viewBox', `0 0 400 ${timelineHeight}`);
-    mobileSvg.setAttribute('viewBox', `0 0 2 ${timelineHeight}`);
+    let tl: gsap.core.Timeline | null = null;
 
-    const cards = gsap.utils.toArray('.gsap-step-card') as HTMLDivElement[];
-    
-    // 1. Generate the exact pixel path tracing perfectly through every dot
-    let dDesktop = `M 200 0`;
-    let lastY = 0;
-    
-    if (cards.length > 0) {
-      // First curve (Top to dot 1)
-      const dot0Y = cards[0].offsetTop + cards[0].offsetHeight / 2;
-      dDesktop += ` C 200 ${dot0Y * 0.2}, 100 ${dot0Y * 0.7}, 200 ${dot0Y}`;
-      lastY = dot0Y;
+    const buildTimeline = () => {
+      // 1. Clean up old timeline and scroll triggers to prevent duplicate instances
+      if (tl) {
+        tl.kill();
+        ScrollTrigger.getAll().forEach(t => {
+          if (t.trigger === containerRef.current) t.kill();
+        });
+      }
+
+      const timelineHeight = timelineRef.current?.offsetHeight || 0;
+      if (timelineHeight <= 0) return;
+
+      // Set pixel-perfect viewBoxes based on actual layout heights
+      desktopSvg.setAttribute('viewBox', `0 0 400 ${timelineHeight}`);
+      mobileSvg.setAttribute('viewBox', `0 0 2 ${timelineHeight}`);
+
+      const cards = gsap.utils.toArray('.gsap-step-card') as HTMLDivElement[];
       
-      // Loop remaining dots
-      for (let i = 1; i < cards.length; i++) {
-        const dotY = cards[i].offsetTop + cards[i].offsetHeight / 2;
-        const isEven = (i % 2 === 0);
-        const controlX = isEven ? 100 : 300; // Alternate weave direction
+      // 2. Generate the exact pixel path tracing perfectly through every dot
+      let dDesktop = `M 200 0`;
+      let lastY = 0;
+      
+      if (cards.length > 0) {
+        const dot0Y = cards[0].offsetTop + cards[0].offsetHeight / 2;
+        dDesktop += ` C 200 ${dot0Y * 0.2}, 100 ${dot0Y * 0.7}, 200 ${dot0Y}`;
+        lastY = dot0Y;
         
-        // S command seamlessly continues the smooth cubic curve to the next point
-        dDesktop += ` S ${controlX} ${lastY + (dotY - lastY) * 0.7}, 200 ${dotY}`;
-        lastY = dotY;
-      }
-    }
-    // Final tail to the bottom
-    dDesktop += ` S 200 ${lastY + (timelineHeight - lastY) * 0.6}, 200 ${timelineHeight}`;
-    const dMobile = `M 1 0 L 1 ${timelineHeight}`;
-    
-    // Inject the generated paths directly into the DOM
-    desktopPath.setAttribute('d', dDesktop);
-    mobilePath.setAttribute('d', dMobile);
-
-    // 2. Setup the Timeline using the actual rendered path
-    const activePath = getComputedStyle(desktopPath).display !== 'none' ? desktopPath : mobilePath;
-    const pathLength = activePath.getTotalLength();
-    if (!pathLength || pathLength <= 0) return;
-    
-    const resolution = Math.max(1, pathLength / 500);
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 70%", 
-        end: "bottom 60%", 
-        scrub: 1, 
-      }
-    });
-
-    // Draw lines
-    [desktopPath, mobilePath].forEach(p => {
-      gsap.set(p, { strokeDasharray: pathLength, strokeDashoffset: pathLength, opacity: 0 });
-      tl.to(p, { strokeDashoffset: 0, duration: 1, ease: "none" }, 0);
-      tl.to(p, { opacity: 1, duration: 0.1, ease: "none" }, 0);
-    });
-
-    // 3. Perfect Sync for Dots & Cards
-    cards.forEach((card) => {
-      const cardY = card.offsetTop + (card.offsetHeight / 2);
-      
-      let targetLength = pathLength; 
-      for (let l = 0; l <= pathLength; l += resolution) {
-        // We can now accurately compare actual physical Y coordinates!
-        if (activePath.getPointAtLength(l).y >= cardY) {
-          targetLength = l;
-          break;
+        for (let i = 1; i < cards.length; i++) {
+          const dotY = cards[i].offsetTop + cards[i].offsetHeight / 2;
+          const isEven = (i % 2 === 0);
+          const controlX = isEven ? 100 : 300;
+          
+          dDesktop += ` S ${controlX} ${lastY + (dotY - lastY) * 0.7}, 200 ${dotY}`;
+          lastY = dotY;
         }
       }
+      dDesktop += ` S 200 ${lastY + (timelineHeight - lastY) * 0.6}, 200 ${timelineHeight}`;
+      const dMobile = `M 1 0 L 1 ${timelineHeight}`;
       
-      const progress = targetLength / pathLength;
+      // Inject coordinates into both background guide and active progress lines
+      desktopPath.setAttribute('d', dDesktop);
+      desktopPathBg.setAttribute('d', dDesktop);
+      mobilePath.setAttribute('d', dMobile);
+      mobilePathBg.setAttribute('d', dMobile);
 
-      const dots = card.querySelectorAll('.gsap-center-dot');
-      const content = card.querySelector('.gsap-card-content');
-      
-      // Setup initial stuck states (opacity 0) to ensure nothing is stuck half-visible
-      tl.fromTo(dots, 
-        { scale: 0.3, opacity: 0, boxShadow: 'none' },
-        { scale: 1.2, opacity: 1, boxShadow: '0 0 20px var(--accent-cyan)', duration: 0.1, ease: "back.out(2)" },
-        progress
-      );
-      
-      if (content) {
-        tl.fromTo(content,
-          { y: 40, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.15, ease: "power2.out" },
-          progress
-        );
+      // 3. Create the ScrollTrigger timeline
+      tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 70%", 
+          end: "bottom 60%", 
+          scrub: 1, 
+          invalidateOnRefresh: true,
+        }
+      });
+
+      // Draw progress lines individually using their own actual paths and lengths
+      [desktopPath, mobilePath].forEach(p => {
+        const length = p.getTotalLength();
+        if (length > 0) {
+          gsap.set(p, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
+          tl!.to(p, { strokeDashoffset: 0, duration: 1, ease: "none" }, 0);
+          tl!.to(p, { opacity: 1, duration: 0.1, ease: "none" }, 0);
+        }
+      });
+
+      // 4. Synchronize dots & cards to the progress line Y coordinates
+      const activePath = getComputedStyle(desktopPath).display !== 'none' ? desktopPath : mobilePath;
+      const pathLength = activePath.getTotalLength();
+      if (pathLength > 0) {
+        const resolution = Math.max(1, pathLength / 500);
+
+        cards.forEach((card) => {
+          const cardY = card.offsetTop + (card.offsetHeight / 2);
+          
+          let targetLength = pathLength; 
+          for (let l = 0; l <= pathLength; l += resolution) {
+            if (activePath.getPointAtLength(l).y >= cardY) {
+              targetLength = l;
+              break;
+            }
+          }
+          
+          const progress = targetLength / pathLength;
+          const dots = card.querySelectorAll('.gsap-center-dot');
+          const content = card.querySelector('.gsap-card-content');
+          
+          tl!.fromTo(dots, 
+            { scale: 0.3, opacity: 0, boxShadow: 'none' },
+            { scale: 1.2, opacity: 1, boxShadow: '0 0 20px var(--accent-cyan)', duration: 0.1, ease: "back.out(2)" },
+            progress
+          );
+          
+          if (content) {
+            tl!.fromTo(content,
+              { y: 40, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.15, ease: "power2.out" },
+              progress
+            );
+          }
+        });
       }
-    });
+    };
+
+    // Run build initially
+    buildTimeline();
+
+    // Call after a small timeout to make sure Next.js finished page layout rendering
+    const timer = setTimeout(buildTimeline, 300);
+
+    // Rebuild paths and layout heights dynamically on window resize
+    window.addEventListener('resize', buildTimeline);
+
+    return () => {
+      if (tl) tl.kill();
+      clearTimeout(timer);
+      window.removeEventListener('resize', buildTimeline);
+    };
 
   }, { scope: containerRef });
 
@@ -200,24 +220,38 @@ export default function Process() {
               </defs>
             </svg>
 
-            {/* Desktop Curved Spine (Completely Dynamic Pixel-Based) */}
+            {/* Desktop Curved Spine */}
             <svg className="gsap-desktop-svg hidden md:block absolute inset-0 w-full h-full overflow-visible">
+              {/* Dark guide background line */}
+              <path 
+                className="gsap-desktop-path-bg"
+                stroke="rgba(47, 168, 255, 0.06)" 
+                strokeWidth="2" 
+                fill="none" 
+              />
+              {/* Animated glowing progress line */}
               <path 
                 className="gsap-desktop-path"
-                // No d attribute here! Injected perfectly by GSAP above
                 stroke="url(#spine-grad)" 
-                strokeWidth="2" 
+                strokeWidth="2.5" 
                 fill="none" 
               />
             </svg>
 
             {/* Mobile Straight Spine */}
             <svg className="gsap-mobile-svg block md:hidden absolute inset-0 w-full h-full overflow-visible">
+              {/* Dark guide background line */}
+              <path 
+                className="gsap-mobile-path-bg"
+                stroke="rgba(47, 168, 255, 0.06)" 
+                strokeWidth="2" 
+                fill="none" 
+              />
+              {/* Animated glowing progress line */}
               <path 
                 className="gsap-mobile-path"
-                // No d attribute here! Injected perfectly by GSAP above
                 stroke="url(#spine-grad)" 
-                strokeWidth="2" 
+                strokeWidth="2.5" 
                 fill="none" 
               />
             </svg>

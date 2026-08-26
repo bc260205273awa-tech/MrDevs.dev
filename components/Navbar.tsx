@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowRight, Code2, Smartphone, Shield, Zap, MapPin, Palette } from "lucide-react";
 import Image from "next/image";
-import { use3DTilt } from "@/hooks/use3DTilt";
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -20,7 +20,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const navRef = useRef<HTMLElement>(null);
-  use3DTilt(navRef, ".tilt-nav", 25, 600); // Super powerful tilt for navbar items
 
   useEffect(() => {
     const handleScroll = () => {

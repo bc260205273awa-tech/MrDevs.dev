@@ -1,25 +1,29 @@
 const sharp = require('sharp');
 const path = require('path');
 
+const eyesPath = "C:/Users/abc/.gemini/antigravity/brain/e983e1d4-86e4-4373-8194-9bd8e83b5451/.user_uploaded/media_1787730903841.webp";
 const cleanFramePath = "C:/Users/abc/.gemini/antigravity/brain/e983e1d4-86e4-4373-8194-9bd8e83b5451/.user_uploaded/media_1787730132547.jpg";
 const outputDir = path.join(__dirname, 'public');
 
-async function processCleanFrame() {
-  const { data, info } = await sharp(cleanFramePath)
+async function processOfficialEyes() {
+  const { data: eyesData, info: eyesInfo } = await sharp(eyesPath)
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  const width = info.width;
-  const height = info.height;
-  const channels = info.channels;
+  const { data: frameData } = await sharp(cleanFramePath)
+    .raw()
+    .toBuffer({ resolveWithObject: true });
 
-  // Exact same bounding box coordinates as the symbols:
-  // (214, 198) to (807, 416), size: 594x219 or padded 598x225
+  const width = eyesInfo.width;
+  const height = eyesInfo.height;
+  const channels = eyesInfo.channels;
+
+  // Exact same bounding box calculated from the frame:
   let minX = width, maxX = 0, minY = height, maxY = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const idx = (y * width + x) * channels;
-      const b = Math.max(data[idx], data[idx + 1], data[idx + 2]);
+      const b = Math.max(frameData[idx], frameData[idx + 1], frameData[idx + 2]);
       if (b > 12) {
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
@@ -38,9 +42,15 @@ async function processCleanFrame() {
   const cropW = maxX - minX + 1;
   const cropH = maxY - minY + 1;
 
-  console.log(`Frame cropped canvas: ${cropW}x${cropH}`);
+  console.log(`Pristine canvas size: ${cropW}x${cropH}`);
 
-  const frameRgba = Buffer.alloc(cropW * cropH * 4);
+  const leftEyeRgba = Buffer.alloc(cropW * cropH * 4);
+  const rightEyeRgba = Buffer.alloc(cropW * cropH * 4);
+
+  // In original image:
+  // Left symbol center: ~360, 310
+  // Right symbol center: ~665, 310
+  // Midpoint between both symbols: ~500
 
   for (let cy = 0; cy < cropH; cy++) {
     for (let cx = 0; cx < cropW; cx++) {
@@ -49,29 +59,47 @@ async function processCleanFrame() {
       const inIdx = (oy * width + ox) * channels;
       const outIdx = (cy * cropW + cx) * 4;
 
-      const r = data[inIdx];
-      const g = data[inIdx + 1];
-      const b = data[inIdx + 2];
+      const r = eyesData[inIdx];
+      const g = eyesData[inIdx + 1];
+      const b = eyesData[inIdx + 2];
       const maxVal = Math.max(r, g, b);
 
-      // Smooth anti-aliased alpha transparency for all black pixels (outside AND inside the lenses!)
       let alpha = 0;
       if (maxVal > 8) {
-        alpha = Math.min(255, Math.floor(((maxVal - 8) / 28) * 255));
+        alpha = Math.min(255, Math.floor(((maxVal - 8) / 26) * 255));
       }
 
-      frameRgba[outIdx] = r;
-      frameRgba[outIdx + 1] = g;
-      frameRgba[outIdx + 2] = b;
-      frameRgba[outIdx + 3] = alpha;
+      // Left eye (ox < 500)
+      if (ox < 500) {
+        leftEyeRgba[outIdx] = r;
+        leftEyeRgba[outIdx + 1] = g;
+        leftEyeRgba[outIdx + 2] = b;
+        leftEyeRgba[outIdx + 3] = alpha;
+      } else {
+        leftEyeRgba[outIdx + 3] = 0;
+      }
+
+      // Right eye (ox >= 500)
+      if (ox >= 500) {
+        rightEyeRgba[outIdx] = r;
+        rightEyeRgba[outIdx + 1] = g;
+        rightEyeRgba[outIdx + 2] = b;
+        rightEyeRgba[outIdx + 3] = alpha;
+      } else {
+        rightEyeRgba[outIdx + 3] = 0;
+      }
     }
   }
 
-  await sharp(frameRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
+  await sharp(leftEyeRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
     .png()
-    .toFile(path.join(outputDir, 'hero-glasses-frame.png'));
+    .toFile(path.join(outputDir, 'hero-symbol-code.png'));
 
-  console.log('Saved pristine hero-glasses-frame.png directly from clean frame image!');
+  await sharp(rightEyeRgba, { raw: { width: cropW, height: cropH, channels: 4 } })
+    .png()
+    .toFile(path.join(outputDir, 'hero-symbol-power.png'));
+
+  console.log('Saved pristine new eyes directly from official eyes render!');
 }
 
-processCleanFrame().catch(console.error);
+processOfficialEyes().catch(console.error);

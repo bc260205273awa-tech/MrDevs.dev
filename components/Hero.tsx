@@ -64,13 +64,13 @@ export default function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main pt-24 pb-16 lg:py-0"
+      className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden font-sans bg-bg-main pt-32 sm:pt-36 lg:pt-28 pb-16"
     >
       {/* Interactive Cursor-Reactive Dust Particles */}
       <HeroParticles />
 
       {/* Main 2-Column Split Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[calc(100vh-96px)]">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4 sm:pt-8 lg:pt-12">
         
         {/* Left Column: Typography & CTAs */}
         <div ref={contentRef} className="lg:col-span-7 flex flex-col items-start text-left gap-6 z-20">
@@ -86,14 +86,14 @@ export default function Hero() {
             </span>
           </div>
 
-          {/* Main Headline */}
+          {/* Main Headline (Clean Human Copy without AI em-dash) */}
           <h1 
             ref={headlineRef}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.2rem] xl:text-[4.75rem] font-bold text-text-heading leading-[1.08] tracking-tighter max-w-2xl"
           >
-            Everything your business needs to grow —{" "}
+            Everything your business needs to grow,{" "}
             <span className="text-accent-primary" style={{ textShadow: '0 0 24px rgba(47,168,255,0.35)' }}>
-              under one roof.
+              all under one roof.
             </span>
           </h1>
 

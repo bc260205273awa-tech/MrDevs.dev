@@ -119,7 +119,7 @@ export default function Navbar() {
             : "py-6 bg-transparent border-b border-transparent"
         }`}
       >
-      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between">
         {/* Logo Image */}
         <a
           href="/"

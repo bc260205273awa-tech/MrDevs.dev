@@ -20,15 +20,101 @@ export function use3DTilt(
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Only apply on hover-capable devices
-    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches) {
-      return;
-    }
-
     const cards = containerRef.current.querySelectorAll<HTMLElement>(selector);
     if (!cards.length) return;
 
-    // Entrance 3D flip-in animation
+    // Check if the device is a touch/mobile device (no fine pointer/hover capability)
+    const isMobile = typeof window !== "undefined" && (
+      window.matchMedia("(pointer: coarse)").matches || 
+      window.matchMedia("(hover: none)").matches
+    );
+
+    if (isMobile) {
+      // Mobile-only autonomous sequential corner-tilting loop
+      const timelines: gsap.core.Timeline[] = [];
+
+      cards.forEach((el, index) => {
+        el.style.transformStyle = "preserve-3d";
+        el.style.willChange = "transform";
+
+        // Create individual timeline with staggered initial delay (1 second gap)
+        const tl = gsap.timeline({
+          repeat: -1,
+          delay: index * 1.0,
+        });
+
+        const tiltX = maxTilt * 0.7; // gentle move
+        const tiltY = maxTilt * 0.7;
+        const moveDur = 0.6; // smooth hover speed physics
+        const pauseDur = 0.8; // pause to show off the corner depth
+
+        // Rotate corners sequentially: Top-Left -> Top-Right -> Bottom-Right -> Bottom-Left -> Center
+        tl
+          // 1. Top-Left
+          .to(el, {
+            rotationY: -tiltX,
+            rotationX: tiltY,
+            scale: scaleHover,
+            transformPerspective: perspective,
+            duration: moveDur,
+            ease: "power2.out"
+          })
+          .to({}, { duration: pauseDur })
+
+          // 2. Top-Right
+          .to(el, {
+            rotationY: tiltX,
+            rotationX: tiltY,
+            scale: scaleHover,
+            transformPerspective: perspective,
+            duration: moveDur,
+            ease: "power2.out"
+          })
+          .to({}, { duration: pauseDur })
+
+          // 3. Bottom-Right
+          .to(el, {
+            rotationY: tiltX,
+            rotationX: -tiltY,
+            scale: scaleHover,
+            transformPerspective: perspective,
+            duration: moveDur,
+            ease: "power2.out"
+          })
+          .to({}, { duration: pauseDur })
+
+          // 4. Bottom-Left
+          .to(el, {
+            rotationY: -tiltX,
+            rotationX: -tiltY,
+            scale: scaleHover,
+            transformPerspective: perspective,
+            duration: moveDur,
+            ease: "power2.out"
+          })
+          .to({}, { duration: pauseDur })
+
+          // 5. Back to Flat Center
+          .to(el, {
+            rotationY: 0,
+            rotationX: 0,
+            scale: 1,
+            duration: moveDur,
+            ease: "power2.out"
+          })
+          // 3 seconds pause before repeating
+          .to({}, { duration: 3.0 });
+
+        timelines.push(tl);
+      });
+
+      return () => {
+        timelines.forEach((tl) => tl.kill());
+      };
+    }
+
+    // --- Desktop Hover Sizing & Logic ---
+    // Entrance 3D flip-in animation for desktop
     gsap.fromTo(
       Array.from(cards),
       {
@@ -59,7 +145,6 @@ export function use3DTilt(
 
       const onEnter = () => {
         initialTransition = el.style.transition;
-        // Temporarily disable CSS transitions on transform to prevent lag
         el.style.transition = "none";
       };
 
@@ -69,8 +154,8 @@ export function use3DTilt(
 
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width / 2); // -1 to 1
-        const dy = (e.clientY - cy) / (rect.height / 2); // -1 to 1
+        const dx = (e.clientX - cx) / (rect.width / 2);
+        const dy = (e.clientY - cy) / (rect.height / 2);
 
         gsap.to(el, {
           rotationY: dx * maxTilt,

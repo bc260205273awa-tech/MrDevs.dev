@@ -158,27 +158,33 @@ export default function HeroParticles() {
 
       }
 
-      // Draw subtle glowing dust connections near the mouse
+      // Draw subtle glowing dust connections everywhere
       for (let a = 0; a < particles.length; a++) {
         for (let b = a + 1; b < particles.length; b++) {
           const dx = particles[a].x - particles[b].x;
           const dy = particles[a].y - particles[b].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          // Only connect particles if within 90px of each other and close to mouse
+          // Connect particles if within 90px of each other
           if (dist < 90) {
+            let lineAlpha = (1 - dist / 90) * 0.12; // Baseline faint alpha everywhere
+
             const mouseDistA = Math.sqrt(
               Math.pow(mouse.x - particles[a].x, 2) + Math.pow(mouse.y - particles[a].y, 2)
             );
+            
+            // Boost brightness if near mouse
             if (mouseDistA < mouse.radius) {
-              const lineAlpha = (1 - dist / 90) * 0.25;
-              ctx.beginPath();
-              ctx.moveTo(particles[a].x, particles[a].y);
-              ctx.lineTo(particles[b].x, particles[b].y);
-              ctx.strokeStyle = `rgba(47, 168, 255, ${lineAlpha})`;
-              ctx.lineWidth = 0.6;
-              ctx.stroke();
+              const force = (1 - mouseDistA / mouse.radius);
+              lineAlpha += force * 0.25;
             }
+
+            ctx.beginPath();
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.strokeStyle = `rgba(47, 168, 255, ${lineAlpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
           }
         }
       }

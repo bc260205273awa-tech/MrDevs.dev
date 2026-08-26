@@ -76,7 +76,7 @@ const STEPS: Step[] = [
 export default function Services() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
-  use3DTilt(containerRef, ".tilt-card", 12, 1000); // Powerful tilt
+  use3DTilt(containerRef, ".tilt-card", 4, 2000, 1.015); // Subtle tilt — no flipping
 
   return (
     <section id="services" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">

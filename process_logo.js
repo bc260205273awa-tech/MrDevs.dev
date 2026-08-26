@@ -13,7 +13,7 @@ async function extractPristineSymbols() {
   const height = info.height;
   const channels = info.channels;
 
-  // Global bounding box (same 598x225 crop)
+  // Global bounding box (exact same 598x225 crop)
   let minX = width, maxX = 0, minY = height, maxY = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -40,8 +40,13 @@ async function extractPristineSymbols() {
   const leftEyeRgba = Buffer.alloc(cropW * cropH * 4);
   const rightEyeRgba = Buffer.alloc(cropW * cropH * 4);
 
-  // Left Symbol: center (360, 310), bounds: x in [290, 432], y in [268, 345]
-  // Right Symbol: center (665, 310), bounds: x in [618, 712], y in [260, 355]
+  // Left Symbol: center (360, 306)
+  const leftCX = 360, leftCY = 306;
+  const leftRadiusX = 66, leftRadiusY = 44;
+
+  // Right Symbol: center (665, 308), circular radius 50
+  const rightCX = 665, rightCY = 308;
+  const rightRadius = 50;
 
   for (let cy = 0; cy < cropH; cy++) {
     for (let cx = 0; cx < cropW; cx++) {
@@ -55,16 +60,19 @@ async function extractPristineSymbols() {
       const b = data[inIdx + 2];
       const maxVal = Math.max(r, g, b);
 
-      // Smooth transparency
+      // Smooth transparency against black background
       let alpha = 0;
       if (maxVal > 15) {
-        alpha = Math.min(255, Math.floor(((maxVal - 15) / 30) * 255));
+        alpha = Math.min(255, Math.floor(((maxVal - 15) / 28) * 255));
       }
 
-      // --- 1. PURE LEFT SYMBOL (</>) ---
-      // Strictly bounded to the symbol geometry (no bottom rim reflection at oy >= 348)
-      const inLeftBox = (ox >= 290 && ox <= 432 && oy >= 265 && oy <= 346);
-      if (inLeftBox && (b > 90 || maxVal > 100)) {
+      // --- 1. CLEAN LEFT CODE SYMBOL (</>) ---
+      // Elliptical mask perfectly hugging </>, eliminates bottom-left stray speck
+      const dxL = (ox - leftCX) / leftRadiusX;
+      const dyL = (oy - leftCY) / leftRadiusY;
+      const inLeftMask = (dxL * dxL + dyL * dyL) <= 1.0;
+
+      if (inLeftMask && (b > 60 || maxVal > 70)) {
         leftEyeRgba[outIdx] = r;
         leftEyeRgba[outIdx + 1] = g;
         leftEyeRgba[outIdx + 2] = b;
@@ -73,10 +81,12 @@ async function extractPristineSymbols() {
         leftEyeRgba[outIdx + 3] = 0;
       }
 
-      // --- 2. PURE RIGHT SYMBOL (Power Button) ---
-      // Strictly bounded to the symbol geometry (no bottom rim reflection at oy >= 356)
-      const inRightBox = (ox >= 618 && ox <= 714 && oy >= 258 && oy <= 354);
-      if (inRightBox && (g > 80 || b > 80 || maxVal > 100)) {
+      // --- 2. CLEAN RIGHT POWER SYMBOL (⏻) ---
+      // Circular mask centered at (665, 308), radius 50 (captures full round button, no cut bottom)
+      const distToPower = Math.hypot(ox - rightCX, oy - rightCY);
+      const inRightMask = distToPower <= rightRadius;
+
+      if (inRightMask && (g > 60 || b > 60 || maxVal > 70)) {
         rightEyeRgba[outIdx] = r;
         rightEyeRgba[outIdx + 1] = g;
         rightEyeRgba[outIdx + 2] = b;
@@ -95,7 +105,7 @@ async function extractPristineSymbols() {
     .png()
     .toFile(path.join(outputDir, 'hero-symbol-power.png'));
 
-  console.log('Successfully saved pristine symbols with ZERO crescent artifacts!');
+  console.log('Successfully saved perfect circular/elliptical symbols with full round power button and zero specks!');
 }
 
 extractPristineSymbols().catch(console.error);

@@ -100,12 +100,67 @@ export default function HeroGlasses3D() {
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
+    // Autonomous Idle Animation (for mobile/touch devices where there is no mouse)
+    let idleAnimation: gsap.core.Timeline | null = null;
+    
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      const maxShiftX = 8;
+      const maxShiftY = 6;
+      
+      // Simulate human eye wandering
+      idleAnimation = gsap.timeline({ repeat: -1, delay: 1 });
+      
+      const createWanderStep = () => {
+        // Random normalized positions (-1 to 1)
+        const nx = (Math.random() - 0.5) * 2;
+        const ny = (Math.random() - 0.5) * 2;
+        
+        // Sometimes dart quickly (saccade), sometimes drift smoothly
+        const isSaccade = Math.random() > 0.6;
+        const duration = isSaccade ? 0.15 + Math.random() * 0.1 : 0.8 + Math.random() * 1.5;
+        const ease = isSaccade ? "power2.out" : "sine.inOut";
+        const pause = isSaccade ? 0.2 + Math.random() * 0.5 : 0;
+        
+        idleAnimation!.to([leftPupilRef.current, rightPupilRef.current], {
+          x: nx * maxShiftX,
+          y: ny * maxShiftY,
+          duration,
+          ease,
+        });
+        
+        // Tiny 3D head movement to match eyes
+        idleAnimation!.to(frameRef.current, {
+          rotateY: nx * 12,
+          rotateX: -ny * 8,
+          x: nx * 5,
+          y: ny * 3,
+          duration: duration * 1.2,
+          ease,
+        }, "<");
+        
+        idleAnimation!.to({}, { duration: pause });
+      };
+
+      // Create a sequence of 10 random eye movements that loop
+      for (let i = 0; i < 10; i++) {
+        createWanderStep();
+        // Occasionally return to center
+        if (i % 3 === 0) {
+          idleAnimation.to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: 0, duration: 0.3, ease: "power2.out" });
+          idleAnimation.to(frameRef.current, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: 0.4, ease: "power2.out" }, "<");
+          idleAnimation.to({}, { duration: 1 + Math.random() });
+        }
+      }
+    } else {
+      // Only attach mouse listeners on devices that actually have a fine pointer
+      window.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseleave", handleMouseLeave);
+    }
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      if (idleAnimation) idleAnimation.kill();
     };
   }, { scope: containerRef });
 

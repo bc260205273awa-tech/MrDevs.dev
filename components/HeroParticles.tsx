@@ -78,8 +78,8 @@ export default function HeroParticles() {
         particles.push({
           x,
           y,
-          vx: (Math.random() - 0.5) * 1.2,
-          vy: (Math.random() - 0.5) * 1.2,
+          vx: (Math.random() - 0.5) * 2.5,
+          vy: (Math.random() - 0.5) * 2.5,
           baseX: x,
           baseY: y,
           size,
@@ -103,26 +103,12 @@ export default function HeroParticles() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // If particle is pushed far off screen, respawn it at a random edge
-        const margin = 80;
-        if (p.x < -margin || p.x > width + margin || p.y < -margin || p.y > height + margin) {
-          // Pick a random edge to spawn from
-          const edge = Math.floor(Math.random() * 4);
-          if (edge === 0) { p.x = Math.random() * width; p.y = 0; }           // top
-          else if (edge === 1) { p.x = Math.random() * width; p.y = height; } // bottom
-          else if (edge === 2) { p.x = 0; p.y = Math.random() * height; }     // left
-          else { p.x = width; p.y = Math.random() * height; }                 // right
-          p.vx = (Math.random() - 0.5) * 1.2;
-          p.vy = (Math.random() - 0.5) * 1.2;
-          p.baseX = p.x;
-          p.baseY = p.y;
-        }
-
-        // Soft boundary nudge for gentle ambient drift (not mouse-pushed)
-        if (p.x < 0) p.vx = Math.abs(p.vx);
-        if (p.x > width) p.vx = -Math.abs(p.vx);
-        if (p.y < 0) p.vy = Math.abs(p.vy);
-        if (p.y > height) p.vy = -Math.abs(p.vy);
+        // If particle goes off screen, seamlessly wrap it to the opposite side
+        const margin = 50;
+        if (p.x < -margin) p.x = width + margin;
+        if (p.x > width + margin) p.x = -margin;
+        if (p.y < -margin) p.y = height + margin;
+        if (p.y > height + margin) p.y = -margin;
 
         // Calculate distance to mouse cursor
         const dx = mouse.x - p.x;

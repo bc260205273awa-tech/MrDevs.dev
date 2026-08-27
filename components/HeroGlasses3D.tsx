@@ -100,53 +100,60 @@ export default function HeroGlasses3D() {
       }
     };
 
-    // Autonomous Idle Animation (for mobile/touch devices where there is no mouse)
     let idleAnimation: gsap.core.Timeline | null = null;
+    let hasMouseMoved = false;
+
+    // Start Autonomous Idle Animation by default (covers mobile, touch, and idle desktop)
+    const maxShiftX = 8;
+    const maxShiftY = 6;
     
-    if (window.matchMedia("(pointer: coarse)").matches) {
-      const maxShiftX = 8;
-      const maxShiftY = 6;
-      
-      // Sequential pattern: Left -> Right -> Up -> Down -> Repeat
-      idleAnimation = gsap.timeline({ repeat: -1 });
-      
-      const moveDur = 0.5;
-      const pauseDur = 0.8;
+    idleAnimation = gsap.timeline({ repeat: -1 });
+    const moveDur = 0.5;
+    const pauseDur = 0.8;
 
-      // 1. Look Left
-      idleAnimation
-        .to([leftPupilRef.current, rightPupilRef.current], { x: -maxShiftX, y: 0, duration: moveDur, ease: "power2.inOut" }, "left")
-        .to(frameRef.current, { rotateY: -15, rotateX: 0, x: -5, y: 0, duration: moveDur, ease: "power2.inOut" }, "left")
-        .to({}, { duration: pauseDur })
+    // 1. Look Left
+    idleAnimation
+      .to([leftPupilRef.current, rightPupilRef.current], { x: -maxShiftX, y: 0, duration: moveDur, ease: "power2.inOut" }, "left")
+      .to(frameRef.current, { rotateY: -15, rotateX: 0, x: -5, y: 0, duration: moveDur, ease: "power2.inOut" }, "left")
+      .to({}, { duration: pauseDur })
 
-      // 2. Look Right
-        .to([leftPupilRef.current, rightPupilRef.current], { x: maxShiftX, y: 0, duration: moveDur, ease: "power2.inOut" }, "right")
-        .to(frameRef.current, { rotateY: 15, rotateX: 0, x: 5, y: 0, duration: moveDur, ease: "power2.inOut" }, "right")
-        .to({}, { duration: pauseDur })
+    // 2. Look Right
+      .to([leftPupilRef.current, rightPupilRef.current], { x: maxShiftX, y: 0, duration: moveDur, ease: "power2.inOut" }, "right")
+      .to(frameRef.current, { rotateY: 15, rotateX: 0, x: 5, y: 0, duration: moveDur, ease: "power2.inOut" }, "right")
+      .to({}, { duration: pauseDur })
 
-      // 3. Look Up
-        .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: -maxShiftY, duration: moveDur, ease: "power2.inOut" }, "up")
-        .to(frameRef.current, { rotateY: 0, rotateX: 12, x: 0, y: -3, duration: moveDur, ease: "power2.inOut" }, "up")
-        .to({}, { duration: pauseDur })
+    // 3. Look Up
+      .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: -maxShiftY, duration: moveDur, ease: "power2.inOut" }, "up")
+      .to(frameRef.current, { rotateY: 0, rotateX: 12, x: 0, y: -3, duration: moveDur, ease: "power2.inOut" }, "up")
+      .to({}, { duration: pauseDur })
 
-      // 4. Look Down
-        .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: maxShiftY, duration: moveDur, ease: "power2.inOut" }, "down")
-        .to(frameRef.current, { rotateY: 0, rotateX: -12, x: 0, y: 3, duration: moveDur, ease: "power2.inOut" }, "down")
-        .to({}, { duration: pauseDur })
+    // 4. Look Down
+      .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: maxShiftY, duration: moveDur, ease: "power2.inOut" }, "down")
+      .to(frameRef.current, { rotateY: 0, rotateX: -12, x: 0, y: 3, duration: moveDur, ease: "power2.inOut" }, "down")
+      .to({}, { duration: pauseDur })
 
-      // 5. Back to Center
-        .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
-        .to(frameRef.current, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
-        .to({}, { duration: pauseDur });
+    // 5. Back to Center
+      .to([leftPupilRef.current, rightPupilRef.current], { x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
+      .to(frameRef.current, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
+      .to({}, { duration: pauseDur });
 
-    } else {
-      // Only attach mouse listeners on devices that actually have a fine pointer
-      window.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseleave", handleMouseLeave);
-    }
+    // Custom mouse move wrapper to detect first interaction
+    const handleMouseMoveWrapper = (e: MouseEvent) => {
+      if (!hasMouseMoved) {
+        hasMouseMoved = true;
+        if (idleAnimation) {
+          idleAnimation.kill();
+          idleAnimation = null;
+        }
+      }
+      handleMouseMove(e);
+    };
+
+    window.addEventListener("mousemove", handleMouseMoveWrapper);
+    document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousemove", handleMouseMoveWrapper);
       document.removeEventListener("mouseleave", handleMouseLeave);
       if (idleAnimation) idleAnimation.kill();
     };

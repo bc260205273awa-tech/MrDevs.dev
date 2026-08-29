@@ -23,8 +23,6 @@ import {
   Gauge,
   GraduationCap
 } from "lucide-react";
-import gsap from "gsap";
-import HeroParticles from "./HeroParticles";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
 // [NEW] Survey form state interface without Question 12
@@ -62,7 +60,7 @@ const INITIAL_STATE: SurveyState = {
   q11TrainingScriptWanted: "",
 };
 
-// [NEW] Exactly 11 Questions (Question 12 removed)
+// [NEW] Exactly 11 Questions
 const TOTAL_QUESTIONS = 11;
 const TOTAL_STEPS = 12; // Step 0 (Staff Info) + Steps 1 to 11
 
@@ -74,193 +72,27 @@ export default function ColdCallingSurvey() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mainCardRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
-  // [NEW] Master 3D Tilt Physics for the Main Container and Option Cards
-  useEffect(() => {
-    const card = mainCardRef.current;
-    if (!card) return;
-
-    const isMobile = typeof window !== "undefined" && (
-      window.matchMedia("(pointer: coarse)").matches || 
-      window.matchMedia("(hover: none)").matches
-    );
-
-    if (isMobile) {
-      // Mobile subtle breathing wave
-      const tl = gsap.timeline({ repeat: -1, yoyo: true });
-      tl.to(card, {
-        rotationY: 3,
-        rotationX: -3,
-        duration: 3,
-        ease: "sine.inOut"
-      }).to(card, {
-        rotationY: -3,
-        rotationX: 3,
-        duration: 3,
-        ease: "sine.inOut"
-      });
-      return () => {
-        tl.kill();
-      };
-    }
-
-    // Desktop: Track mouse movement across window and apply 3D tilt to main card
-    const handleMouseMoveWindow = (e: MouseEvent) => {
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-
-      // Calculate relative delta
-      const dx = (e.clientX - cx) / (window.innerWidth / 2);
-      const dy = (e.clientY - cy) / (window.innerHeight / 2);
-
-      const maxTilt = 8; // degrees for main frame
-      gsap.to(card, {
-        rotationY: dx * maxTilt,
-        rotationX: -dy * maxTilt,
-        transformPerspective: 1200,
-        ease: "power2.out",
-        duration: 0.35,
-        overwrite: "auto",
-      });
-
-      // Also calculate spotlight coordinates
-      const cardX = e.clientX - rect.left;
-      const cardY = e.clientY - rect.top;
-      card.style.setProperty("--mouse-x", `${cardX}px`);
-      card.style.setProperty("--mouse-y", `${cardY}px`);
-
-      // Sub-cards spotlight
-      const subCards = card.querySelectorAll<HTMLElement>(".tilt-button");
-      subCards.forEach((sub) => {
-        const sRect = sub.getBoundingClientRect();
-        const sx = e.clientX - sRect.left;
-        const sy = e.clientY - sRect.top;
-        sub.style.setProperty("--mouse-x", `${sx}px`);
-        sub.style.setProperty("--mouse-y", `${sy}px`);
-      });
-    };
-
-    const handleMouseLeaveWindow = () => {
-      if (!card) return;
-      gsap.to(card, {
-        rotationY: 0,
-        rotationX: 0,
-        duration: 0.8,
-        ease: "elastic.out(1, 0.4)",
-        overwrite: "auto",
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMoveWindow);
-    document.addEventListener("mouseleave", handleMouseLeaveWindow);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMoveWindow);
-      document.removeEventListener("mouseleave", handleMouseLeaveWindow);
-    };
-  }, []);
-
-  // [NEW] Dynamic 3D tilt on individual button cards (re-attached on step change)
-  useEffect(() => {
-    const card = mainCardRef.current;
-    if (!card) return;
-
-    const isMobile = typeof window !== "undefined" && (
-      window.matchMedia("(pointer: coarse)").matches || 
-      window.matchMedia("(hover: none)").matches
-    );
-
-    if (isMobile) return;
-
-    const buttons = card.querySelectorAll<HTMLElement>(".tilt-button");
-    const cleanupList: (() => void)[] = [];
-
-    buttons.forEach((btn) => {
-      btn.style.transformStyle = "preserve-3d";
-      btn.style.willChange = "transform";
-
-      const onEnter = () => {
-        gsap.to(btn, {
-          scale: 1.03,
-          z: 20,
-          duration: 0.2,
-          ease: "power2.out",
-        });
-      };
-
-      const onMove = (e: MouseEvent) => {
-        const rect = btn.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width / 2);
-        const dy = (e.clientY - cy) / (rect.height / 2);
-
-        const btnMaxTilt = 12;
-        gsap.to(btn, {
-          rotationY: dx * btnMaxTilt,
-          rotationX: -dy * btnMaxTilt,
-          scale: 1.035,
-          z: 25,
-          transformPerspective: 600,
-          ease: "power2.out",
-          duration: 0.18,
-          overwrite: "auto",
-        });
-      };
-
-      const onLeave = () => {
-        gsap.to(btn, {
-          rotationY: 0,
-          rotationX: 0,
-          scale: 1,
-          z: 0,
-          duration: 0.6,
-          ease: "elastic.out(1.1, 0.4)",
-          overwrite: "auto",
-        });
-      };
-
-      btn.addEventListener("mouseenter", onEnter);
-      btn.addEventListener("mousemove", onMove);
-      btn.addEventListener("mouseleave", onLeave);
-
-      cleanupList.push(() => {
-        btn.removeEventListener("mouseenter", onEnter);
-        btn.removeEventListener("mousemove", onMove);
-        btn.removeEventListener("mouseleave", onLeave);
-      });
-    });
-
-    return () => {
-      cleanupList.forEach((fn) => fn());
-    };
-  }, [currentStep]);
-
-  // [NEW] Auto-focus input on step change
+  // Auto-focus input on step change
   useEffect(() => {
     setValidationError(null);
     const timer = setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
       }
-    }, 150);
+    }, 80);
     return () => clearTimeout(timer);
   }, [currentStep]);
 
-  // [NEW] Keyboard shortcuts listener
+  // Fast Keyboard shortcuts listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isSubmitting || isSubmitted) return;
 
-      // Enter key handler
       if (e.key === "Enter" && !e.shiftKey) {
         if (currentStep === 2 && formData.q2ColdCallingExperience === "Yes" && document.activeElement?.tagName === "TEXTAREA") {
-          return; // Allow multiline in textarea
+          return;
         }
         e.preventDefault();
         handleNext();
@@ -319,7 +151,6 @@ export default function ColdCallingSurvey() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentStep, formData, isSubmitting, isSubmitted]);
 
-  // Validation checker
   const isStepValid = (): boolean => {
     switch (currentStep) {
       case 0:
@@ -397,7 +228,7 @@ export default function ColdCallingSurvey() {
         if (currentStep < TOTAL_STEPS - 1) {
           setCurrentStep((prev) => prev + 1);
         }
-      }, 220);
+      }, 150);
     }
   };
 
@@ -419,7 +250,7 @@ export default function ColdCallingSurvey() {
       if (currentStep < TOTAL_STEPS - 1) {
         setCurrentStep((prev) => prev + 1);
       }
-    }, 220);
+    }, 150);
   };
 
   const handleSubmit = async () => {
@@ -448,7 +279,6 @@ export default function ColdCallingSurvey() {
       };
 
       if (!supabase) {
-        console.warn("Supabase credentials not configured in env. Storing in localStorage backup.", payload);
         if (typeof window !== "undefined") {
           const localSubmissions = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
           localSubmissions.push(payload);
@@ -480,61 +310,52 @@ export default function ColdCallingSurvey() {
     return "High Performer - Strong objection handling & closing ability";
   };
 
-  // [NEW] Confirmation Screen with 3D Holographic Tilt
+  // Confirmation Screen
   if (isSubmitted) {
     return (
-      <main ref={containerRef} className="min-h-screen bg-bg-main text-text-heading flex flex-col items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden selection:bg-accent-primary/20 selection:text-white">
-        <HeroParticles />
+      <main className="min-h-screen bg-[#070b14] text-text-heading flex flex-col items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent-primary/10 rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-primary/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-accent-cyan/15 rounded-full blur-[130px] pointer-events-none" />
-
-        <div 
-          ref={mainCardRef}
-          style={{ transformStyle: "preserve-3d" }}
-          className="spotlight-card relative z-10 w-full max-w-lg bg-white/5 backdrop-blur-2xl border border-white/10 border-t-white/25 rounded-3xl p-8 sm:p-12 shadow-[0_30px_90px_rgba(0,0,0,0.7)] text-center flex flex-col items-center animate-fade-up"
-        >
-          {/* 3D Elevated Logo Badge */}
-          <div style={{ transform: "translateZ(35px)" }} className="mb-8 relative flex items-center justify-center">
-            <div className="absolute inset-0 bg-accent-cyan/25 rounded-3xl blur-2xl animate-pulse" />
-            <div className="relative w-24 h-24 rounded-3xl bg-bg-deep border border-accent-cyan/40 flex items-center justify-center p-4 shadow-[0_0_35px_rgba(0,212,255,0.35)]">
+        <div className="relative z-10 w-full max-w-lg bg-[#0D1527] border border-white/10 rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-center flex flex-col items-center">
+          <div className="mb-6 relative flex items-center justify-center">
+            <div className="relative w-20 h-20 rounded-2xl bg-[#060A13] border border-accent-cyan/40 flex items-center justify-center p-3 shadow-[0_0_25px_rgba(0,212,255,0.25)]">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
-                width={64}
-                height={64}
+                width={56}
+                height={56}
                 className="object-contain"
                 priority
               />
             </div>
           </div>
 
-          <div style={{ transform: "translateZ(25px)" }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5DCAA5]/10 border border-[#5DCAA5]/30 text-[#5DCAA5] text-xs font-bold uppercase tracking-wider mb-5">
-            <CheckCircle2 size={15} />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5DCAA5]/10 border border-[#5DCAA5]/30 text-[#5DCAA5] text-xs font-bold uppercase tracking-wider mb-4">
+            <CheckCircle2 size={14} />
             Assessment Recorded
           </div>
 
-          <h1 style={{ transform: "translateZ(30px)" }} className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
+          <h1 className="text-2xl font-bold tracking-tight text-white mb-2">
             Thanks - we will be in touch
           </h1>
 
-          <p style={{ transform: "translateZ(20px)" }} className="text-text-body text-sm sm:text-base leading-relaxed mb-8 max-w-sm">
-            Thank you, <span className="text-white font-medium">{formData.staffName}</span>. Your cold calling assessment has been safely submitted. Mubeen and the team will review your responses.
+          <p className="text-text-body text-xs sm:text-sm leading-relaxed mb-6 max-w-sm">
+            Thank you, <span className="text-white font-semibold">{formData.staffName}</span>. Your cold calling assessment has been safely submitted. Mubeen and the team will review your responses.
           </p>
 
-          <div style={{ transform: "translateZ(15px)" }} className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-5 text-xs text-text-body flex flex-col gap-3 text-left shadow-inner">
-            <div className="flex justify-between items-center border-b border-white/5 pb-2.5">
-              <span className="text-text-body font-medium">Team Member</span>
+          <div className="w-full bg-[#060A13] border border-white/10 rounded-2xl p-4 text-xs text-text-body flex flex-col gap-2.5 text-left">
+            <div className="flex justify-between items-center border-b border-white/5 pb-2">
+              <span className="text-text-body">Team Member</span>
               <span className="text-white font-semibold">{formData.staffName}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-white/5 pb-2.5">
-              <span className="text-text-body font-medium">Position</span>
+            <div className="flex justify-between items-center border-b border-white/5 pb-2">
+              <span className="text-text-body">Position</span>
               <span className="text-white font-semibold">{formData.staffRole}</span>
             </div>
             <div className="flex justify-between items-center pt-0.5">
-              <span className="text-text-body font-medium">Readiness Status</span>
+              <span className="text-text-body">Readiness Status</span>
               <span className="text-accent-cyan font-bold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-accent-cyan animate-ping" />
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
                 Submitted &amp; Logged
               </span>
             </div>
@@ -545,69 +366,21 @@ export default function ColdCallingSurvey() {
   }
 
   return (
-    <main ref={containerRef} className="min-h-screen bg-bg-main text-text-heading flex flex-col justify-between p-4 sm:p-6 md:p-10 font-sans relative overflow-hidden selection:bg-accent-primary/20 selection:text-white">
-      {/* 3D Spotlight Dynamic CSS */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .spotlight-card {
-          position: relative;
-        }
-        .spotlight-card::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: radial-gradient(
-            550px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            rgba(47, 168, 255, 0.14),
-            transparent 45%
-          );
-          z-index: 0;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity 0.35s ease;
-        }
-        .spotlight-card::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          padding: 1px;
-          background: radial-gradient(
-            400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            rgba(0, 212, 255, 0.6),
-            transparent 45%
-          );
-          z-index: 1;
-          pointer-events: none;
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          opacity: 0;
-          transition: opacity 0.35s ease;
-        }
-        .spotlight-card:hover::before,
-        .spotlight-card:hover::after {
-          opacity: 1;
-        }
-      `}} />
+    <main className="min-h-screen bg-[#070b14] text-text-heading flex flex-col justify-between p-4 sm:p-6 md:p-8 font-sans relative overflow-hidden">
+      {/* Fast Static Ambient Background Gradients */}
+      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-accent-primary/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-accent-cyan/10 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Interactive Cursor-Reactive Dust Particles */}
-      <HeroParticles />
-
-      {/* Ambient Radial Background Glows */}
-      <div className="absolute -top-40 -left-40 w-[550px] h-[550px] bg-accent-primary/10 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-[550px] h-[550px] bg-accent-cyan/10 rounded-full blur-[160px] pointer-events-none" />
-
-      {/* Top Floating Glass Header */}
-      <header className="w-full max-w-4xl mx-auto pt-2 pb-6 z-20">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 shadow-lg">
-            <div className="w-8 h-8 rounded-xl bg-bg-deep border border-accent-cyan/40 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(0,212,255,0.25)]">
+      {/* Top Header */}
+      <header className="w-full max-w-3xl mx-auto pt-2 pb-4 z-20">
+        <div className="flex items-center justify-between gap-4 mb-3">
+          <div className="flex items-center gap-3 bg-[#0D1527] px-3.5 py-2 rounded-xl border border-white/10 shadow">
+            <div className="w-7 h-7 rounded-lg bg-[#060A13] border border-accent-cyan/40 flex items-center justify-center p-1">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
-                width={24}
-                height={24}
+                width={20}
+                height={20}
                 className="object-contain"
               />
             </div>
@@ -617,8 +390,8 @@ export default function ColdCallingSurvey() {
             </div>
           </div>
 
-          <div className="px-4 py-2 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-xs font-medium text-text-body flex items-center gap-2 shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
+          <div className="px-3.5 py-1.5 rounded-xl bg-[#0D1527] border border-white/10 text-xs font-medium text-text-body flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
             {currentStep === 0 ? (
               <span className="text-white font-semibold">Staff Identification</span>
             ) : (
@@ -632,48 +405,40 @@ export default function ColdCallingSurvey() {
           </div>
         </div>
 
-        {/* Glowing Dynamic Progress Track */}
-        <div className="w-full h-1.5 bg-white/5 backdrop-blur-sm border border-white/5 rounded-full overflow-hidden relative">
+        {/* Progress Track */}
+        <div className="w-full h-1 bg-[#0D1527] border border-white/5 rounded-full overflow-hidden relative">
           <div
-            className="h-full bg-gradient-to-r from-accent-primary via-accent-cyan to-accent-primary transition-all duration-300 ease-out relative"
+            className="h-full bg-gradient-to-r from-accent-primary to-accent-cyan transition-all duration-200 ease-out"
             style={{ width: `${progressPercent}%` }}
-          >
-            <div className="absolute right-0 top-0 bottom-0 w-4 bg-white blur-[3px]" />
-          </div>
+          />
         </div>
       </header>
 
-      {/* Main 3D Holographic Question Card */}
-      <div className="flex-1 flex items-center justify-center my-4 z-10 w-full perspective-[1200px]">
-        <div 
-          ref={mainCardRef}
-          style={{ transformStyle: "preserve-3d" }}
-          className="spotlight-card w-full max-w-3xl bg-white/[0.04] backdrop-blur-2xl border border-white/10 border-t-white/20 rounded-3xl p-6 sm:p-10 md:p-14 shadow-[0_30px_90px_rgba(0,0,0,0.7)] relative overflow-hidden"
-        >
-          {/* Subtle Ambient Top Corner Glow */}
-          <div className="absolute -top-20 -right-20 w-48 h-48 bg-accent-cyan/15 rounded-full blur-3xl pointer-events-none" />
-
-          {/* STEP 0: Staff Info Identification */}
+      {/* Main Question Card */}
+      <div className="flex-1 flex items-center justify-center my-4 z-10 w-full">
+        <div className="w-full max-w-2xl bg-[#0D1527] border border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative">
+          
+          {/* STEP 0: Staff Info */}
           {currentStep === 0 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-xs font-bold uppercase tracking-wider w-fit">
-                <Sparkles size={14} className="animate-pulse" />
+            <div className="flex flex-col gap-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-xs font-bold uppercase tracking-wider w-fit">
+                <Sparkles size={13} />
                 <span>Cold Calling Readiness Check</span>
               </div>
 
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-3">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
                   Staff Readiness Assessment
                 </h1>
-                <p className="text-text-body text-sm sm:text-base leading-relaxed max-w-xl">
+                <p className="text-text-body text-xs sm:text-sm leading-relaxed max-w-xl">
                   This quick 11-question assessment evaluates readiness for upcoming outbound client communication campaigns. Please enter your name and current role to get started.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                <div className="tilt-button spotlight-card flex flex-col gap-2 p-4 rounded-2xl bg-white/[0.02] border border-white/10">
-                  <label className="text-xs font-semibold text-text-heading flex items-center gap-2">
-                    <User size={14} className="text-accent-cyan" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-1">
+                <div className="flex flex-col gap-1.5 p-3.5 rounded-xl bg-[#080E1A] border border-white/10">
+                  <label className="text-xs font-semibold text-text-heading flex items-center gap-1.5">
+                    <User size={13} className="text-accent-cyan" />
                     Full Name <span className="text-accent-primary">*</span>
                   </label>
                   <input
@@ -685,13 +450,13 @@ export default function ColdCallingSurvey() {
                       setValidationError(null);
                     }}
                     placeholder="e.g. Mubeen Khan"
-                    className="w-full px-4 py-3 bg-[#0A0F1C]/90 border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all duration-200"
+                    className="w-full px-3.5 py-2.5 bg-[#040810] border border-white/10 focus:border-accent-cyan rounded-lg text-white placeholder-[#5F5E5A] text-sm focus:outline-none transition-colors"
                   />
                 </div>
 
-                <div className="tilt-button spotlight-card flex flex-col gap-2 p-4 rounded-2xl bg-white/[0.02] border border-white/10">
-                  <label className="text-xs font-semibold text-text-heading flex items-center gap-2">
-                    <Briefcase size={14} className="text-accent-cyan" />
+                <div className="flex flex-col gap-1.5 p-3.5 rounded-xl bg-[#080E1A] border border-white/10">
+                  <label className="text-xs font-semibold text-text-heading flex items-center gap-1.5">
+                    <Briefcase size={13} className="text-accent-cyan" />
                     Current Role <span className="text-accent-primary">*</span>
                   </label>
                   <input
@@ -702,7 +467,7 @@ export default function ColdCallingSurvey() {
                       setValidationError(null);
                     }}
                     placeholder="e.g. Developer, Outreach, Design"
-                    className="w-full px-4 py-3 bg-[#0A0F1C]/90 border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all duration-200"
+                    className="w-full px-3.5 py-2.5 bg-[#040810] border border-white/10 focus:border-accent-cyan rounded-lg text-white placeholder-[#5F5E5A] text-sm focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -711,16 +476,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 1: Phone Calls */}
           {currentStep === 1 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <PhoneCall size={14} />
+                <PhoneCall size={13} />
                 <span>Question 1 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Comfortable speaking with potential clients on a phone call?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -730,41 +495,41 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q1ComfortableCalls", opt.label)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q1ComfortableCalls === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q1ComfortableCalls === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q1ComfortableCalls === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q1ComfortableCalls === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* STEP 2: Cold Calling Experience (Conditional Follow-up) */}
+          {/* STEP 2: Cold Calling Experience */}
           {currentStep === 2 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <Target size={14} />
+                <Target size={13} />
                 <span>Question 2 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Done cold calling before?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -773,32 +538,31 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q2ColdCallingExperience", opt.label, opt.label === "No")}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q2ColdCallingExperience === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q2ColdCallingExperience === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q2ColdCallingExperience === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q2ColdCallingExperience === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
 
-              {/* Conditional Follow-up textarea if Yes */}
               {formData.q2ColdCallingExperience === "Yes" && (
-                <div className="tilt-button spotlight-card flex flex-col gap-2.5 p-5 rounded-2xl bg-white/[0.02] border border-accent-cyan/30 mt-2 animate-fade-up">
-                  <label className="text-xs font-semibold text-accent-cyan flex items-center gap-2">
-                    <Sparkles size={13} />
+                <div className="flex flex-col gap-2 p-4 rounded-xl bg-[#080E1A] border border-accent-cyan/30 mt-1">
+                  <label className="text-xs font-semibold text-accent-cyan flex items-center gap-1.5">
+                    <Sparkles size={12} />
                     Briefly tell me about your experience: <span className="text-accent-primary">*</span>
                   </label>
                   <textarea
@@ -810,7 +574,7 @@ export default function ColdCallingSurvey() {
                       setValidationError(null);
                     }}
                     placeholder="Mention the industry, call volume, or campaign outcomes..."
-                    className="w-full px-4 py-3.5 bg-[#0A0F1C]/90 border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm resize-none focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all duration-200"
+                    className="w-full px-3.5 py-2.5 bg-[#040810] border border-white/10 focus:border-accent-cyan rounded-lg text-white placeholder-[#5F5E5A] text-sm resize-none focus:outline-none transition-colors"
                   />
                 </div>
               )}
@@ -819,16 +583,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 3: Calling Business Owner */}
           {currentStep === 3 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <User size={14} />
+                <User size={13} />
                 <span>Question 3 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Comfortable calling a business owner or manager who has never spoken to MR Devs before?
               </h2>
 
-              <div className="grid grid-cols-1 gap-3 mt-2">
+              <div className="grid grid-cols-1 gap-2.5 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -838,23 +602,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q3CallingBusinessOwner", opt.label)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q3CallingBusinessOwner === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.01]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q3CallingBusinessOwner === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q3CallingBusinessOwner === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q3CallingBusinessOwner === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -863,16 +627,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 4: Call Volume */}
           {currentStep === 4 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <Gauge size={14} />
+                <Gauge size={13} />
                 <span>Question 4 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 How many cold calls can you realistically make in a day while maintaining quality?
               </h2>
 
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-2">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-1">
                 {[
                   { key: "A", label: "20" },
                   { key: "B", label: "30" },
@@ -884,15 +648,15 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q4CallsPerDay", opt.label)}
-                    className={`tilt-button spotlight-card flex flex-col items-center justify-center p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q4CallsPerDay === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-105"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)] scale-105"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <span className="text-xs font-bold text-accent-cyan/80 mb-1">[{opt.key}]</span>
-                    <span className="text-2xl font-bold text-white">{opt.label}</span>
-                    <span className="text-[11px] text-text-body mt-1 font-normal">calls/day</span>
+                    <span className="text-xs font-bold text-accent-cyan/80 mb-0.5">[{opt.key}]</span>
+                    <span className="text-xl font-bold text-white">{opt.label}</span>
+                    <span className="text-[10px] text-text-body mt-0.5 font-normal">calls/day</span>
                   </button>
                 ))}
               </div>
@@ -901,28 +665,27 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 5: Objections */}
           {currentStep === 5 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <ShieldCheck size={14} />
+                <ShieldCheck size={13} />
                 <span>Question 5 of 11</span>
               </div>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug mb-3">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug mb-2">
                   Comfortable handling common objections?
                 </h2>
-                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 text-xs text-text-body leading-relaxed flex flex-col gap-1.5">
+                <div className="p-3 rounded-xl bg-[#080E1A] border border-white/10 text-xs text-text-body leading-relaxed flex flex-col gap-1">
                   <span className="text-accent-cyan font-semibold">Common objections to navigate:</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-text-body/90">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px]">
                     <span>• &quot;Not interested&quot;</span>
                     <span>• &quot;We already have a website&quot;</span>
                     <span>• &quot;Send me details on WhatsApp&quot;</span>
                     <span>• &quot;How much does it cost?&quot;</span>
-                    <span>• &quot;I&apos;m busy right now&quot;</span>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -932,23 +695,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q5HandlingObjections", opt.label)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q5HandlingObjections === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q5HandlingObjections === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q5HandlingObjections === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q5HandlingObjections === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -957,25 +720,25 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 6: Languages Multi-Select */}
           {currentStep === 6 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                  <Languages size={14} />
+                  <Languages size={13} />
                   <span>Question 6 of 11</span>
                 </div>
-                <span className="text-[11px] text-accent-cyan bg-accent-cyan/10 border border-accent-cyan/30 px-3 py-1 rounded-full font-semibold">
+                <span className="text-[11px] text-accent-cyan bg-accent-cyan/10 border border-accent-cyan/30 px-2.5 py-0.5 rounded-full font-semibold">
                   Multi-select
                 </span>
               </div>
 
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug mb-1">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug mb-1">
                   Comfortable speaking in:
                 </h2>
-                <p className="text-xs text-text-body">Select all languages and dialects you are comfortable conducting calls in.</p>
+                <p className="text-xs text-text-body">Select all languages you feel confident conducting calls in.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 {[
                   "Urdu",
                   "Roman Urdu",
@@ -988,19 +751,19 @@ export default function ColdCallingSurvey() {
                       key={lang}
                       type="button"
                       onClick={() => toggleLanguage(lang)}
-                      className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                      className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                         isChecked
-                          ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)]"
-                          : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                          ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                          : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                       }`}
                     >
-                      <span className="text-base">{lang}</span>
-                      <div className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${
+                      <span>{lang}</span>
+                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center ${
                         isChecked
-                          ? "bg-accent-cyan border-accent-cyan text-bg-deep shadow-[0_0_10px_rgba(0,212,255,0.8)]"
+                          ? "bg-accent-cyan border-accent-cyan text-[#050B14]"
                           : "border-white/20 bg-white/5"
                       }`}>
-                        {isChecked && <Check size={16} strokeWidth={3} />}
+                        {isChecked && <Check size={14} strokeWidth={3} />}
                       </div>
                     </button>
                   );
@@ -1011,16 +774,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 7: Regular Calling */}
           {currentStep === 7 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <Volume2 size={14} />
+                <Volume2 size={13} />
                 <span>Question 7 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Willing to make cold calls regularly as part of MR Devs responsibilities?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -1029,23 +792,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q7RegularCallsWillingness", opt.label)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q7RegularCallsWillingness === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q7RegularCallsWillingness === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q7RegularCallsWillingness === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q7RegularCallsWillingness === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -1054,16 +817,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 8: Phone & SIM */}
           {currentStep === 8 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <Smartphone size={14} />
+                <Smartphone size={13} />
                 <span>Question 8 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Do you have a phone and SIM you can make business calls with?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -1072,23 +835,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q8PhoneSimAvailable", opt.label)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q8PhoneSimAvailable === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q8PhoneSimAvailable === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q8PhoneSimAvailable === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q8PhoneSimAvailable === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -1097,16 +860,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 9: Calling Package */}
           {currentStep === 9 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <CreditCard size={14} />
+                <CreditCard size={13} />
                 <span>Question 9 of 11</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Comfortable using a company-provided calling package on your existing number initially?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -1115,23 +878,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q9CompanyCallingPackage", opt.label)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q9CompanyCallingPackage === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q9CompanyCallingPackage === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q9CompanyCallingPackage === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q9CompanyCallingPackage === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -1140,13 +903,13 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 10: Confidence Scale 1-10 */}
           {currentStep === 10 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <Gauge size={14} />
+                <Gauge size={13} />
                 <span>Question 10 of 11</span>
               </div>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug mb-1">
                   Confidence making a cold call to a potential client?
                 </h2>
                 <div className="flex items-center gap-2 text-xs font-semibold text-accent-cyan">
@@ -1155,18 +918,18 @@ export default function ColdCallingSurvey() {
                 </div>
               </div>
 
-              {/* 1-10 Glowing Number Tiles */}
-              <div className="flex flex-col gap-4 mt-2">
-                <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-2.5">
+              {/* 1-10 Number Tiles */}
+              <div className="flex flex-col gap-3 mt-1">
+                <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                     <button
                       key={num}
                       type="button"
                       onClick={() => handleScaleSelect(num)}
-                      className={`tilt-button spotlight-card h-14 rounded-2xl border font-bold text-base flex flex-col items-center justify-center transition-all duration-200 cursor-pointer ${
+                      className={`h-12 rounded-xl border font-bold text-sm sm:text-base flex items-center justify-center transition-all cursor-pointer ${
                         formData.q10ConfidenceScale === num
-                          ? "bg-accent-cyan border-accent-cyan text-bg-deep shadow-[0_0_25px_rgba(0,212,255,0.6)] scale-110 z-10"
-                          : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.08] hover:border-white/30 hover:text-white"
+                          ? "bg-accent-cyan border-accent-cyan text-[#050B14] shadow-[0_0_15px_rgba(0,212,255,0.5)] scale-105"
+                          : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/30 hover:text-white"
                       }`}
                     >
                       <span>{num}</span>
@@ -1174,15 +937,9 @@ export default function ColdCallingSurvey() {
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center text-xs text-text-body px-1 font-medium">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400/80" />
-                    1 - Very Uncomfortable
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    10 - Very Confident
-                    <span className="w-2 h-2 rounded-full bg-accent-cyan shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
-                  </span>
+                <div className="flex justify-between items-center text-xs text-text-body px-1">
+                  <span>1 - Very Uncomfortable</span>
+                  <span>10 - Very Confident</span>
                 </div>
               </div>
             </div>
@@ -1190,16 +947,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 11: Training and Script */}
           {currentStep === 11 && (
-            <div style={{ transform: "translateZ(30px)" }} className="flex flex-col gap-6 animate-fade-up relative z-10">
+            <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
-                <GraduationCap size={14} />
+                <GraduationCap size={13} />
                 <span>Question 11 of 11 (Final)</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
                 Would you like training and a cold-calling script before starting?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -1208,23 +965,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q11TrainingScriptWanted", opt.label, false)}
-                    className={`tilt-button spotlight-card flex items-center justify-between p-5 rounded-2xl border text-sm font-semibold transition-all duration-200 text-left cursor-pointer ${
+                    className={`flex items-center justify-between p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                       formData.q11TrainingScriptWanted === opt.label
-                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_25px_rgba(0,212,255,0.3)] scale-[1.02]"
-                        : "bg-white/[0.03] border-white/10 text-text-body hover:bg-white/[0.07] hover:border-white/25 hover:text-white"
+                        ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_15px_rgba(0,212,255,0.25)]"
+                        : "bg-[#080E1A] border-white/10 text-text-body hover:bg-[#121A2E] hover:border-white/20 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-3">
+                      <span className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center ${
                         formData.q11TrainingScriptWanted === opt.label
-                          ? "bg-accent-cyan text-bg-deep shadow-[0_0_12px_rgba(0,212,255,0.8)]"
-                          : "bg-white/10 text-text-body border border-white/10"
+                          ? "bg-accent-cyan text-[#050B14]"
+                          : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span>{opt.label}</span>
                     </div>
-                    {formData.q11TrainingScriptWanted === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q11TrainingScriptWanted === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -1233,17 +990,17 @@ export default function ColdCallingSurvey() {
 
           {/* Validation Alert */}
           {validationError && (
-            <div className="mt-6 flex items-center gap-2.5 p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs animate-fade-up">
-              <AlertCircle size={16} className="text-red-400 shrink-0" />
+            <div className="mt-5 flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+              <AlertCircle size={15} className="text-red-400 shrink-0" />
               <span>{validationError}</span>
             </div>
           )}
 
           {/* Submission Error Banner */}
           {submitError && (
-            <div className="mt-6 flex flex-col gap-2 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs animate-fade-up">
+            <div className="mt-5 flex flex-col gap-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs">
               <div className="flex items-center gap-2">
-                <AlertCircle size={16} className="text-amber-400 shrink-0" />
+                <AlertCircle size={15} className="text-amber-400 shrink-0" />
                 <span className="font-semibold">Submission Notice</span>
               </div>
               <p className="text-text-body">{submitError}</p>
@@ -1251,57 +1008,55 @@ export default function ColdCallingSurvey() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="self-start mt-1 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold text-xs flex items-center gap-2 transition-colors"
+                className="self-start mt-1 px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold text-xs flex items-center gap-1.5 transition-colors"
               >
-                <RefreshCw size={13} className={isSubmitting ? "animate-spin" : ""} />
+                <RefreshCw size={12} className={isSubmitting ? "animate-spin" : ""} />
                 Retry Submission
               </button>
             </div>
           )}
 
           {/* Navigation Controls Dock */}
-          <div style={{ transform: "translateZ(30px)" }} className="flex items-center justify-between gap-4 mt-8 pt-6 border-t border-white/5 relative z-10">
-            {/* Back Button */}
+          <div className="flex items-center justify-between gap-4 mt-8 pt-5 border-t border-white/5">
             {currentStep > 0 ? (
               <button
                 type="button"
                 onClick={handlePrev}
                 disabled={isSubmitting}
-                className="tilt-button px-5 py-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-text-body hover:text-white text-xs font-semibold flex items-center gap-2 transition-all duration-200 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-[#080E1A] hover:bg-[#121A2E] border border-white/10 text-text-body hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={15} />
                 Back
               </button>
             ) : (
               <div />
             )}
 
-            {/* Next / Submit Button */}
             <button
               type="button"
               onClick={handleNext}
               disabled={isSubmitting}
-              className="tilt-button px-7 py-3.5 rounded-2xl bg-accent-primary hover:bg-accent-cyan text-bg-deep font-bold text-sm flex items-center gap-2 transition-all duration-300 shadow-glow hover:shadow-glow-cyan hover:scale-[1.03] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-6 py-3 rounded-xl bg-accent-primary hover:bg-accent-cyan text-[#050B14] font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-glow hover:shadow-glow-cyan hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? (
                 <>
-                  <RefreshCw size={16} className="animate-spin" />
+                  <RefreshCw size={14} className="animate-spin" />
                   Recording Response...
                 </>
               ) : currentStep === TOTAL_STEPS - 1 ? (
                 <>
                   Submit Assessment
-                  <Check size={16} />
+                  <Check size={15} />
                 </>
               ) : currentStep === 0 ? (
                 <>
                   Begin Assessment
-                  <ArrowRight size={16} />
+                  <ArrowRight size={15} />
                 </>
               ) : (
                 <>
                   Continue
-                  <ChevronRight size={16} />
+                  <ChevronRight size={15} />
                 </>
               )}
             </button>
@@ -1310,13 +1065,13 @@ export default function ColdCallingSurvey() {
       </div>
 
       {/* Footer Navigation Bar */}
-      <footer className="w-full max-w-3xl mx-auto pb-2 text-center text-xs text-text-body/60 select-none z-10 flex flex-wrap items-center justify-center gap-3">
+      <footer className="w-full max-w-2xl mx-auto pb-2 text-center text-xs text-text-body/60 select-none z-10 flex flex-wrap items-center justify-center gap-3">
         <span className="flex items-center gap-1.5">
-          Press <kbd className="px-2 py-0.5 rounded-md bg-white/10 text-white font-mono text-[11px] border border-white/10">Enter ↵</kbd> or click to advance
+          Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">Enter ↵</kbd> or click to advance
         </span>
         <span>•</span>
         <span className="flex items-center gap-1.5">
-          Use keys <kbd className="px-1.5 py-0.5 rounded-md bg-white/10 text-white font-mono text-[11px] border border-white/10">A</kbd>-<kbd className="px-1.5 py-0.5 rounded-md bg-white/10 text-white font-mono text-[11px] border border-white/10">E</kbd> for quick choice
+          Use keys <kbd className="px-1 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">A</kbd>-<kbd className="px-1 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">E</kbd> for quick choice
         </span>
       </footer>
     </main>

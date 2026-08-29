@@ -27,3 +27,4 @@ If you are asked to modify these components, respect these established rules:
 *When you make a structural change, log it here for the next AI.*
 
 - **Aug 27, 2026 (Previous AI)**: Created `AI_MEMORY.md`. Established seamless wrap-around for particles, automated eye-tracking fallback for mobile, and fixed Process timeline scroll trigger lengths.
+- **Aug 29, 2026 (Current AI)**: Added internal staff-only Cold Calling Readiness Survey at `/internal/cc-readiness-7f3k9pQ2xR` with Typeform UX, crawler disallow in `app/robots.ts`, Supabase integration in `lib/supabaseClient.ts`, and standalone branding layout.

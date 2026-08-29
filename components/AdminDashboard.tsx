@@ -25,11 +25,14 @@ import {
   Lock,
   Users,
   Award,
-  Calendar
+  Calendar,
+  Activity,
+  TrendingUp,
+  Flame,
+  ArrowUpRight
 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
-// [NEW] Assessment Submission Schema
 export interface AssessmentRecord {
   id: string;
   staff_name: string;
@@ -50,7 +53,6 @@ export interface AssessmentRecord {
   status?: "Ready" | "Needs Training" | "Under Review";
 }
 
-// [NEW] Default High-Quality Demo Submissions
 const DEMO_RECORDS: AssessmentRecord[] = [
   {
     id: "demo-1",
@@ -149,13 +151,12 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  // Load submissions cleanly
+  // Load submissions
   const loadSubmissions = async () => {
     setIsLoading(true);
     try {
       let combined: AssessmentRecord[] = [];
 
-      // 1. Supabase Fetch
       const supabase = getSupabaseClient();
       if (supabase) {
         const { data, error } = await supabase
@@ -168,7 +169,6 @@ export default function AdminDashboard() {
         }
       }
 
-      // 2. LocalStorage Fetch
       if (typeof window !== "undefined") {
         const local = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
         if (local.length > 0) {
@@ -181,7 +181,6 @@ export default function AdminDashboard() {
         }
       }
 
-      // 3. Fallback demo data
       if (combined.length === 0) {
         combined = DEMO_RECORDS;
       }
@@ -225,6 +224,27 @@ export default function AdminDashboard() {
     }
   };
 
+  // Zero-overhead 3D Tilt handlers on mouse move over individual card
+  const handleTiltMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+
+    card.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(6px)`;
+    card.style.setProperty("--mouse-x", `${x}px`);
+    card.style.setProperty("--mouse-y", `${y}px`);
+  };
+
+  const handleTiltMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    card.style.transform = `perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+  };
+
   // Memoized Search & Filter
   const filteredRecords = useMemo(() => {
     return records.filter((rec) => {
@@ -242,7 +262,7 @@ export default function AdminDashboard() {
     });
   }, [records, searchTerm, selectedConfidence]);
 
-  // Memoized Statistics
+  // Metrics
   const stats = useMemo(() => {
     const total = records.length;
     if (total === 0) return { total: 0, avgConfidence: 0, readyPercent: 0, trainingCount: 0 };
@@ -322,31 +342,48 @@ export default function AdminDashboard() {
   // ==========================================
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-[#070b14] text-text-heading flex flex-col items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
-        {/* Fast Static GPU Background Gradients (0 FPS overhead) */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent-primary/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent-cyan/10 rounded-full blur-[100px] pointer-events-none" />
+      <main className="min-h-screen bg-[#060a12] text-text-heading flex flex-col items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
+        {/* Animated Cyber Grid */}
+        <div 
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{
+            backgroundImage: "radial-gradient(rgba(47, 168, 255, 0.25) 1px, transparent 1px)",
+            backgroundSize: "36px 36px"
+          }}
+        />
 
-        <div className="relative z-10 w-full max-w-md bg-[#0D1527] border border-white/10 rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col items-center">
-          <div className="mb-6 relative flex items-center justify-center">
-            <div className="relative w-16 h-16 rounded-2xl bg-[#060A13] border border-accent-cyan/40 flex items-center justify-center p-3 shadow-[0_0_20px_rgba(0,212,255,0.25)]">
+        {/* Ambient Glowing Orbs */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-tr from-accent-primary/20 to-accent-cyan/15 rounded-full blur-[130px] pointer-events-none animate-pulse-slow" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent-cyan/10 rounded-full blur-[110px] pointer-events-none" />
+
+        {/* 3D Glass Login Card */}
+        <div
+          onMouseMove={handleTiltMouseMove}
+          onMouseLeave={handleTiltMouseLeave}
+          style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
+          className="relative z-10 w-full max-w-md bg-[#0c1424]/90 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-3xl p-8 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] flex flex-col items-center"
+        >
+          {/* Logo Badge */}
+          <div className="mb-6 relative flex items-center justify-center group">
+            <div className="absolute inset-0 bg-accent-cyan/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+            <div className="relative w-20 h-20 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-3 shadow-[0_0_30px_rgba(0,212,255,0.35)]">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
-                width={44}
-                height={44}
+                width={52}
+                height={52}
                 className="object-contain"
                 priority
               />
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-xs font-bold uppercase tracking-wider mb-3">
             <Lock size={13} />
             <span>Executive Command Center</span>
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-white mb-2 text-center">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2 text-center">
             Admin Assessment Portal
           </h1>
           <p className="text-text-body text-xs sm:text-sm text-center mb-6 leading-relaxed max-w-xs">
@@ -367,7 +404,7 @@ export default function AdminDashboard() {
                   setAuthError(null);
                 }}
                 placeholder="Enter access code..."
-                className="w-full px-4 py-3.5 bg-[#060A13] border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                className="w-full px-4 py-3.5 bg-[#040810] border border-white/15 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 transition-all"
                 autoFocus
               />
             </div>
@@ -381,7 +418,7 @@ export default function AdminDashboard() {
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl bg-accent-primary hover:bg-accent-cyan text-[#050B14] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-glow hover:shadow-glow-cyan hover:scale-[1.01] active:scale-[0.98] mt-1"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_0_25px_rgba(47,168,255,0.4)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] hover:scale-[1.02] active:scale-[0.98] mt-1"
             >
               <span>Authenticate &amp; Enter</span>
               <ChevronRight size={16} />
@@ -389,7 +426,7 @@ export default function AdminDashboard() {
           </form>
 
           <div className="mt-6 pt-4 border-t border-white/5 text-[11px] text-text-body/60 text-center flex items-center justify-center gap-2">
-            <span>Passcode: <code className="text-accent-cyan font-mono font-semibold">mrdevs2026</code></span>
+            <span>Passcode: <code className="text-accent-cyan font-mono font-bold bg-accent-cyan/10 px-2 py-0.5 rounded border border-accent-cyan/20">mrdevs2026</code></span>
           </div>
         </div>
       </main>
@@ -397,46 +434,55 @@ export default function AdminDashboard() {
   }
 
   // ==========================================
-  // VIEW 2: FULL ADMIN DASHBOARD (BLAZING FAST)
+  // VIEW 2: FULL ADMIN DASHBOARD (PREMIUM & FAST)
   // ==========================================
   return (
-    <main className="min-h-screen bg-[#070b14] text-text-heading p-4 sm:p-6 md:p-8 font-sans relative overflow-x-hidden">
-      {/* Fast Static Ambient Background Gradients */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-accent-primary/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-accent-cyan/10 rounded-full blur-[120px] pointer-events-none" />
+    <main className="min-h-screen bg-[#060a12] text-text-heading p-4 sm:p-6 md:p-8 font-sans relative overflow-x-hidden">
+      {/* Dynamic Cyber Grid Texture */}
+      <div 
+        className="absolute inset-0 opacity-15 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(rgba(47, 168, 255, 0.25) 1px, transparent 1px)",
+          backgroundSize: "36px 36px"
+        }}
+      />
+
+      {/* Ambient Lighting Orbs */}
+      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-accent-primary/10 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-accent-cyan/10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto flex flex-col gap-6 relative z-10">
         
         {/* TOP BAR */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-[#0D1527] border border-white/10 shadow-lg">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 border-t-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#060A13] border border-accent-cyan/40 flex items-center justify-center p-2 shadow-[0_0_15px_rgba(0,212,255,0.25)]">
+            <div className="w-12 h-12 rounded-2xl bg-[#040810] border border-accent-cyan/40 flex items-center justify-center p-2.5 shadow-[0_0_20px_rgba(0,212,255,0.3)]">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
-                width={28}
-                height={28}
+                width={32}
+                height={32}
                 className="object-contain"
               />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                <h1 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
                   Cold Calling Command Center
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[#5DCAA5] text-[10px] font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[#5DCAA5] text-[10px] font-bold uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                   Live Sync
                 </span>
               </div>
-              <p className="text-xs text-text-body">MR Devs Staff Readiness &amp; Outreach Capabilities</p>
+              <p className="text-xs text-text-body mt-0.5">MR Devs Staff Readiness &amp; Outreach Capabilities</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={loadSubmissions}
-              className="px-3.5 py-2 rounded-xl bg-[#060A13] hover:bg-[#121B30] border border-white/10 text-xs font-semibold text-text-body hover:text-white flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2 rounded-xl bg-[#040810] hover:bg-[#101b30] border border-white/10 text-xs font-semibold text-text-body hover:text-white flex items-center gap-1.5 transition-all shadow hover:border-white/20"
             >
               <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
               <span>Refresh</span>
@@ -444,7 +490,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={exportToCSV}
-              className="px-4 py-2 rounded-xl bg-accent-primary/20 hover:bg-accent-primary/30 border border-accent-cyan/40 text-xs font-bold text-accent-cyan flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2 rounded-xl bg-accent-primary/20 hover:bg-accent-primary/30 border border-accent-cyan/40 text-xs font-bold text-accent-cyan flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,212,255,0.25)] transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <Download size={14} />
               <span>Export CSV</span>
@@ -452,7 +498,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={handleLogout}
-              className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-semibold text-red-300 flex items-center gap-1.5 transition-colors ml-1"
+              className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-semibold text-red-300 flex items-center gap-1.5 transition-all ml-1"
             >
               <LogOut size={14} />
               <span>Logout</span>
@@ -460,90 +506,122 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* METRICS KPI GRID */}
+        {/* METRICS KPI GRID WITH 3D TILT */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Total Assessed */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#0D1527] border border-white/10 hover:border-white/20 transition-colors flex flex-col justify-between">
+          <div
+            onMouseMove={handleTiltMouseMove}
+            onMouseLeave={handleTiltMouseLeave}
+            style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
+            className="p-6 rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 border-t-white/20 shadow-xl flex flex-col justify-between hover:border-accent-primary/40 hover:shadow-[0_15px_35px_rgba(47,168,255,0.15)] group cursor-default"
+          >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-text-body tracking-wider uppercase">Total Assessed</span>
-              <div className="w-8 h-8 rounded-lg bg-accent-primary/10 border border-accent-primary/30 flex items-center justify-center text-accent-cyan">
-                <Users size={16} />
+              <span className="text-xs font-bold text-text-body tracking-wider uppercase">Total Assessed</span>
+              <div className="w-10 h-10 rounded-xl bg-accent-primary/10 border border-accent-primary/30 flex items-center justify-center text-accent-cyan group-hover:scale-110 transition-transform">
+                <Users size={18} />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-white tracking-tight">{stats.total}</div>
-              <p className="text-[11px] text-text-body mt-1">Staff members submitted</p>
+              <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{stats.total}</div>
+              <p className="text-xs text-text-body mt-1 flex items-center gap-1.5 font-medium">
+                <Activity size={12} className="text-accent-cyan" />
+                Staff members submitted
+              </p>
             </div>
           </div>
 
           {/* Card 2: Average Confidence */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#0D1527] border border-white/10 hover:border-white/20 transition-colors flex flex-col justify-between">
+          <div
+            onMouseMove={handleTiltMouseMove}
+            onMouseLeave={handleTiltMouseLeave}
+            style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
+            className="p-6 rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 border-t-white/20 shadow-xl flex flex-col justify-between hover:border-accent-cyan/40 hover:shadow-[0_15px_35px_rgba(0,212,255,0.2)] group cursor-default"
+          >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-text-body tracking-wider uppercase">Avg. Confidence</span>
-              <div className="w-8 h-8 rounded-lg bg-accent-cyan/10 border border-accent-cyan/30 flex items-center justify-center text-accent-cyan">
-                <Award size={16} />
+              <span className="text-xs font-bold text-text-body tracking-wider uppercase">Avg. Confidence</span>
+              <div className="w-10 h-10 rounded-xl bg-accent-cyan/10 border border-accent-cyan/30 flex items-center justify-center text-accent-cyan group-hover:scale-110 transition-transform">
+                <Award size={18} />
               </div>
             </div>
             <div>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold text-white tracking-tight">{stats.avgConfidence}</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{stats.avgConfidence}</span>
                 <span className="text-sm font-semibold text-text-body">/ 10</span>
               </div>
-              <p className="text-[11px] text-text-body mt-1">Team self-rating average</p>
+              <p className="text-xs text-text-body mt-1 flex items-center gap-1.5 font-medium">
+                <TrendingUp size={12} className="text-accent-cyan" />
+                Team self-rating average
+              </p>
             </div>
           </div>
 
           {/* Card 3: Ready for Outreach */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#0D1527] border border-white/10 hover:border-white/20 transition-colors flex flex-col justify-between">
+          <div
+            onMouseMove={handleTiltMouseMove}
+            onMouseLeave={handleTiltMouseLeave}
+            style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
+            className="p-6 rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 border-t-white/20 shadow-xl flex flex-col justify-between hover:border-emerald-500/40 hover:shadow-[0_15px_35px_rgba(93,202,165,0.15)] group cursor-default"
+          >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-text-body tracking-wider uppercase">Outreach Ready</span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-[#5DCAA5]">
-                <Target size={16} />
+              <span className="text-xs font-bold text-text-body tracking-wider uppercase">Outreach Ready</span>
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-[#5DCAA5] group-hover:scale-110 transition-transform">
+                <Target size={18} />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-emerald-400 tracking-tight">{stats.readyPercent}%</div>
-              <p className="text-[11px] text-text-body mt-1">Confirmed call willingness</p>
+              <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 tracking-tight">{stats.readyPercent}%</div>
+              <p className="text-xs text-text-body mt-1 flex items-center gap-1.5 font-medium">
+                <Flame size={12} className="text-emerald-400" />
+                Confirmed call readiness
+              </p>
             </div>
           </div>
 
           {/* Card 4: Needs Script / Training */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#0D1527] border border-white/10 hover:border-white/20 transition-colors flex flex-col justify-between">
+          <div
+            onMouseMove={handleTiltMouseMove}
+            onMouseLeave={handleTiltMouseLeave}
+            style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
+            className="p-6 rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 border-t-white/20 shadow-xl flex flex-col justify-between hover:border-amber-500/40 hover:shadow-[0_15px_35px_rgba(245,158,11,0.15)] group cursor-default"
+          >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-text-body tracking-wider uppercase">Training Requested</span>
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <GraduationCap size={16} />
+              <span className="text-xs font-bold text-text-body tracking-wider uppercase">Training Requested</span>
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <GraduationCap size={18} />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-amber-300 tracking-tight">{stats.trainingCount}</div>
-              <p className="text-[11px] text-text-body mt-1">Requested scripts or training</p>
+              <div className="text-3xl sm:text-4xl font-extrabold text-amber-300 tracking-tight">{stats.trainingCount}</div>
+              <p className="text-xs text-text-body mt-1 flex items-center gap-1.5 font-medium">
+                <Sparkles size={12} className="text-amber-400" />
+                Requested script &amp; training
+              </p>
             </div>
           </div>
         </div>
 
         {/* SEARCH & FILTERS BAR */}
-        <div className="p-4 rounded-2xl bg-[#0D1527] border border-white/10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="p-4 sm:p-5 rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5 shadow-lg">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#5F5E5A]" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5F5E5A]" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search team member by name or role..."
-              className="w-full pl-10 pr-4 py-2 bg-[#060A13] border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-xs sm:text-sm focus:outline-none transition-colors"
+              className="w-full pl-11 pr-4 py-2.5 bg-[#040810] border border-white/10 focus:border-accent-cyan rounded-2xl text-white placeholder-[#5F5E5A] text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-accent-cyan/30 transition-all"
             />
           </div>
 
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="flex items-center gap-1.5 bg-[#060A13] border border-white/10 rounded-xl px-3 py-2 text-xs">
-              <span className="text-text-body text-[11px]">Score:</span>
+            <div className="flex items-center gap-1.5 bg-[#040810] border border-white/10 rounded-2xl px-3.5 py-2 text-xs">
+              <span className="text-text-body text-[11px] font-medium">Score:</span>
               <select
                 value={selectedConfidence}
                 onChange={(e) => setSelectedConfidence(e.target.value)}
-                className="bg-transparent text-white font-medium focus:outline-none cursor-pointer pr-1"
+                className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer pr-1"
               >
                 <option value="All">All Scores</option>
                 <option value="High (8-10)">High (8-10)</option>
@@ -552,26 +630,26 @@ export default function AdminDashboard() {
               </select>
             </div>
 
-            <div className="px-3 py-2 rounded-xl bg-[#060A13] border border-white/10 text-xs font-semibold text-text-body">
+            <div className="px-3.5 py-2 rounded-2xl bg-[#040810] border border-white/10 text-xs font-semibold text-text-body">
               Showing <span className="text-accent-cyan font-bold">{filteredRecords.length}</span> of {records.length}
             </div>
           </div>
         </div>
 
         {/* SUBMISSIONS TABLE */}
-        <div className="rounded-2xl bg-[#0D1527] border border-white/10 shadow-xl overflow-hidden">
+        <div className="rounded-3xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/10 border-t-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-[#080E1A] border-b border-white/10 text-text-body text-[11px] font-semibold uppercase tracking-wider">
+              <thead className="bg-[#040810]/80 border-b border-white/10 text-text-body text-[11px] font-bold uppercase tracking-wider">
                 <tr>
-                  <th className="px-6 py-3.5">Team Member</th>
-                  <th className="px-6 py-3.5">Role</th>
-                  <th className="px-6 py-3.5 text-center">Confidence</th>
-                  <th className="px-6 py-3.5">Daily Volume</th>
-                  <th className="px-6 py-3.5">Languages</th>
-                  <th className="px-6 py-3.5">Script Wanted</th>
-                  <th className="px-6 py-3.5">Submitted</th>
-                  <th className="px-6 py-3.5 text-right">Actions</th>
+                  <th className="px-6 py-4">Team Member</th>
+                  <th className="px-6 py-4">Role</th>
+                  <th className="px-6 py-4 text-center">Confidence</th>
+                  <th className="px-6 py-4">Daily Volume</th>
+                  <th className="px-6 py-4">Languages</th>
+                  <th className="px-6 py-4">Script Wanted</th>
+                  <th className="px-6 py-4">Submitted</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -579,7 +657,7 @@ export default function AdminDashboard() {
                   <tr>
                     <td colSpan={8} className="px-6 py-12 text-center text-text-body">
                       <div className="flex flex-col items-center gap-2">
-                        <Users size={28} className="text-white/20" />
+                        <Users size={32} className="text-white/20" />
                         <p className="text-sm font-semibold text-white">No assessment submissions found</p>
                         <p className="text-xs text-text-body">Try clearing search or filter terms.</p>
                       </div>
@@ -589,19 +667,19 @@ export default function AdminDashboard() {
                   filteredRecords.map((rec) => {
                     const score = rec.q10_confidence_scale || 0;
                     const scoreColor = 
-                      score >= 8 ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" :
-                      score >= 5 ? "bg-accent-cyan/15 text-accent-cyan border-accent-cyan/30" :
-                      "bg-amber-500/15 text-amber-300 border-amber-500/30";
+                      score >= 8 ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]" :
+                      score >= 5 ? "bg-accent-cyan/15 text-accent-cyan border-accent-cyan/30 shadow-[0_0_12px_rgba(0,212,255,0.2)]" :
+                      "bg-amber-500/15 text-amber-300 border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.2)]";
 
                     return (
                       <tr
                         key={rec.id}
                         onClick={() => setSelectedRecord(rec)}
-                        className="hover:bg-[#121B30] transition-colors cursor-pointer group"
+                        className="hover:bg-[#101b30] transition-colors cursor-pointer group"
                       >
                         {/* Member */}
                         <td className="px-6 py-4 font-semibold text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-accent-primary/10 border border-accent-primary/30 flex items-center justify-center text-accent-cyan font-bold text-xs uppercase shrink-0">
+                          <div className="w-9 h-9 rounded-full bg-accent-primary/10 border border-accent-primary/30 flex items-center justify-center text-accent-cyan font-bold text-xs uppercase shrink-0 group-hover:scale-105 transition-transform">
                             {rec.staff_name.charAt(0)}
                           </div>
                           <div>
@@ -619,23 +697,23 @@ export default function AdminDashboard() {
 
                         {/* Confidence */}
                         <td className="px-6 py-4 text-center">
-                          <span className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${scoreColor}`}>
+                          <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold border ${scoreColor}`}>
                             {score} / 10
                           </span>
                         </td>
 
                         {/* Daily Volume */}
                         <td className="px-6 py-4 text-white font-medium">
-                          <span className="px-2 py-0.5 rounded-md bg-[#060A13] border border-white/10 text-xs">
+                          <span className="px-2.5 py-1 rounded-xl bg-[#040810] border border-white/10 text-xs">
                             {rec.q4_calls_per_day} calls/day
                           </span>
                         </td>
 
                         {/* Languages */}
                         <td className="px-6 py-4 text-text-body text-xs">
-                          <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          <div className="flex flex-wrap gap-1 max-w-[220px]">
                             {(rec.q6_languages || []).map((l, i) => (
-                              <span key={i} className="px-1.5 py-0.5 rounded bg-[#060A13] border border-white/5 text-[10px] text-text-body">
+                              <span key={i} className="px-2 py-0.5 rounded-md bg-[#040810] border border-white/5 text-[10px] text-text-body">
                                 {l}
                               </span>
                             ))}
@@ -645,7 +723,7 @@ export default function AdminDashboard() {
                         {/* Script Wanted */}
                         <td className="px-6 py-4">
                           {rec.q11_training_script_wanted === "Yes" ? (
-                            <span className="inline-flex items-center gap-1 text-amber-300 text-xs font-medium">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
                               <GraduationCap size={13} />
                               Yes
                             </span>
@@ -667,9 +745,10 @@ export default function AdminDashboard() {
                               e.stopPropagation();
                               setSelectedRecord(rec);
                             }}
-                            className="px-3 py-1.5 rounded-lg bg-[#060A13] hover:bg-accent-primary hover:text-[#050B14] border border-white/10 text-xs font-semibold text-white transition-colors"
+                            className="px-3.5 py-1.5 rounded-xl bg-[#040810] hover:bg-accent-primary hover:text-[#040A14] border border-white/10 hover:border-accent-cyan text-xs font-bold text-white transition-all inline-flex items-center gap-1 group/btn"
                           >
-                            Inspect →
+                            <span>Inspect</span>
+                            <ArrowUpRight size={13} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                           </button>
                         </td>
                       </tr>
@@ -687,90 +766,90 @@ export default function AdminDashboard() {
           MODAL: FULL 11-QUESTION DETAIL DRAWER
       ========================================== */}
       {selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-          <div className="relative w-full max-w-2xl max-h-[90vh] bg-[#0D1527] border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-up">
+          <div className="relative w-full max-w-2xl max-h-[90vh] bg-[#0c1424] border border-white/15 border-t-white/30 rounded-3xl p-6 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setSelectedRecord(null)}
-              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#060A13] hover:bg-white/10 border border-white/10 flex items-center justify-center text-text-body hover:text-white transition-colors"
+              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#040810] hover:bg-white/10 border border-white/10 flex items-center justify-center text-text-body hover:text-white transition-colors cursor-pointer"
             >
-              <X size={15} />
+              <X size={16} />
             </button>
 
             {/* Modal Header */}
             <div className="flex items-start gap-4 mb-6 pr-10">
-              <div className="w-12 h-12 rounded-xl bg-accent-primary/10 border border-accent-cyan/40 flex items-center justify-center text-accent-cyan font-bold text-xl uppercase shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-accent-primary/10 border border-accent-cyan/40 flex items-center justify-center text-accent-cyan font-bold text-2xl uppercase shrink-0 shadow-[0_0_25px_rgba(0,212,255,0.25)]">
                 {selectedRecord.staff_name.charAt(0)}
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-2xl font-extrabold text-white tracking-tight">
                   {selectedRecord.staff_name}
                 </h2>
-                <p className="text-sm text-accent-cyan font-medium">{selectedRecord.staff_role}</p>
+                <p className="text-sm text-accent-cyan font-semibold">{selectedRecord.staff_role}</p>
                 <p className="text-xs text-text-body mt-0.5">Submitted: {formatDate(selectedRecord.submitted_at)}</p>
               </div>
             </div>
 
             {/* Rating Highlight Pill */}
-            <div className="p-4 rounded-xl bg-[#060A13] border border-white/10 mb-6 flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-[#040810] border border-white/10 mb-6 flex items-center justify-between shadow-inner">
               <div className="flex items-center gap-3">
-                <Gauge size={18} className="text-accent-cyan" />
+                <Gauge size={20} className="text-accent-cyan" />
                 <div>
                   <span className="text-[11px] text-text-body uppercase font-bold tracking-wider">Confidence Score</span>
-                  <p className="text-base font-bold text-white">{selectedRecord.q10_confidence_scale} / 10</p>
+                  <p className="text-lg font-extrabold text-white">{selectedRecord.q10_confidence_scale} / 10</p>
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-xs text-text-body">Phone Outreach:</span>
-                <p className="text-xs font-semibold text-accent-cyan">{selectedRecord.q1_comfortable_calls}</p>
+                <span className="text-xs text-text-body font-medium">Phone Outreach:</span>
+                <p className="text-xs font-bold text-accent-cyan">{selectedRecord.q1_comfortable_calls}</p>
               </div>
             </div>
 
             {/* 11 Questions Breakdown */}
-            <div className="flex flex-col gap-3.5">
+            <div className="flex flex-col gap-4">
               <h3 className="text-xs font-bold text-accent-cyan tracking-wider uppercase">Full Assessment Breakdown</h3>
 
               {/* Q1, Q3, Q4, Q5 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">1. Comfortable on Phone Calls?</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q1_comfortable_calls}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">1. Comfortable on Phone Calls?</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q1_comfortable_calls}</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">3. Calling New Business Owners?</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q3_calling_business_owner}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">3. Calling New Business Owners?</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q3_calling_business_owner}</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">4. Daily Realistic Call Volume</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q4_calls_per_day} calls/day</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">4. Daily Realistic Call Volume</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q4_calls_per_day} calls/day</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">5. Handling Common Objections</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q5_handling_objections}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">5. Handling Common Objections</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q5_handling_objections}</p>
                 </div>
               </div>
 
               {/* Q2 Written Experience Note (if any) */}
-              <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                <span className="text-[11px] text-text-body">2. Past Cold Calling Experience:</span>
-                <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q2_cold_calling_experience}</p>
+              <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                <span className="text-xs text-text-body">2. Past Cold Calling Experience:</span>
+                <p className="text-sm font-bold text-white mt-1">{selectedRecord.q2_cold_calling_experience}</p>
                 {selectedRecord.q2_experience_details && (
-                  <div className="mt-2 p-3 rounded-lg bg-[#040810] border border-accent-cyan/20 text-xs text-text-body leading-relaxed">
-                    <span className="text-accent-cyan font-medium block mb-1">Experience Summary:</span>
+                  <div className="mt-2.5 p-3 rounded-xl bg-[#080E1A] border border-accent-cyan/30 text-xs text-text-body leading-relaxed">
+                    <span className="text-accent-cyan font-bold block mb-1">Experience Summary:</span>
                     &ldquo;{selectedRecord.q2_experience_details}&rdquo;
                   </div>
                 )}
               </div>
 
               {/* Q6 Languages */}
-              <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                <span className="text-[11px] text-text-body">6. Fluent Languages &amp; Dialects:</span>
+              <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                <span className="text-xs text-text-body">6. Fluent Languages &amp; Dialects:</span>
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {(selectedRecord.q6_languages || []).map((l, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-md bg-accent-primary/10 border border-accent-primary/30 text-xs text-accent-cyan font-medium">
+                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-accent-primary/10 border border-accent-primary/30 text-xs text-accent-cyan font-semibold">
                       {l}
                     </span>
                   ))}
@@ -779,24 +858,24 @@ export default function AdminDashboard() {
 
               {/* Q7, Q8, Q9, Q11 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">7. Regular Cold Calling Role?</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q7_regular_calls_willingness}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">7. Regular Cold Calling Role?</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q7_regular_calls_willingness}</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">8. Personal Phone &amp; SIM Available?</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q8_phone_sim_available}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">8. Personal Phone &amp; SIM Available?</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q8_phone_sim_available}</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">9. Company Calling Package?</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q9_company_calling_package}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">9. Company Calling Package?</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q9_company_calling_package}</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#080E1A] border border-white/5">
-                  <span className="text-[11px] text-text-body">11. Wants Training &amp; Script?</span>
-                  <p className="text-sm font-semibold text-white mt-1">{selectedRecord.q11_training_script_wanted}</p>
+                <div className="p-4 rounded-2xl bg-[#040810] border border-white/5">
+                  <span className="text-xs text-text-body">11. Wants Training &amp; Script?</span>
+                  <p className="text-sm font-bold text-white mt-1">{selectedRecord.q11_training_script_wanted}</p>
                 </div>
               </div>
             </div>
@@ -806,7 +885,7 @@ export default function AdminDashboard() {
               <span className="text-xs text-text-body">ID: <code className="font-mono text-[10px]">{selectedRecord.id}</code></span>
               <button
                 onClick={() => setSelectedRecord(null)}
-                className="px-5 py-2 rounded-xl bg-accent-primary hover:bg-accent-cyan text-[#050B14] font-bold text-xs transition-colors"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs transition-all shadow-[0_0_20px_rgba(0,212,255,0.3)] hover:scale-[1.02] active:scale-[0.98]"
               >
                 Close Inspector
               </button>

@@ -83,7 +83,7 @@ export default function ColdCallingSurvey() {
     return () => clearTimeout(timer);
   }, [currentStep]);
 
-  // Fast Zero-Lag 3D Tilt handlers on mouse move over individual card
+  // Zero-Lag 3D Tilt handler on desktop
   const handleTiltMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
@@ -102,7 +102,7 @@ export default function ColdCallingSurvey() {
     card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
   };
 
-  // Fast Keyboard shortcuts listener
+  // Keyboard shortcuts listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isSubmitting || isSubmitted) return;
@@ -321,17 +321,19 @@ export default function ColdCallingSurvey() {
 
   const getScaleFeedback = (val: number | null) => {
     if (!val) return "Select a score from 1 to 10";
-    if (val <= 3) return "Developing - Requires script & training support";
-    if (val <= 6) return "Moderate - Familiar with basic outreach principles";
-    if (val <= 8) return "Confident - Comfortable qualifying leads & handling friction";
-    return "High Performer - Strong objection handling & closing ability";
+    if (val <= 3) return "Developing - Needs training & scripts";
+    if (val <= 6) return "Moderate - Familiar with outreach basics";
+    if (val <= 8) return "Confident - Handles objections & qualifies leads";
+    return "High Performer - Strong closing ability";
   };
 
-  // Confirmation Screen
+  // ==========================================
+  // CONFIRMATION SCREEN (FULLY RESPONSIVE)
+  // ==========================================
   if (isSubmitted) {
     return (
-      <main className="min-h-screen bg-[#060a12] text-text-heading flex flex-col items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
-        {/* Animated Cyber Grid */}
+      <main className="min-h-[100dvh] bg-[#060a12] text-text-heading flex flex-col items-center justify-center p-3.5 sm:p-6 font-sans relative overflow-hidden">
+        {/* Cyber Grid */}
         <div 
           className="absolute inset-0 opacity-15 pointer-events-none"
           style={{
@@ -340,17 +342,17 @@ export default function ColdCallingSurvey() {
           }}
         />
 
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-accent-primary/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent-primary/10 rounded-full blur-[140px] pointer-events-none" />
 
         <div 
           onMouseMove={handleTiltMouseMove}
           onMouseLeave={handleTiltMouseLeave}
           style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
-          className="relative z-10 w-full max-w-lg bg-[#0c1424]/90 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-3xl p-8 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] text-center flex flex-col items-center animate-fade-up"
+          className="relative z-10 w-full max-w-lg bg-[#0c1424]/95 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] text-center flex flex-col items-center animate-fade-up"
         >
-          <div className="mb-6 relative flex items-center justify-center group">
+          <div className="mb-4 sm:mb-6 relative flex items-center justify-center group">
             <div className="absolute inset-0 bg-accent-cyan/25 rounded-2xl blur-xl" />
-            <div className="relative w-20 h-20 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-3 shadow-[0_0_25px_rgba(0,212,255,0.3)]">
+            <div className="relative w-16 sm:w-20 h-16 sm:h-20 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-3 shadow-[0_0_25px_rgba(0,212,255,0.3)]">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
@@ -362,30 +364,30 @@ export default function ColdCallingSurvey() {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#5DCAA5]/10 border border-[#5DCAA5]/30 text-[#5DCAA5] text-xs font-bold uppercase tracking-wider mb-4">
-            <CheckCircle2 size={14} />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5DCAA5]/10 border border-[#5DCAA5]/30 text-[#5DCAA5] text-xs font-bold uppercase tracking-wider mb-3 sm:mb-4">
+            <CheckCircle2 size={13} />
             Assessment Recorded
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2">
             Thanks - we will be in touch
           </h1>
 
-          <p className="text-text-body text-xs sm:text-sm leading-relaxed mb-6 max-w-sm">
+          <p className="text-text-body text-xs sm:text-sm leading-relaxed mb-5 sm:mb-6 max-w-sm">
             Thank you, <span className="text-white font-semibold">{formData.staffName}</span>. Your cold calling assessment has been safely submitted. Mubeen and the team will review your responses.
           </p>
 
-          <div className="w-full bg-[#040810] border border-white/10 rounded-2xl p-4 text-xs text-text-body flex flex-col gap-2.5 text-left shadow-inner">
+          <div className="w-full bg-[#040810] border border-white/10 rounded-xl sm:rounded-2xl p-4 text-xs text-text-body flex flex-col gap-2.5 text-left shadow-inner">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <span className="text-text-body font-medium">Team Member</span>
-              <span className="text-white font-semibold">{formData.staffName}</span>
+              <span className="text-white font-semibold truncate ml-2">{formData.staffName}</span>
             </div>
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <span className="text-text-body font-medium">Position</span>
-              <span className="text-white font-semibold">{formData.staffRole}</span>
+              <span className="text-white font-semibold truncate ml-2">{formData.staffRole}</span>
             </div>
             <div className="flex justify-between items-center pt-0.5">
-              <span className="text-text-body font-medium">Readiness Status</span>
+              <span className="text-text-body font-medium">Status</span>
               <span className="text-accent-cyan font-bold flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-ping" />
                 Submitted &amp; Logged
@@ -397,9 +399,12 @@ export default function ColdCallingSurvey() {
     );
   }
 
+  // ==========================================
+  // MAIN FORM FLOW (FULLY RESPONSIVE)
+  // ==========================================
   return (
-    <main className="min-h-screen bg-[#060a12] text-text-heading flex flex-col justify-between p-4 sm:p-6 md:p-8 font-sans relative overflow-hidden">
-      {/* Cyber Grid Texture */}
+    <main className="min-h-[100dvh] bg-[#060a12] text-text-heading flex flex-col justify-between p-3.5 sm:p-6 md:p-8 font-sans relative overflow-hidden">
+      {/* Cyber Grid */}
       <div 
         className="absolute inset-0 opacity-15 pointer-events-none"
         style={{
@@ -408,39 +413,39 @@ export default function ColdCallingSurvey() {
         }}
       />
 
-      {/* Ambient Radial Background Glows */}
-      <div className="absolute -top-40 -left-40 w-[550px] h-[550px] bg-accent-primary/10 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-[550px] h-[550px] bg-accent-cyan/10 rounded-full blur-[150px] pointer-events-none" />
+      {/* Ambient Lighting */}
+      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-accent-primary/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-accent-cyan/10 rounded-full blur-[150px] pointer-events-none" />
 
       {/* Top Header */}
-      <header className="w-full max-w-3xl mx-auto pt-2 pb-4 z-20">
-        <div className="flex items-center justify-between gap-4 mb-3">
-          <div className="flex items-center gap-3 bg-[#0c1424]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 shadow">
-            <div className="w-8 h-8 rounded-lg bg-[#040810] border border-accent-cyan/40 flex items-center justify-center p-1.5 shadow-[0_0_10px_rgba(0,212,255,0.2)]">
+      <header className="w-full max-w-3xl mx-auto pt-1 sm:pt-2 pb-3 sm:pb-4 z-20">
+        <div className="flex items-center justify-between gap-2.5 mb-2.5">
+          <div className="flex items-center gap-2.5 bg-[#0c1424]/90 backdrop-blur-md px-3 py-1.5 sm:py-2 rounded-xl border border-white/10 shadow">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#040810] border border-accent-cyan/40 flex items-center justify-center p-1 shadow-[0_0_10px_rgba(0,212,255,0.2)] shrink-0">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
-                width={22}
-                height={22}
+                width={20}
+                height={20}
                 className="object-contain"
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-white tracking-wide uppercase">MR Devs</span>
-              <span className="text-[10px] text-accent-cyan font-medium">Internal Assessment</span>
+              <span className="text-[11px] sm:text-xs font-bold text-white tracking-wide uppercase">MR Devs</span>
+              <span className="text-[9px] sm:text-[10px] text-accent-cyan font-medium leading-none">Internal Assessment</span>
             </div>
           </div>
 
-          <div className="px-4 py-1.5 rounded-xl bg-[#0c1424]/90 backdrop-blur-md border border-white/10 text-xs font-medium text-text-body flex items-center gap-2 shadow">
+          <div className="px-3 sm:px-4 py-1.5 rounded-xl bg-[#0c1424]/90 backdrop-blur-md border border-white/10 text-xs font-medium text-text-body flex items-center gap-2 shadow">
             <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
             {currentStep === 0 ? (
-              <span className="text-white font-semibold">Staff Identification</span>
+              <span className="text-white font-semibold text-[11px] sm:text-xs">Staff Info</span>
             ) : (
-              <div className="flex items-center gap-1.5">
-                <span className="text-white font-semibold">Question {currentStep}</span>
+              <div className="flex items-center gap-1 text-[11px] sm:text-xs">
+                <span className="text-white font-semibold">Q{currentStep}</span>
                 <span className="text-text-body/60">/</span>
                 <span className="text-text-body">{TOTAL_QUESTIONS}</span>
-                <span className="text-[10px] text-accent-cyan font-mono ml-1">({progressPercent}%)</span>
+                <span className="text-[10px] text-accent-cyan font-mono ml-0.5">({progressPercent}%)</span>
               </div>
             )}
           </div>
@@ -455,34 +460,34 @@ export default function ColdCallingSurvey() {
         </div>
       </header>
 
-      {/* Main Question Card with 3D Tilt */}
-      <div className="flex-1 flex items-center justify-center my-4 z-10 w-full">
+      {/* Main Question Card with 3D Tilt & Responsive Sizing */}
+      <div className="flex-1 flex items-center justify-center my-2 sm:my-4 z-10 w-full">
         <div
           onMouseMove={handleTiltMouseMove}
           onMouseLeave={handleTiltMouseLeave}
           style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
-          className="w-full max-w-2xl bg-[#0c1424]/90 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-3xl p-6 sm:p-8 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.7)] relative overflow-hidden"
+          className="w-full max-w-2xl bg-[#0c1424]/95 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.7)] relative"
         >
           
           {/* STEP 0: Staff Info */}
           {currentStep === 0 && (
-            <div className="flex flex-col gap-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-xs font-bold uppercase tracking-wider w-fit">
-                <Sparkles size={13} />
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-[11px] font-bold uppercase tracking-wider w-fit">
+                <Sparkles size={12} />
                 <span>Cold Calling Readiness Check</span>
               </div>
 
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-1.5 sm:mb-2">
                   Staff Readiness Assessment
                 </h1>
                 <p className="text-text-body text-xs sm:text-sm leading-relaxed max-w-xl">
-                  This quick 11-question assessment evaluates readiness for upcoming outbound client communication campaigns. Please enter your name and current role to get started.
+                  This quick 11-question assessment evaluates readiness for upcoming outbound client outreach campaigns. Enter your name and role to begin.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-1">
-                <div className="flex flex-col gap-1.5 p-4 rounded-2xl bg-[#040810] border border-white/10 focus-within:border-accent-cyan transition-colors">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                <div className="flex flex-col gap-1.5 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#040810] border border-white/10 focus-within:border-accent-cyan transition-colors">
                   <label className="text-xs font-semibold text-text-heading flex items-center gap-1.5">
                     <User size={13} className="text-accent-cyan" />
                     Full Name <span className="text-accent-primary">*</span>
@@ -496,11 +501,11 @@ export default function ColdCallingSurvey() {
                       setValidationError(null);
                     }}
                     placeholder="e.g. Mubeen Khan"
-                    className="w-full px-3.5 py-2.5 bg-[#080E1A] border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#080E1A] border border-white/10 focus:border-accent-cyan rounded-lg sm:rounded-xl text-white placeholder-[#5F5E5A] text-base sm:text-sm focus:outline-none transition-colors"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5 p-4 rounded-2xl bg-[#040810] border border-white/10 focus-within:border-accent-cyan transition-colors">
+                <div className="flex flex-col gap-1.5 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#040810] border border-white/10 focus-within:border-accent-cyan transition-colors">
                   <label className="text-xs font-semibold text-text-heading flex items-center gap-1.5">
                     <Briefcase size={13} className="text-accent-cyan" />
                     Current Role <span className="text-accent-primary">*</span>
@@ -513,7 +518,7 @@ export default function ColdCallingSurvey() {
                       setValidationError(null);
                     }}
                     placeholder="e.g. Developer, Outreach, Design"
-                    className="w-full px-3.5 py-2.5 bg-[#080E1A] border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#080E1A] border border-white/10 focus:border-accent-cyan rounded-lg sm:rounded-xl text-white placeholder-[#5F5E5A] text-base sm:text-sm focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -522,16 +527,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 1: Phone Calls */}
           {currentStep === 1 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <PhoneCall size={13} />
                 <span>Question 1 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Comfortable speaking with potential clients on a phone call?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -541,23 +546,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q1ComfortableCalls", opt.label)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q1ComfortableCalls === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q1ComfortableCalls === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q1ComfortableCalls === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q1ComfortableCalls === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -566,16 +571,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 2: Cold Calling Experience */}
           {currentStep === 2 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <Target size={13} />
                 <span>Question 2 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Done cold calling before?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -584,29 +589,29 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q2ColdCallingExperience", opt.label, opt.label === "No")}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q2ColdCallingExperience === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q2ColdCallingExperience === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q2ColdCallingExperience === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q2ColdCallingExperience === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
 
               {formData.q2ColdCallingExperience === "Yes" && (
-                <div className="flex flex-col gap-2 p-4 rounded-2xl bg-[#040810] border border-accent-cyan/40 mt-1 shadow-inner">
+                <div className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#040810] border border-accent-cyan/40 mt-1 shadow-inner">
                   <label className="text-xs font-semibold text-accent-cyan flex items-center gap-1.5">
                     <Sparkles size={13} />
                     Briefly tell me about your experience: <span className="text-accent-primary">*</span>
@@ -620,7 +625,7 @@ export default function ColdCallingSurvey() {
                       setValidationError(null);
                     }}
                     placeholder="Mention the industry, call volume, or campaign outcomes..."
-                    className="w-full px-4 py-3 bg-[#080E1A] border border-white/10 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm resize-none focus:outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#080E1A] border border-white/10 focus:border-accent-cyan rounded-lg sm:rounded-xl text-white placeholder-[#5F5E5A] text-base sm:text-sm resize-none focus:outline-none transition-colors"
                   />
                 </div>
               )}
@@ -629,16 +634,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 3: Calling Business Owner */}
           {currentStep === 3 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <User size={13} />
                 <span>Question 3 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Comfortable calling a business owner or manager who has never spoken to MR Devs before?
               </h2>
 
-              <div className="grid grid-cols-1 gap-3 mt-1">
+              <div className="grid grid-cols-1 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -648,61 +653,63 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q3CallingBusinessOwner", opt.label)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.98] ${
                       formData.q3CallingBusinessOwner === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.01]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q3CallingBusinessOwner === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q3CallingBusinessOwner === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q3CallingBusinessOwner === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* STEP 4: Call Volume */}
+          {/* STEP 4: Call Volume (Responsive 2-col on mobile with full-width last item, 5-col on desktop) */}
           {currentStep === 4 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <Gauge size={13} />
                 <span>Question 4 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 How many cold calls can you realistically make in a day while maintaining quality?
               </h2>
 
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-1">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 mt-1">
                 {[
                   { key: "A", label: "20" },
                   { key: "B", label: "30" },
                   { key: "C", label: "50" },
                   { key: "D", label: "75" },
                   { key: "E", label: "100+" },
-                ].map((opt) => (
+                ].map((opt, idx) => (
                   <button
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q4CallsPerDay", opt.label)}
-                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                    className={`flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                      idx === 4 ? "col-span-2 sm:col-span-1" : ""
+                    } ${
                       formData.q4CallsPerDay === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-105"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
-                    <span className="text-xs font-bold text-accent-cyan/80 mb-0.5">[{opt.key}]</span>
-                    <span className="text-2xl font-extrabold text-white">{opt.label}</span>
-                    <span className="text-[11px] text-text-body mt-0.5 font-normal">calls/day</span>
+                    <span className="text-[11px] font-bold text-accent-cyan/80 mb-0.5">[{opt.key}]</span>
+                    <span className="text-xl sm:text-2xl font-extrabold text-white">{opt.label}</span>
+                    <span className="text-[10px] sm:text-[11px] text-text-body mt-0.5 font-normal">calls/day</span>
                   </button>
                 ))}
               </div>
@@ -711,18 +718,18 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 5: Objections */}
           {currentStep === 5 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <ShieldCheck size={13} />
                 <span>Question 5 of 11</span>
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug mb-2">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug mb-2">
                   Comfortable handling common objections?
                 </h2>
-                <div className="p-3.5 rounded-2xl bg-[#040810] border border-white/10 text-xs text-text-body leading-relaxed flex flex-col gap-1">
-                  <span className="text-accent-cyan font-bold">Common objections to navigate:</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px]">
+                <div className="p-3 sm:p-3.5 rounded-xl bg-[#040810] border border-white/10 text-xs text-text-body leading-relaxed flex flex-col gap-1">
+                  <span className="text-accent-cyan font-bold text-[11px]">Common objections to navigate:</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5 sm:gap-1 text-[11px]">
                     <span>• &quot;Not interested&quot;</span>
                     <span>• &quot;We already have a website&quot;</span>
                     <span>• &quot;Send me details on WhatsApp&quot;</span>
@@ -731,7 +738,7 @@ export default function ColdCallingSurvey() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -741,23 +748,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q5HandlingObjections", opt.label)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q5HandlingObjections === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q5HandlingObjections === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q5HandlingObjections === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q5HandlingObjections === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -766,25 +773,25 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 6: Languages Multi-Select */}
           {currentStep === 6 && (
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4 sm:gap-5">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                   <Languages size={13} />
                   <span>Question 6 of 11</span>
                 </div>
-                <span className="text-[11px] text-accent-cyan bg-accent-cyan/10 border border-accent-cyan/30 px-3 py-1 rounded-full font-bold">
+                <span className="text-[10px] sm:text-[11px] text-accent-cyan bg-accent-cyan/10 border border-accent-cyan/30 px-2.5 py-0.5 rounded-full font-bold">
                   Multi-select
                 </span>
               </div>
 
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug mb-1">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug mb-1">
                   Comfortable speaking in:
                 </h2>
                 <p className="text-xs text-text-body">Select all languages you feel confident conducting calls in.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
                 {[
                   "Urdu",
                   "Roman Urdu",
@@ -797,19 +804,19 @@ export default function ColdCallingSurvey() {
                       key={lang}
                       type="button"
                       onClick={() => toggleLanguage(lang)}
-                      className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                      className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                         isChecked
                           ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)]"
                           : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                       }`}
                     >
-                      <span className="text-base">{lang}</span>
-                      <div className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${
+                      <span className="text-sm sm:text-base">{lang}</span>
+                      <div className={`w-5 sm:w-6 h-5 sm:h-6 rounded-md sm:rounded-lg border flex items-center justify-center transition-all ${
                         isChecked
                           ? "bg-accent-cyan border-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "border-white/20 bg-white/5"
                       }`}>
-                        {isChecked && <Check size={16} strokeWidth={3} />}
+                        {isChecked && <Check size={14} strokeWidth={3} />}
                       </div>
                     </button>
                   );
@@ -820,16 +827,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 7: Regular Calling */}
           {currentStep === 7 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <Volume2 size={13} />
                 <span>Question 7 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Willing to make cold calls regularly as part of MR Devs responsibilities?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -838,23 +845,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q7RegularCallsWillingness", opt.label)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q7RegularCallsWillingness === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q7RegularCallsWillingness === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q7RegularCallsWillingness === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q7RegularCallsWillingness === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -863,16 +870,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 8: Phone & SIM */}
           {currentStep === 8 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <Smartphone size={13} />
                 <span>Question 8 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Do you have a phone and SIM you can make business calls with?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -881,23 +888,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q8PhoneSimAvailable", opt.label)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q8PhoneSimAvailable === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q8PhoneSimAvailable === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q8PhoneSimAvailable === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q8PhoneSimAvailable === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -906,16 +913,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 9: Calling Package */}
           {currentStep === 9 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <CreditCard size={13} />
                 <span>Question 9 of 11</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Comfortable using a company-provided calling package on your existing number initially?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -924,55 +931,55 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q9CompanyCallingPackage", opt.label)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q9CompanyCallingPackage === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q9CompanyCallingPackage === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q9CompanyCallingPackage === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q9CompanyCallingPackage === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* STEP 10: Confidence Scale 1-10 */}
+          {/* STEP 10: Confidence Scale 1-10 (Optimized 5x2 grid for mobile) */}
           {currentStep === 10 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <Gauge size={13} />
                 <span>Question 10 of 11</span>
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug mb-1">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug mb-1">
                   Confidence making a cold call to a potential client?
                 </h2>
-                <div className="flex items-center gap-2 text-xs font-bold text-accent-cyan">
+                <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-accent-cyan">
                   <span>Rating: {formData.q10ConfidenceScale || "—"} / 10</span>
                   <span className="text-text-body font-normal">• {getScaleFeedback(formData.q10ConfidenceScale)}</span>
                 </div>
               </div>
 
-              {/* 1-10 Number Tiles */}
-              <div className="flex flex-col gap-3 mt-1">
-                <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+              {/* 1-10 Number Tiles Grid */}
+              <div className="flex flex-col gap-2.5 mt-1">
+                <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                     <button
                       key={num}
                       type="button"
                       onClick={() => handleScaleSelect(num)}
-                      className={`h-12 rounded-xl border font-bold text-sm sm:text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                      className={`h-11 sm:h-12 rounded-xl border font-extrabold text-sm sm:text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                         formData.q10ConfidenceScale === num
                           ? "bg-accent-cyan border-accent-cyan text-[#040A14] shadow-[0_0_20px_rgba(0,212,255,0.6)] scale-105"
                           : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/30 hover:text-white"
@@ -983,9 +990,9 @@ export default function ColdCallingSurvey() {
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center text-xs text-text-body px-1 font-medium">
-                  <span>1 - Very Uncomfortable</span>
-                  <span>10 - Very Confident</span>
+                <div className="flex justify-between items-center text-[11px] sm:text-xs text-text-body px-1 font-medium">
+                  <span>1 - Very Low</span>
+                  <span>10 - Very High</span>
                 </div>
               </div>
             </div>
@@ -993,16 +1000,16 @@ export default function ColdCallingSurvey() {
 
           {/* STEP 11: Training and Script */}
           {currentStep === 11 && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2 text-accent-cyan text-xs font-bold uppercase tracking-wider">
+            <div className="flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-2 text-accent-cyan text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <GraduationCap size={13} />
                 <span>Question 11 of 11 (Final)</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white leading-snug">
                 Would you like training and a cold-calling script before starting?
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
                 {[
                   { key: "A", label: "Yes" },
                   { key: "B", label: "No" },
@@ -1011,23 +1018,23 @@ export default function ColdCallingSurvey() {
                     key={opt.label}
                     type="button"
                     onClick={() => handleSingleSelect("q11TrainingScriptWanted", opt.label, false)}
-                    className={`flex items-center justify-between p-4 rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-sm font-semibold transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
                       formData.q11TrainingScriptWanted === opt.label
                         ? "bg-accent-primary/20 border-accent-cyan text-white shadow-[0_0_20px_rgba(0,212,255,0.3)] scale-[1.02]"
                         : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/25 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center shrink-0 ${
                         formData.q11TrainingScriptWanted === opt.label
                           ? "bg-accent-cyan text-[#040A14] shadow-[0_0_10px_rgba(0,212,255,0.8)]"
                           : "bg-white/10 text-text-body"
                       }`}>
                         {opt.key}
                       </span>
-                      <span className="text-base">{opt.label}</span>
+                      <span className="text-sm sm:text-base">{opt.label}</span>
                     </div>
-                    {formData.q11TrainingScriptWanted === opt.label && <Check size={18} className="text-accent-cyan" />}
+                    {formData.q11TrainingScriptWanted === opt.label && <Check size={16} className="text-accent-cyan" />}
                   </button>
                 ))}
               </div>
@@ -1036,17 +1043,17 @@ export default function ColdCallingSurvey() {
 
           {/* Validation Alert */}
           {validationError && (
-            <div className="mt-5 flex items-center gap-2 p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
-              <AlertCircle size={15} className="text-red-400 shrink-0" />
+            <div className="mt-4 flex items-center gap-2 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs animate-fade-up">
+              <AlertCircle size={14} className="text-red-400 shrink-0" />
               <span>{validationError}</span>
             </div>
           )}
 
           {/* Submission Error Banner */}
           {submitError && (
-            <div className="mt-5 flex flex-col gap-2 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs">
+            <div className="mt-4 flex flex-col gap-2 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs">
               <div className="flex items-center gap-2">
-                <AlertCircle size={15} className="text-amber-400 shrink-0" />
+                <AlertCircle size={14} className="text-amber-400 shrink-0" />
                 <span className="font-semibold">Submission Notice</span>
               </div>
               <p className="text-text-body">{submitError}</p>
@@ -1054,7 +1061,7 @@ export default function ColdCallingSurvey() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="self-start mt-1 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                className="self-start mt-1 px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-bold text-xs flex items-center gap-1.5 transition-colors"
               >
                 <RefreshCw size={12} className={isSubmitting ? "animate-spin" : ""} />
                 Retry Submission
@@ -1062,17 +1069,17 @@ export default function ColdCallingSurvey() {
             </div>
           )}
 
-          {/* Navigation Controls Dock */}
-          <div className="flex items-center justify-between gap-4 mt-8 pt-5 border-t border-white/5">
+          {/* Navigation Controls Dock (Responsive Layout) */}
+          <div className="flex items-center justify-between gap-3 mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-white/5">
             {currentStep > 0 ? (
               <button
                 type="button"
                 onClick={handlePrev}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 rounded-xl bg-[#040810] hover:bg-[#101b30] border border-white/10 text-text-body hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-[#040810] hover:bg-[#101b30] border border-white/10 text-text-body hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <ChevronLeft size={15} />
-                Back
+                <ChevronLeft size={14} />
+                <span>Back</span>
               </button>
             ) : (
               <div />
@@ -1082,7 +1089,7 @@ export default function ColdCallingSurvey() {
               type="button"
               onClick={handleNext}
               disabled={isSubmitting}
-              className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(47,168,255,0.4)] hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(47,168,255,0.4)] hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ml-auto"
             >
               {isSubmitting ? (
                 <>
@@ -1111,12 +1118,12 @@ export default function ColdCallingSurvey() {
       </div>
 
       {/* Footer Navigation Bar */}
-      <footer className="w-full max-w-2xl mx-auto pb-2 text-center text-xs text-text-body/60 select-none z-10 flex flex-wrap items-center justify-center gap-3">
-        <span className="flex items-center gap-1.5">
-          Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">Enter ↵</kbd> or click to advance
+      <footer className="w-full max-w-2xl mx-auto pb-1 sm:pb-2 text-center text-[11px] sm:text-xs text-text-body/60 select-none z-10 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+        <span className="flex items-center gap-1">
+          Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[9px] sm:text-[10px]">Enter ↵</kbd> or click to advance
         </span>
-        <span>•</span>
-        <span className="flex items-center gap-1.5">
+        <span className="hidden sm:inline">•</span>
+        <span className="hidden sm:flex items-center gap-1">
           Use keys <kbd className="px-1 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">A</kbd>-<kbd className="px-1 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">E</kbd> for quick choice
         </span>
       </footer>

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next build",
     "start": "next start",
     "lint": "next lint",
     "extract-frames": "node -e \"const fs=require('fs'); if(!fs.existsSync('public/frames/logo-reveal')) fs.mkdirSync('public/frames/logo-reveal', {recursive:true});\" && ffmpeg -y -i scripts/source-video/logo-reveal.mp4 -vf fps=11.25,scale=1280:-1 -c:v libwebp -q:v 78 public/frames/logo-reveal/frame-%04d.webp"

@@ -195,8 +195,8 @@ export default function AdminDashboard() {
         }
       }
 
-      // 3. Read LocalStorage submissions
-      if (typeof window !== "undefined") {
+      // 3. Read LocalStorage submissions only as fallback if cloud has no records
+      if (combined.length === 0 && typeof window !== "undefined") {
         const local = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
         if (local.length > 0) {
           const mappedLocal: AssessmentRecord[] = local.map((item: any, idx: number) => ({
@@ -204,9 +204,19 @@ export default function AdminDashboard() {
             ...item,
             status: item.status || "Ready"
           }));
-          combined = [...mappedLocal, ...combined];
+          combined = mappedLocal;
         }
       }
+
+      // Deduplicate records to ensure no duplicate cards appear
+      const uniqueMap = new Map<string, AssessmentRecord>();
+      combined.forEach((rec) => {
+        const key = `${rec.staff_name.toLowerCase().trim()}_${rec.submitted_at || rec.id}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, rec);
+        }
+      });
+      combined = Array.from(uniqueMap.values());
 
       if (combined.length === 0) {
         combined = DEMO_RECORDS;

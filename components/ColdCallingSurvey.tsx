@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { 
   Check, 
   ChevronRight, 
@@ -412,6 +413,26 @@ export default function ColdCallingSurvey() {
               </span>
             </div>
           </div>
+
+          <Link
+            href="/"
+            className="w-full mt-5 sm:mt-6 py-3.5 px-6 rounded-xl sm:rounded-2xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-[0_0_25px_rgba(0,212,255,0.35)] hover:shadow-[0_0_35px_rgba(0,212,255,0.5)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <span>Return to MR Devs Website</span>
+            <ArrowRight size={15} />
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsSubmitted(false);
+              setCurrentStep(0);
+              setFormData(INITIAL_STATE);
+            }}
+            className="mt-3 text-xs text-text-body hover:text-white transition-colors cursor-pointer py-1"
+          >
+            Submit another response
+          </button>
         </div>
       </main>
     );

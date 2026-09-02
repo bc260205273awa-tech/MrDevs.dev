@@ -24,6 +24,8 @@ import {
   GraduationCap
 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getFirebaseDb } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 interface SurveyState {
   staffName: string;
@@ -275,8 +277,6 @@ export default function ColdCallingSurvey() {
     setSubmitError(null);
 
     try {
-      const supabase = getSupabaseClient();
-
       const payload = {
         staff_name: formData.staffName.trim(),
         staff_role: formData.staffRole.trim(),
@@ -295,17 +295,35 @@ export default function ColdCallingSurvey() {
         submitted_at: new Date().toISOString(),
       };
 
-      if (!supabase) {
-        if (typeof window !== "undefined") {
-          const localSubmissions = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
-          localSubmissions.push(payload);
-          localStorage.setItem("mrdevs_cc_submissions", JSON.stringify(localSubmissions));
+      let saved = false;
+
+      // 1. Try Firebase Firestore
+      const db = getFirebaseDb();
+      if (db) {
+        try {
+          await addDoc(collection(db, "cold_calling_survey"), payload);
+          saved = true;
+        } catch (fbErr) {
+          console.warn("Firebase save error:", fbErr);
         }
-      } else {
-        const { error } = await supabase.from("cold_calling_survey").insert([payload]);
-        if (error) {
-          throw new Error(error.message || "Failed to record survey response in Supabase.");
+      }
+
+      // 2. Try Supabase
+      if (!saved) {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          const { error } = await supabase.from("cold_calling_survey").insert([payload]);
+          if (!error) {
+            saved = true;
+          }
         }
+      }
+
+      // 3. Always keep local backup
+      if (typeof window !== "undefined") {
+        const localSubmissions = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
+        localSubmissions.push(payload);
+        localStorage.setItem("mrdevs_cc_submissions", JSON.stringify(localSubmissions));
       }
 
       setIsSubmitted(true);

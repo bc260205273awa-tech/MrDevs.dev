@@ -32,6 +32,8 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getFirebaseDb } from "@/lib/firebase";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 export interface AssessmentRecord {
   id: string;
@@ -157,18 +159,43 @@ export default function AdminDashboard() {
     try {
       let combined: AssessmentRecord[] = [];
 
-      const supabase = getSupabaseClient();
-      if (supabase) {
-        const { data, error } = await supabase
-          .from("cold_calling_survey")
-          .select("*")
-          .order("submitted_at", { ascending: false });
-
-        if (!error && data && data.length > 0) {
-          combined = data as AssessmentRecord[];
+      // 1. Try Firebase Firestore
+      const db = getFirebaseDb();
+      if (db) {
+        try {
+          const q = query(collection(db, "cold_calling_survey"), orderBy("submitted_at", "desc"));
+          const querySnapshot = await getDocs(q);
+          const fbRecords: AssessmentRecord[] = [];
+          querySnapshot.forEach((doc) => {
+            fbRecords.push({
+              id: doc.id,
+              ...(doc.data() as any),
+            });
+          });
+          if (fbRecords.length > 0) {
+            combined = fbRecords;
+          }
+        } catch (fbErr) {
+          console.warn("Firebase query notice:", fbErr);
         }
       }
 
+      // 2. Try Supabase if no Firebase records
+      if (combined.length === 0) {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          const { data, error } = await supabase
+            .from("cold_calling_survey")
+            .select("*")
+            .order("submitted_at", { ascending: false });
+
+          if (!error && data && data.length > 0) {
+            combined = data as AssessmentRecord[];
+          }
+        }
+      }
+
+      // 3. Read LocalStorage submissions
       if (typeof window !== "undefined") {
         const local = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
         if (local.length > 0) {

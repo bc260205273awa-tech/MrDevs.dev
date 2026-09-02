@@ -303,8 +303,9 @@ export default function ColdCallingSurvey() {
         try {
           await addDoc(collection(db, "cold_calling_survey"), payload);
           saved = true;
-        } catch (fbErr) {
+        } catch (fbErr: any) {
           console.warn("Firebase save error:", fbErr);
+          throw new Error(fbErr?.message || "Failed to record survey response in Firebase.");
         }
       }
 
@@ -313,17 +314,16 @@ export default function ColdCallingSurvey() {
         const supabase = getSupabaseClient();
         if (supabase) {
           const { error } = await supabase.from("cold_calling_survey").insert([payload]);
-          if (!error) {
-            saved = true;
+          if (error) {
+            throw new Error(error.message || "Failed to record survey response in Supabase.");
           }
+          saved = true;
         }
       }
 
-      // 3. Always keep local backup
+      // Clear any legacy local storage key from browser
       if (typeof window !== "undefined") {
-        const localSubmissions = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
-        localSubmissions.push(payload);
-        localStorage.setItem("mrdevs_cc_submissions", JSON.stringify(localSubmissions));
+        localStorage.removeItem("mrdevs_cc_submissions");
       }
 
       setIsSubmitted(true);

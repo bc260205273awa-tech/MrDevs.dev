@@ -29,11 +29,12 @@ import {
   Activity,
   TrendingUp,
   Flame,
-  ArrowUpRight
+  ArrowUpRight,
+  Trash2
 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import { getFirebaseDb } from "@/lib/firebase";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 
 export interface AssessmentRecord {
   id: string;
@@ -153,23 +154,30 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  // Load submissions
+  // Purge any legacy browser storage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("mrdevs_cc_submissions");
+    }
+  }, []);
+
+  // Load submissions directly from Firebase Cloud Firestore
   const loadSubmissions = async () => {
     setIsLoading(true);
     try {
       let combined: AssessmentRecord[] = [];
 
-      // 1. Try Firebase Firestore
+      // 1. Load from Firebase Cloud Firestore
       const db = getFirebaseDb();
       if (db) {
         try {
           const q = query(collection(db, "cold_calling_survey"), orderBy("submitted_at", "desc"));
           const querySnapshot = await getDocs(q);
           const fbRecords: AssessmentRecord[] = [];
-          querySnapshot.forEach((doc) => {
+          querySnapshot.forEach((d) => {
             fbRecords.push({
-              id: doc.id,
-              ...(doc.data() as any),
+              id: d.id,
+              ...(d.data() as any),
             });
           });
           if (fbRecords.length > 0) {
@@ -195,19 +203,6 @@ export default function AdminDashboard() {
         }
       }
 
-      // 3. Read LocalStorage submissions only as fallback if cloud has no records
-      if (combined.length === 0 && typeof window !== "undefined") {
-        const local = JSON.parse(localStorage.getItem("mrdevs_cc_submissions") || "[]");
-        if (local.length > 0) {
-          const mappedLocal: AssessmentRecord[] = local.map((item: any, idx: number) => ({
-            id: `local-${idx}-${Date.now()}`,
-            ...item,
-            status: item.status || "Ready"
-          }));
-          combined = mappedLocal;
-        }
-      }
-
       // Deduplicate records to ensure no duplicate cards appear
       const uniqueMap = new Map<string, AssessmentRecord>();
       combined.forEach((rec) => {
@@ -218,16 +213,39 @@ export default function AdminDashboard() {
       });
       combined = Array.from(uniqueMap.values());
 
-      if (combined.length === 0) {
-        combined = DEMO_RECORDS;
-      }
-
       setRecords(combined);
     } catch (err) {
       console.error("Failed to load assessments:", err);
-      setRecords(DEMO_RECORDS);
+      setRecords([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Delete submission from Firebase Cloud
+  const handleDeleteRecord = async (recordId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this submission record?")) return;
+
+    try {
+      const db = getFirebaseDb();
+      if (db) {
+        await deleteDoc(doc(db, "cold_calling_survey", recordId));
+      } else {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          await supabase.from("cold_calling_survey").delete().eq("id", recordId);
+        }
+      }
+
+      // Update state immediately
+      setRecords((prev) => prev.filter((r) => r.id !== recordId));
+      if (selectedRecord?.id === recordId) {
+        setSelectedRecord(null);
+      }
+    } catch (err: any) {
+      console.error("Failed to delete record:", err);
+      alert("Failed to delete record: " + (err?.message || "Unknown error"));
     }
   };
 
@@ -868,17 +886,27 @@ export default function AdminDashboard() {
 
                         {/* Action */}
                         <td className="px-6 py-4 text-right whitespace-nowrap">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedRecord(rec);
-                            }}
-                            className="px-3.5 py-1.5 rounded-xl bg-[#040810] hover:bg-accent-primary hover:text-[#040A14] border border-white/10 hover:border-accent-cyan text-xs font-bold text-white transition-all inline-flex items-center gap-1 group/btn"
-                          >
-                            <span>Inspect</span>
-                            <ArrowUpRight size={13} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedRecord(rec);
+                              }}
+                              className="px-3.5 py-1.5 rounded-xl bg-[#040810] hover:bg-accent-primary hover:text-[#040A14] border border-white/10 hover:border-accent-cyan text-xs font-bold text-white transition-all inline-flex items-center gap-1 group/btn"
+                            >
+                              <span>Inspect</span>
+                              <ArrowUpRight size={13} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                            </button>
+                            <button
+                              type="button"
+                              title="Delete submission"
+                              onClick={(e) => handleDeleteRecord(rec.id, e)}
+                              className="p-1.5 rounded-xl bg-[#040810] hover:bg-red-500/20 text-text-body hover:text-red-400 border border-white/10 hover:border-red-500/30 transition-all cursor-pointer"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -1010,8 +1038,15 @@ export default function AdminDashboard() {
             </div>
 
             {/* Modal Actions */}
-            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[11px] text-text-body">ID: <code className="font-mono text-[10px]">{selectedRecord.id}</code></span>
+            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => handleDeleteRecord(selectedRecord.id)}
+                className="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Trash2 size={14} />
+                <span>Delete Submission</span>
+              </button>
               <button
                 onClick={() => setSelectedRecord(null)}
                 className="px-5 sm:px-6 py-2.5 rounded-xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs transition-all shadow-[0_0_20px_rgba(0,212,255,0.3)] hover:scale-[1.02] active:scale-[0.98]"

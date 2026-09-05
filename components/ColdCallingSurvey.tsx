@@ -373,7 +373,7 @@ export default function ColdCallingSurvey() {
             <div className="absolute inset-0 bg-accent-cyan/25 rounded-2xl blur-xl" />
             <div className="relative w-16 sm:w-20 h-16 sm:h-20 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-3 shadow-[0_0_25px_rgba(0,212,255,0.3)]">
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="MR Devs"
                 width={56}
                 height={56}
@@ -462,7 +462,7 @@ export default function ColdCallingSurvey() {
           <div className="flex items-center gap-2.5 bg-[#0c1424]/90 backdrop-blur-md px-3 py-1.5 sm:py-2 rounded-xl border border-white/10 shadow">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#040810] border border-accent-cyan/40 flex items-center justify-center p-1 shadow-[0_0_10px_rgba(0,212,255,0.2)] shrink-0">
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="MR Devs"
                 width={20}
                 height={20}

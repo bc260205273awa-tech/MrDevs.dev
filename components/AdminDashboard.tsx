@@ -590,7 +590,7 @@ export default function AdminDashboard() {
             <div className="absolute inset-0 bg-accent-cyan/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
             <div className="relative w-14 sm:w-16 h-14 sm:h-16 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-2.5 shadow-[0_0_30px_rgba(0,212,255,0.35)]">
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="MR Devs"
                 width={44}
                 height={44}
@@ -793,7 +793,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3">
             <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl sm:rounded-2xl bg-[#040810] border border-accent-cyan/40 flex items-center justify-center p-2 shadow-[0_0_20px_rgba(0,212,255,0.3)] shrink-0">
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="MR Devs"
                 width={30}
                 height={30}

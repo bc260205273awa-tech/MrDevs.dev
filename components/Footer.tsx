@@ -61,7 +61,7 @@ export default function Footer() {
               className="flex items-center select-none min-h-[44px]"
             >
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="mrdevs logo"
                 width={73}
                 height={28}

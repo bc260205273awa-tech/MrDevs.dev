@@ -61,3 +61,8 @@ If you are asked to modify these components, respect these established rules:
   - Eliminated 90 consecutive React re-renders by replacing frame-by-frame state updates with ref tracking.
   - Removed blocking loading overlay so poster frame appears instantaneously on canvas.
   - Added nearest-loaded frame fallback for jank-free 60fps scrubbing during progressive download.
+- **Sep 5, 2026 (Current AI)**: Complete WebP Asset Migration & Favicon Optimization:
+  - Generated next-gen WebP assets (`logo.webp`, `hero-glasses-frame.webp`, `hero-symbol-code.webp`, `hero-symbol-power.webp`) with up to 84% size savings.
+  - Updated all production component references to WebP across Navbar, Footer, Hero, Admin, Survey, and Layout.
+  - Resized `app/icon.png` from 156.2 KB (803x310) to 1.7 KB (48x48), eliminating 154 KB of tab favicon download overhead on every request.
+  - Purged 1.15 MB of unreferenced legacy assets from `public/`.

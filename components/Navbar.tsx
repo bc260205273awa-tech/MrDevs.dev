@@ -125,7 +125,7 @@ export default function Navbar() {
           className="tilt-nav flex items-center select-none"
         >
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="mrdevs logo"
             width={78}
             height={30}

@@ -197,7 +197,7 @@ export default function HeroGlasses3D() {
           className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(47,168,255,0.85)] z-10"
         >
           <Image
-            src="/hero-symbol-code.png"
+            src="/hero-symbol-code.webp"
             alt="Left Eye Pupil"
             fill
             sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
@@ -211,7 +211,7 @@ export default function HeroGlasses3D() {
           className="absolute inset-0 pointer-events-none drop-shadow-[0_0_15px_rgba(0,212,255,0.85)] z-10"
         >
           <Image
-            src="/hero-symbol-power.png"
+            src="/hero-symbol-power.webp"
             alt="Right Eye Pupil"
             fill
             sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
@@ -222,7 +222,7 @@ export default function HeroGlasses3D() {
         {/* Layer 3: Pristine Clean Metallic Glasses Frame on Top (Frame occludes pupils naturally) */}
         <div className="absolute inset-0 pointer-events-none z-20">
           <Image
-            src="/hero-glasses-frame.png"
+            src="/hero-glasses-frame.webp"
             alt="MrDevs Clean Glasses Frame"
             fill
             priority

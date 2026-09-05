@@ -36,9 +36,9 @@ export const metadata: Metadata = {
     canonical: "https://mrdevs.dev",
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.webp",
+    shortcut: "/logo.webp",
+    apple: "/logo.webp",
   },
   openGraph: {
     title: "MrDevs | Premium digital agency, Web & app development",
@@ -78,7 +78,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "MrDevs",
-    "image": "https://mrdevs.dev/logo.png",
+    "image": "https://mrdevs.dev/logo.webp",
     "url": "https://mrdevs.dev",
     "description":
       "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome: your revenue.",

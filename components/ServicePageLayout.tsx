@@ -82,7 +82,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
     "provider": {
       "@type": "LocalBusiness",
       "name": "MrDevs",
-      "image": "https://mrdevs.dev/logo.png",
+      "image": "https://mrdevs.dev/logo.webp",
       "url": "https://mrdevs.dev"
     },
     "areaServed": {

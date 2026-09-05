@@ -220,7 +220,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                       Proven at Scale
                     </h3>
                     <p className="text-[11px] text-[#888780] leading-relaxed">
-                      Engineered KhanHub — a multi-department clinic & hospital ERP handling 24/7 operations for 50,000+ people.
+                      Engineered KhanHub, a multi-department clinic & hospital ERP handling 24/7 operations for 50,000+ people.
                     </p>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
 
         {/* FAQs Section */}
         <section className="py-16 bg-[#0a0f1a]">
-          <div className="max-w-2xl mx-auto px-6">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl md:text-2xl font-medium text-[#f1efe8] mb-8 text-center">
               Frequently asked questions
             </h2>
@@ -246,22 +246,22 @@ export default function ServicePageLayout({ data, children }: { data: ServicePag
                   >
                     <button
                       onClick={() => toggleFaq(idx)}
-                      className="w-full px-5 py-4 flex items-center justify-between gap-4 text-left font-medium text-xs text-[#f1efe8] hover:bg-[#0f1729]/50 transition-colors"
+                      className="w-full px-4 sm:px-5 py-4 flex items-center justify-between gap-4 text-left font-medium text-xs text-[#f1efe8] hover:bg-[#0f1729]/50 transition-colors"
                     >
                       <span>{faq.question}</span>
                       <ChevronDown
                         size={14}
-                        className={`text-[#888780] transition-transform duration-200 ${
+                        className={`text-[#888780] transition-transform duration-200 shrink-0 ${
                           isOpen ? "rotate-180" : ""
                         }`}
                       />
                     </button>
                     <div
                       className={`transition-all duration-300 ease-in-out ${
-                        isOpen ? "max-h-48 border-t border-[rgba(133,183,235,0.06)]" : "max-h-0"
+                        isOpen ? "max-h-96 border-t border-[rgba(133,183,235,0.06)]" : "max-h-0"
                       } overflow-hidden`}
                     >
-                      <p className="px-5 py-4 text-xs text-[#888780] leading-relaxed">
+                      <p className="px-4 sm:px-5 py-4 text-xs text-[#888780] leading-relaxed">
                         {faq.answer}
                       </p>
                     </div>

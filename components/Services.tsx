@@ -80,7 +80,7 @@ export default function Services() {
 
   return (
     <section id="services" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col items-center mb-16 md:mb-24 scroll-reveal">
@@ -101,7 +101,7 @@ export default function Services() {
           {STEPS.map((step, idx) => (
             <div
               key={step.num}
-              className="tilt-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-colors duration-500"
+              className="tilt-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-colors duration-500"
               style={{ transitionDelay: `${idx * 100}ms` }}
             >
               {/* Subtle background glow on hover */}

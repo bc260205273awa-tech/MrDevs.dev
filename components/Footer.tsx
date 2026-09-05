@@ -51,10 +51,10 @@ export default function Footer() {
       {/* Visual Accent Top Divider */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[rgba(133,183,235,0.18)] to-transparent" />
 
-      <div className="max-w-5xl mx-auto px-6 pt-16 pb-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-16">
           {/* Column 1: Brand Info */}
-          <div className="col-span-2 md:col-span-1 flex flex-col items-start gap-4">
+          <div className="col-span-1 sm:col-span-2 md:col-span-1 flex flex-col items-start gap-4">
             <a
               href={isHome ? "#hero" : "/"}
               onClick={(e) => handleScrollTo(e, "#hero")}
@@ -121,7 +121,7 @@ export default function Footer() {
           </div>
 
           {/* Column 4: Contact & Socials */}
-          <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
+          <div className="col-span-1 sm:col-span-2 md:col-span-1 flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <span className="text-[10px] font-medium text-[#f1efe8]/40 tracking-wider uppercase select-none">
                 get in touch

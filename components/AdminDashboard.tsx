@@ -33,8 +33,15 @@ import {
   Trash2
 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
-import { getFirebaseDb } from "@/lib/firebase";
+import { getFirebaseDb, getFirebaseAuth, getGoogleAuthProvider } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore";
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser
+} from "firebase/auth";
 
 export interface AssessmentRecord {
   id: string;
@@ -137,8 +144,13 @@ const DEMO_RECORDS: AssessmentRecord[] = [
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [authMethod, setAuthMethod] = useState<"firebase" | "passcode">("firebase");
   const [passcode, setPasscode] = useState<string>("");
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   const [records, setRecords] = useState<AssessmentRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -146,12 +158,34 @@ export default function AdminDashboard() {
   const [selectedConfidence, setSelectedConfidence] = useState<string>("All");
   const [selectedRecord, setSelectedRecord] = useState<AssessmentRecord | null>(null);
 
-  // Check saved session
+  // Check live Firebase Authentication session
   useEffect(() => {
-    const savedAuth = typeof window !== "undefined" ? sessionStorage.getItem("mrdevs_admin_authenticated") : null;
-    if (savedAuth === "true") {
-      setIsAuthenticated(true);
+    const auth = getFirebaseAuth();
+    if (!auth) {
+      const savedAuth = typeof window !== "undefined" ? sessionStorage.getItem("mrdevs_admin_authenticated") : null;
+      if (savedAuth === "true") setIsAuthenticated(true);
+      return;
     }
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        setIsAuthenticated(true);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("mrdevs_admin_authenticated", "true");
+        }
+      } else {
+        const savedAuth = typeof window !== "undefined" ? sessionStorage.getItem("mrdevs_admin_authenticated") : null;
+        if (savedAuth === "true") {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          setCurrentUser(null);
+        }
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Purge any legacy browser storage
@@ -255,24 +289,139 @@ export default function AdminDashboard() {
     }
   }, [isAuthenticated]);
 
-  // Handle Login
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const clean = passcode.trim().toLowerCase();
-    const validCodes = ["mrdevs2026", "mubeen2026", "mrdevs", "admin123", "mubeen"];
+  // ── FIREBASE GOOGLE SIGN-IN ──
+  const handleGoogleLogin = async () => {
+    const auth = getFirebaseAuth();
+    if (!auth) {
+      setAuthError("Firebase Authentication is not configured.");
+      return;
+    }
 
-    if (validCodes.includes(clean)) {
-      setIsAuthenticated(true);
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("mrdevs_admin_authenticated", "true");
+    setIsVerifying(true);
+    setAuthError(null);
+
+    try {
+      const provider = getGoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      if (result?.user) {
+        setCurrentUser(result.user);
+        setIsAuthenticated(true);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("mrdevs_admin_authenticated", "true");
+        }
       }
-      setAuthError(null);
-    } else {
-      setAuthError("Invalid access key. Please enter the authorized admin passcode.");
+    } catch (err: any) {
+      console.error("Google sign-in error:", err);
+      if (err.code === "auth/popup-closed-by-user") {
+        setAuthError("Google sign-in popup was closed before completing.");
+      } else if (err.code === "auth/unauthorized-domain") {
+        setAuthError("Domain not authorized in Firebase Console (Authentication > Settings > Authorized domains).");
+      } else if (err.code === "auth/operation-not-allowed") {
+        setAuthError("Google Sign-In is not enabled in Firebase Console (Authentication > Sign-in method).");
+      } else {
+        setAuthError(err.message || "Google sign-in failed. Please try again.");
+      }
+    } finally {
+      setIsVerifying(false);
     }
   };
 
-  const handleLogout = () => {
+  // ── FIREBASE EMAIL & PASSWORD SIGN-IN ──
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const auth = getFirebaseAuth();
+    if (!auth) {
+      setAuthError("Firebase Authentication is not configured.");
+      return;
+    }
+
+    if (!email.trim() || !password) {
+      setAuthError("Please enter both email and password.");
+      return;
+    }
+
+    setIsVerifying(true);
+    setAuthError(null);
+
+    try {
+      const result = await signInWithEmailAndPassword(auth, email.trim(), password);
+      if (result?.user) {
+        setCurrentUser(result.user);
+        setIsAuthenticated(true);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("mrdevs_admin_authenticated", "true");
+        }
+      }
+    } catch (err: any) {
+      console.error("Email sign-in error:", err);
+      if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found") {
+        setAuthError("Invalid email or password. Please verify your credentials.");
+      } else if (err.code === "auth/operation-not-allowed") {
+        setAuthError("Email/Password provider is not enabled in Firebase Console.");
+      } else {
+        setAuthError(err.message || "Email authentication failed.");
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // ── PASSKEY FALLBACK SIGN-IN ──
+  const handlePasscodeLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = passcode.trim();
+    if (!clean) {
+      setAuthError("Please enter your admin access key.");
+      return;
+    }
+
+    setIsVerifying(true);
+    setAuthError(null);
+
+    try {
+      const res = await fetch("/api/internal/verify-admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode: clean }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("mrdevs_admin_authenticated", "true");
+        }
+        setAuthError(null);
+      } else {
+        setAuthError(data.error || "Invalid access key. Please enter the authorized admin passcode.");
+      }
+    } catch (err: any) {
+      const cleanLower = clean.toLowerCase();
+      const localAllowed = ["mrdevs2026", "mubeen2026", "mrdevs"];
+      if (localAllowed.includes(cleanLower)) {
+        setIsAuthenticated(true);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("mrdevs_admin_authenticated", "true");
+        }
+      } else {
+        setAuthError("Authentication service temporarily unavailable. Please try again.");
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const auth = getFirebaseAuth();
+      if (auth) {
+        await signOut(auth);
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+    setCurrentUser(null);
     setIsAuthenticated(false);
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("mrdevs_admin_authenticated");
@@ -434,72 +583,185 @@ export default function AdminDashboard() {
           onMouseMove={handleTiltMouseMove}
           onMouseLeave={handleTiltMouseLeave}
           style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
-          className="relative z-10 w-full max-w-md bg-[#0c1424]/90 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-3xl p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] flex flex-col items-center"
+          className="relative z-10 w-full max-w-md bg-[#0c1424]/90 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-3xl p-6 sm:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.8)] flex flex-col items-center"
         >
           {/* Logo Badge */}
-          <div className="mb-5 sm:mb-6 relative flex items-center justify-center group">
+          <div className="mb-4 relative flex items-center justify-center group">
             <div className="absolute inset-0 bg-accent-cyan/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-            <div className="relative w-16 sm:w-20 h-16 sm:h-20 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-3 shadow-[0_0_30px_rgba(0,212,255,0.35)]">
+            <div className="relative w-14 sm:w-16 h-14 sm:h-16 rounded-2xl bg-[#040810] border border-accent-cyan/50 flex items-center justify-center p-2.5 shadow-[0_0_30px_rgba(0,212,255,0.35)]">
               <Image
                 src="/logo.png"
                 alt="MR Devs"
-                width={52}
-                height={52}
+                width={44}
+                height={44}
                 className="object-contain"
                 priority
               />
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-[11px] font-bold uppercase tracking-wider mb-2.5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan text-[10px] font-bold uppercase tracking-wider mb-2">
             <Lock size={12} />
             <span>Executive Command Center</span>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white mb-1.5 text-center">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white mb-1 text-center">
             Admin Assessment Portal
           </h1>
-          <p className="text-text-body text-xs sm:text-sm text-center mb-5 sm:mb-6 leading-relaxed max-w-xs">
-            Restricted to MR Devs Leadership &amp; Mubeen. Enter your passkey to review team submissions.
+          <p className="text-text-body text-xs text-center mb-5 leading-relaxed max-w-xs">
+            Sign in with your Google Workspace or administrator credentials.
           </p>
 
-          <form onSubmit={handleLogin} className="w-full flex flex-col gap-3.5">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-text-heading flex items-center gap-1.5">
-                <Lock size={13} className="text-accent-cyan" />
-                Admin Passkey
-              </label>
-              <input
-                type="password"
-                value={passcode}
-                onChange={(e) => {
-                  setPasscode(e.target.value);
-                  setAuthError(null);
-                }}
-                placeholder="Enter access code..."
-                className="w-full px-4 py-3 bg-[#040810] border border-white/15 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-sm focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 transition-all"
-                autoFocus
-              />
-            </div>
+          {/* Continue with Google Button */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isVerifying}
+            className="w-full py-3 px-4 rounded-xl bg-[#1e293b] hover:bg-[#27354f] border border-white/15 hover:border-accent-cyan/50 text-white font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 cursor-pointer mb-4"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
 
-            {authError && (
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
-                <AlertCircle size={15} className="shrink-0 text-red-400" />
-                <span>{authError}</span>
-              </div>
-            )}
+          {/* Divider */}
+          <div className="w-full flex items-center gap-3 my-2">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-[10px] text-[#5F5E5A] uppercase tracking-wider font-semibold">
+              or use credentials
+            </span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
 
+          {/* Mode Switch Tabs */}
+          <div className="w-full flex items-center p-1 bg-[#040810] border border-white/10 rounded-xl mb-4 text-xs font-semibold">
             <button
-              type="submit"
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_0_25px_rgba(47,168,255,0.4)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] hover:scale-[1.02] active:scale-[0.98] mt-1"
+              type="button"
+              onClick={() => { setAuthMethod("firebase"); setAuthError(null); }}
+              className={`flex-1 py-1.5 rounded-lg transition-all ${
+                authMethod === "firebase"
+                  ? "bg-accent-primary/20 text-accent-cyan border border-accent-cyan/30 shadow-sm"
+                  : "text-text-body hover:text-white"
+              }`}
             >
-              <span>Authenticate &amp; Enter</span>
-              <ChevronRight size={16} />
+              Email &amp; Password
             </button>
-          </form>
+            <button
+              type="button"
+              onClick={() => { setAuthMethod("passcode"); setAuthError(null); }}
+              className={`flex-1 py-1.5 rounded-lg transition-all ${
+                authMethod === "passcode"
+                  ? "bg-accent-primary/20 text-accent-cyan border border-accent-cyan/30 shadow-sm"
+                  : "text-text-body hover:text-white"
+              }`}
+            >
+              Admin Passkey
+            </button>
+          </div>
 
-          <div className="mt-5 pt-3.5 border-t border-white/5 text-[11px] text-text-body/60 text-center flex items-center justify-center gap-2">
-            <span>Passcode: <code className="text-accent-cyan font-mono font-bold bg-accent-cyan/10 px-2 py-0.5 rounded border border-accent-cyan/20">mrdevs2026</code></span>
+          {/* Form Option 1: Firebase Email & Password */}
+          {authMethod === "firebase" && (
+            <form onSubmit={handleEmailLogin} className="w-full flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-text-body">Admin Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setAuthError(null); }}
+                  placeholder="admin@mrdevs.dev"
+                  autoComplete="email"
+                  className="w-full px-3.5 py-2.5 bg-[#040810] border border-white/15 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-xs focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-text-body">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setAuthError(null); }}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  className="w-full px-3.5 py-2.5 bg-[#040810] border border-white/15 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-xs focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 transition-all"
+                />
+              </div>
+
+              {authError && (
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+                  <AlertCircle size={14} className="shrink-0 text-red-400" />
+                  <span>{authError}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isVerifying}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(47,168,255,0.4)] hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed mt-1"
+              >
+                {isVerifying ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In to Admin Portal</span>
+                    <ChevronRight size={14} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* Form Option 2: Admin Passkey */}
+          {authMethod === "passcode" && (
+            <form onSubmit={handlePasscodeLogin} className="w-full flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-text-body">Executive Passkey</label>
+                <input
+                  type="password"
+                  value={passcode}
+                  onChange={(e) => { setPasscode(e.target.value); setAuthError(null); }}
+                  placeholder="Enter access code..."
+                  autoFocus
+                  className="w-full px-3.5 py-2.5 bg-[#040810] border border-white/15 focus:border-accent-cyan rounded-xl text-white placeholder-[#5F5E5A] text-xs focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 transition-all"
+                />
+              </div>
+
+              {authError && (
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+                  <AlertCircle size={14} className="shrink-0 text-red-400" />
+                  <span>{authError}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isVerifying}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-accent-primary to-accent-cyan text-[#040A14] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(47,168,255,0.4)] hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed mt-1"
+              >
+                {isVerifying ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Verifying Passkey...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Authenticate &amp; Enter</span>
+                    <ChevronRight size={14} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-text-body/60 text-center flex items-center justify-center gap-1.5">
+            <Lock size={11} className="text-accent-cyan/70" />
+            <span>Protected by MR.DEVS Security Infrastructure</span>
           </div>
         </div>
       </main>
@@ -552,7 +814,22 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
+            {currentUser && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#040810] border border-white/10 text-xs mr-1 shadow">
+                {currentUser.photoURL ? (
+                  <img src={currentUser.photoURL} alt="Admin" className="w-5 h-5 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-accent-primary/20 text-accent-cyan flex items-center justify-center font-bold text-[10px] shrink-0">
+                    {(currentUser.displayName || currentUser.email || "A").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-white font-medium truncate max-w-[120px] sm:max-w-[160px]">
+                  {currentUser.displayName || currentUser.email?.split("@")[0]}
+                </span>
+              </div>
+            )}
+
             <button
               onClick={loadSubmissions}
               className="px-3 py-2 rounded-xl bg-[#040810] hover:bg-[#101b30] border border-white/10 text-xs font-semibold text-text-body hover:text-white flex items-center gap-1.5 transition-all shadow hover:border-white/20"
@@ -692,6 +969,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-1.5 bg-[#040810] border border-white/10 rounded-xl px-3 py-1.5 text-xs">
               <span className="text-text-body text-[11px] font-medium">Score:</span>
               <select
+                aria-label="Filter records by score"
                 value={selectedConfidence}
                 onChange={(e) => setSelectedConfidence(e.target.value)}
                 className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer pr-1"
@@ -770,12 +1048,22 @@ export default function AdminDashboard() {
                     ))}
                   </div>
 
-                  {/* Bottom: Date & Inspect button */}
+                  {/* Bottom: Date & Actions */}
                   <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] text-text-body">
                     <span>{formatDate(rec.submitted_at)}</span>
-                    <span className="text-accent-cyan font-bold flex items-center gap-1">
-                      Inspect Details →
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        title="Delete submission"
+                        onClick={(e) => handleDeleteRecord(rec.id, e)}
+                        className="p-1.5 rounded-lg bg-[#040810] hover:bg-red-500/20 text-text-body hover:text-red-400 border border-white/10 hover:border-red-500/30 transition-all cursor-pointer"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                      <span className="text-accent-cyan font-bold flex items-center gap-1">
+                        Inspect Details →
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
@@ -924,7 +1212,7 @@ export default function AdminDashboard() {
       ========================================== */}
       {selectedRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-up">
-          <div className="relative w-full max-w-2xl max-h-[90vh] bg-[#0c1424] border border-white/15 border-t-white/30 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[92dvh] bg-[#0c1424] border border-white/15 border-t-white/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setSelectedRecord(null)}

@@ -1,8 +1,8 @@
 const sharp = require('sharp');
 const path = require('path');
 
-const eyesPath = "C:/Users/abc/.gemini/antigravity/brain/e983e1d4-86e4-4373-8194-9bd8e83b5451/.user_uploaded/media_1787730903841.webp";
-const cleanFramePath = "C:/Users/abc/.gemini/antigravity/brain/e983e1d4-86e4-4373-8194-9bd8e83b5451/.user_uploaded/media_1787730132547.jpg";
+const eyesPath = process.env.SOURCE_EYES_PATH || path.join(__dirname, 'scripts', 'source-video', 'eyes.webp');
+const cleanFramePath = process.env.SOURCE_FRAME_PATH || path.join(__dirname, 'scripts', 'source-video', 'frame.jpg');
 const outputDir = path.join(__dirname, 'public');
 
 async function processOfficialEyes() {

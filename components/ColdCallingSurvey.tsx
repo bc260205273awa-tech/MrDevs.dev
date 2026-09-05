@@ -351,7 +351,7 @@ export default function ColdCallingSurvey() {
   // ==========================================
   if (isSubmitted) {
     return (
-      <main className="min-h-[100dvh] bg-[#060a12] text-text-heading flex flex-col items-center justify-center p-3.5 sm:p-6 font-sans relative overflow-hidden">
+      <main className="min-h-[100dvh] bg-[#060a12] text-text-heading flex flex-col items-center justify-center p-3 sm:p-6 font-sans relative overflow-y-auto">
         {/* Cyber Grid */}
         <div 
           className="absolute inset-0 opacity-15 pointer-events-none"
@@ -442,7 +442,7 @@ export default function ColdCallingSurvey() {
   // MAIN FORM FLOW (FULLY RESPONSIVE)
   // ==========================================
   return (
-    <main className="min-h-[100dvh] bg-[#060a12] text-text-heading flex flex-col justify-between p-3.5 sm:p-6 md:p-8 font-sans relative overflow-hidden">
+    <main className="min-h-[100dvh] bg-[#060a12] text-text-heading flex flex-col justify-between p-3 sm:p-6 md:p-8 font-sans relative overflow-y-auto">
       {/* Cyber Grid */}
       <div 
         className="absolute inset-0 opacity-15 pointer-events-none"
@@ -505,7 +505,7 @@ export default function ColdCallingSurvey() {
           onMouseMove={handleTiltMouseMove}
           onMouseLeave={handleTiltMouseLeave}
           style={{ transition: "transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease" }}
-          className="w-full max-w-2xl bg-[#0c1424]/95 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.7)] relative"
+          className="w-full max-w-2xl bg-[#0c1424]/95 backdrop-blur-xl border border-white/15 border-t-white/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.7)] relative"
         >
           
           {/* STEP 0: Staff Info */}
@@ -1005,7 +1005,7 @@ export default function ColdCallingSurvey() {
                   Confidence making a cold call to a potential client?
                 </h2>
                 <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-accent-cyan">
-                  <span>Rating: {formData.q10ConfidenceScale || "—"} / 10</span>
+                  <span>Rating: {formData.q10ConfidenceScale || "-"} / 10</span>
                   <span className="text-text-body font-normal">• {getScaleFeedback(formData.q10ConfidenceScale)}</span>
                 </div>
               </div>
@@ -1018,7 +1018,7 @@ export default function ColdCallingSurvey() {
                       key={num}
                       type="button"
                       onClick={() => handleScaleSelect(num)}
-                      className={`h-11 sm:h-12 rounded-xl border font-extrabold text-sm sm:text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                      className={`h-11 sm:h-12 min-h-[44px] rounded-xl border font-extrabold text-sm sm:text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                         formData.q10ConfidenceScale === num
                           ? "bg-accent-cyan border-accent-cyan text-[#040A14] shadow-[0_0_20px_rgba(0,212,255,0.6)] scale-105"
                           : "bg-[#040810] border-white/10 text-text-body hover:bg-[#101b30] hover:border-white/30 hover:text-white"

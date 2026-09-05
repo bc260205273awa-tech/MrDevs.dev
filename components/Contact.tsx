@@ -59,7 +59,7 @@ export default function Contact() {
 
   return (
     <section id="contact" ref={containerRef} className="py-20 bg-[#0a0f1a] font-sans overflow-hidden">
-      <div className="max-w-md mx-auto px-6 flex flex-col items-center">
+      <div className="max-w-md mx-auto px-4 sm:px-6 flex flex-col items-center">
         
         {/* Section Label */}
         <span className="text-[10px] font-medium text-[#888780] tracking-[0.15em] uppercase mb-3 select-none scroll-reveal">
@@ -71,7 +71,7 @@ export default function Contact() {
           Let&apos;s build yours next.
         </h2>
 
-        {/* Primary CTA — WhatsApp Button */}
+        {/* Primary CTA - WhatsApp Button */}
         <a
           href="https://wa.me/923218492868"
           target="_blank"
@@ -162,12 +162,14 @@ export default function Contact() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-[#888780] font-medium select-none">
+                <label htmlFor="projectType" className="text-[10px] text-[#888780] font-medium select-none">
                   Project type
                 </label>
                 <div className="relative">
                   <select
+                    id="projectType"
                     name="projectType"
+                    aria-label="Project type"
                     value={form.projectType}
                     onChange={handleChange}
                     required

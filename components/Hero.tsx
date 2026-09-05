@@ -27,24 +27,22 @@ export default function Hero() {
     const tl = gsap.timeline();
     
     tl.from(headlineRef.current, {
-      y: 40,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out',
-      delay: 0.2
+      y: 24,
+      duration: 0.8,
+      ease: 'power3.out'
     })
     .from(subtextRef.current, {
-      y: 20,
-      opacity: 0,
-      duration: 0.8,
+      y: 16,
+      opacity: 0.2,
+      duration: 0.7,
       ease: 'power3.out'
-    }, "-=0.6")
+    }, "-=0.5")
     .from(ctaRef.current, {
-      y: 20,
+      y: 16,
       opacity: 0,
-      duration: 0.8,
+      duration: 0.7,
       ease: 'power3.out'
-    }, "-=0.6");
+    }, "-=0.5");
   }, { scope: containerRef });
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
@@ -70,7 +68,7 @@ export default function Hero() {
       <HeroParticles />
 
       {/* Main 2-Column Split Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 sm:pt-8 lg:pt-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 sm:pt-8 lg:pt-12">
         
         {/* Right Column: 3D Interactive Agency Glasses Logo (Shown first on mobile) */}
         <div className="order-1 lg:order-2 lg:col-span-5 flex items-center justify-center w-full relative z-10 py-4 lg:py-0">
@@ -94,7 +92,7 @@ export default function Hero() {
           {/* Main Headline (Clean Human Copy without AI em-dash) */}
           <h1 
             ref={headlineRef}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.2rem] xl:text-[4.75rem] font-bold text-text-heading leading-[1.08] tracking-tighter max-w-2xl"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-[4.2rem] xl:text-[4.75rem] font-bold text-text-heading leading-[1.08] tracking-tighter max-w-2xl"
           >
             Everything your business needs to grow,{" "}
             <span className="text-accent-primary" style={{ textShadow: '0 0 24px rgba(47,168,255,0.35)' }}>

@@ -92,18 +92,21 @@ export default function HeroParticles() {
 
     initParticles();
 
+    let isVisible = true;
+
     // Render loop
     const render = () => {
+      if (!isVisible) return;
       ctx.clearRect(0, 0, width, height);
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Ambient floating movement
+        // Ambient floating movement (exact speed preserved)
         p.x += p.vx;
         p.y += p.vy;
 
-        // If particle goes off screen, seamlessly wrap it to the opposite side
+        // Wrap seamlessly
         const margin = 50;
         if (p.x < -margin) p.x = width + margin;
         if (p.x > width + margin) p.x = -margin;
@@ -113,65 +116,75 @@ export default function HeroParticles() {
         // Calculate distance to mouse cursor
         const dx = mouse.x - p.x;
         const dy = mouse.y - p.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Fast bounding box check before sqrt
+        if (Math.abs(dx) < mouse.radius && Math.abs(dy) < mouse.radius) {
+          const distance = Math.sqrt(dx * dx + dy * dy);
 
-        let forceDirectionX = dx / distance;
-        let forceDirectionY = dy / distance;
+          if (distance < mouse.radius) {
+            const force = (mouse.radius - distance) / mouse.radius;
+            const forceDirectionX = dx / distance;
+            const forceDirectionY = dy / distance;
+            const directionX = forceDirectionX * force * p.density * 0.6;
+            const directionY = forceDirectionY * force * p.density * 0.6;
 
-        // Particle reaction range
-        if (distance < mouse.radius) {
-          const force = (mouse.radius - distance) / mouse.radius;
-          const directionX = forceDirectionX * force * p.density * 0.6;
-          const directionY = forceDirectionY * force * p.density * 0.6;
+            // Repel gently away from cursor
+            p.x -= directionX;
+            p.y -= directionY;
 
-          // Repel gently away from cursor
-          p.x -= directionX;
-          p.y -= directionY;
+            // Performant GPU hardware glow (replaces CPU-heavy shadowBlur)
+            const glowAlpha = Math.min(p.alpha + force * 0.5, 1);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size + force * 4, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(47, 168, 255, ${force * 0.35})`;
+            ctx.fill();
 
-          // Increase brightness / glow near mouse
-          const glowAlpha = Math.min(p.alpha + force * 0.5, 1);
-          ctx.shadowBlur = 12 * force;
-          ctx.shadowColor = "#2FA8FF";
-
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size + force * 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = `${p.color}${glowAlpha})`;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        } else {
-          // Normal ambient state
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `${p.color}${p.alpha})`;
-          ctx.fill();
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size + force * 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = `${p.color}${glowAlpha})`;
+            ctx.fill();
+            continue;
+          }
         }
 
+        // Normal ambient state
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `${p.color}${p.alpha})`;
+        ctx.fill();
       }
 
-      // Draw subtle glowing dust connections everywhere
+      // Draw subtle glowing dust connections (optimized bounding-box distance check)
+      const maxDist = 90;
+      const maxDistSq = 8100; // 90 * 90
+
       for (let a = 0; a < particles.length; a++) {
+        const pa = particles[a];
         for (let b = a + 1; b < particles.length; b++) {
-          const dx = particles[a].x - particles[b].x;
-          const dy = particles[a].y - particles[b].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const pb = particles[b];
+          const dx = pa.x - pb.x;
+          if (dx > maxDist || dx < -maxDist) continue;
+          const dy = pa.y - pb.y;
+          if (dy > maxDist || dy < -maxDist) continue;
 
-          // Connect particles if within 90px of each other
-          if (dist < 90) {
-            let lineAlpha = (1 - dist / 90) * 0.12; // Baseline faint alpha everywhere
+          const distSq = dx * dx + dy * dy;
+          if (distSq < maxDistSq) {
+            const dist = Math.sqrt(distSq);
+            let lineAlpha = (1 - dist / maxDist) * 0.12;
 
-            const mouseDistA = Math.sqrt(
-              Math.pow(mouse.x - particles[a].x, 2) + Math.pow(mouse.y - particles[a].y, 2)
-            );
-            
-            // Boost brightness if near mouse
-            if (mouseDistA < mouse.radius) {
-              const force = (1 - mouseDistA / mouse.radius);
-              lineAlpha += force * 0.25;
+            const mdx = mouse.x - pa.x;
+            const mdy = mouse.y - pa.y;
+            if (Math.abs(mdx) < mouse.radius && Math.abs(mdy) < mouse.radius) {
+              const mouseDistA = Math.sqrt(mdx * mdx + mdy * mdy);
+              if (mouseDistA < mouse.radius) {
+                const force = (1 - mouseDistA / mouse.radius);
+                lineAlpha += force * 0.25;
+              }
             }
 
             ctx.beginPath();
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.moveTo(pa.x, pa.y);
+            ctx.lineTo(pb.x, pb.y);
             ctx.strokeStyle = `rgba(47, 168, 255, ${lineAlpha})`;
             ctx.lineWidth = 0.6;
             ctx.stroke();
@@ -182,10 +195,41 @@ export default function HeroParticles() {
       animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    // Pause rendering when offscreen or tab is backgrounded
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry.isIntersecting) {
+        if (!isVisible) {
+          isVisible = true;
+          animationFrameId = requestAnimationFrame(render);
+        }
+      } else {
+        isVisible = false;
+        cancelAnimationFrame(animationFrameId);
+      }
+    });
+
+    observer.observe(canvas);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isVisible = false;
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        isVisible = true;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Defer initial render until hydration settles
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("resize", handleResize);

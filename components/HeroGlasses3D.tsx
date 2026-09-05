@@ -103,11 +103,11 @@ export default function HeroGlasses3D() {
     let idleAnimation: gsap.core.Timeline | null = null;
     let hasMouseMoved = false;
 
-    // Start Autonomous Idle Animation by default (covers mobile, touch, and idle desktop)
+    // Start Autonomous Idle Animation with initial delay so initial paint is instantaneous
     const maxShiftX = 8;
     const maxShiftY = 6;
     
-    idleAnimation = gsap.timeline({ repeat: -1 });
+    idleAnimation = gsap.timeline({ repeat: -1, delay: 0.6 });
     const moveDur = 0.5;
     const pauseDur = 0.8;
 
@@ -137,6 +137,19 @@ export default function HeroGlasses3D() {
       .to(frameRef.current, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: moveDur, ease: "power2.inOut" }, "center")
       .to({}, { duration: pauseDur });
 
+    // Pause idle animation when scrolled offscreen
+    const viewObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        if (!hasMouseMoved && idleAnimation) idleAnimation.play();
+      } else {
+        if (idleAnimation) idleAnimation.pause();
+      }
+    }, { threshold: 0.1 });
+
+    if (containerRef.current) {
+      viewObserver.observe(containerRef.current);
+    }
+
     // Custom mouse move wrapper to detect first interaction
     const handleMouseMoveWrapper = (e: MouseEvent) => {
       if (!hasMouseMoved) {
@@ -149,10 +162,11 @@ export default function HeroGlasses3D() {
       handleMouseMove(e);
     };
 
-    window.addEventListener("mousemove", handleMouseMoveWrapper);
-    document.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("mousemove", handleMouseMoveWrapper, { passive: true });
+    document.addEventListener("mouseleave", handleMouseLeave, { passive: true });
 
     return () => {
+      viewObserver.disconnect();
       window.removeEventListener("mousemove", handleMouseMoveWrapper);
       document.removeEventListener("mouseleave", handleMouseLeave);
       if (idleAnimation) idleAnimation.kill();
@@ -187,6 +201,7 @@ export default function HeroGlasses3D() {
             alt="Left Eye Pupil"
             fill
             priority
+            sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
             className="object-contain"
           />
         </div>
@@ -201,6 +216,7 @@ export default function HeroGlasses3D() {
             alt="Right Eye Pupil"
             fill
             priority
+            sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
             className="object-contain"
           />
         </div>
@@ -212,6 +228,7 @@ export default function HeroGlasses3D() {
             alt="MrDevs Clean Glasses Frame"
             fill
             priority
+            sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
             className="object-contain"
           />
         </div>

@@ -12,24 +12,32 @@ export default function WhyMrDevs() {
   useScrollReveal(containerRef);
   use3DTilt(containerRef, ".tilt-card", 15, 1000);
 
-  // Dynamic Spotlight Effect
+  // Dynamic Spotlight Effect (Optimized with zero layout thrashing)
   useEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
 
+    let rafId: number | null = null;
+
     const handleMouseMove = (e: MouseEvent) => {
-      const cards = grid.querySelectorAll('.spotlight-card');
-      for (const card of Array.from(cards)) {
-        const rect = card.getBoundingClientRect();
+      const targetCard = (e.target as HTMLElement)?.closest('.spotlight-card') as HTMLElement | null;
+      if (!targetCard) return;
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const rect = targetCard.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
-        (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
-      }
+        targetCard.style.setProperty('--mouse-x', `${x}px`);
+        targetCard.style.setProperty('--mouse-y', `${y}px`);
+      });
     };
 
-    grid.addEventListener('mousemove', handleMouseMove);
-    return () => grid.removeEventListener('mousemove', handleMouseMove);
+    grid.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      grid.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   const PILLARS = [
@@ -157,7 +165,7 @@ export default function WhyMrDevs() {
         }
       `}} />
 
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col mb-16 scroll-reveal">
@@ -183,7 +191,7 @@ export default function WhyMrDevs() {
             return (
               <div
                 key={index}
-                className={`tilt-card spotlight-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
+                className={`tilt-card spotlight-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 flex flex-col justify-end overflow-hidden ${pillar.gridClass}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {/* Custom Visual for the Card */}
@@ -195,7 +203,7 @@ export default function WhyMrDevs() {
                 </div>
 
                 {/* Content anchored to bottom */}
-                <div className="relative z-20 mt-auto max-w-md pt-32 lg:pt-0">
+                <div className="relative z-20 mt-auto max-w-md pt-36 sm:pt-32 lg:pt-0">
                   <h3 className="font-sans font-semibold text-2xl lg:text-3xl text-text-heading mb-3 tracking-tight group-hover:text-white transition-colors duration-300">
                     {pillar.title}
                   </h3>

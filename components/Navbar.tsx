@@ -118,7 +118,7 @@ export default function Navbar() {
             : "py-6 bg-transparent border-b border-transparent"
         }`}
       >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
         {/* Logo Image */}
         <a
           href="/"
@@ -336,10 +336,10 @@ export default function Navbar() {
       {/* Mobile dropdown panel */}
       <div
         className={`md:hidden overflow-y-auto transition-all duration-300 ease-in-out border-b border-[rgba(133,183,235,0.06)] bg-[#0a0f1a] ${
-          open ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
+          open ? "max-h-[85dvh] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-6 py-4 flex flex-col gap-1">
+        <div className="px-5 sm:px-6 py-4 flex flex-col gap-1">
           {/* Services Accordion */}
           <div>
             <button
@@ -352,22 +352,22 @@ export default function Navbar() {
 
             {mobileAccordionOpen && (
               <div className="pl-4 py-2 flex flex-col gap-3 border-l border-[rgba(133,183,235,0.1)] mb-2 mt-1">
-                <a href="/services/web-development" className="text-xs text-[#888780] py-1">web development</a>
-                <a href="/services/app-development" className="text-xs text-[#888780] py-1">app development</a>
-                <a href="/services/hospital-software-systems" className="text-xs text-[#888780] py-1">hospital & software systems</a>
-                <a href="/services/whatsapp-automation" className="text-xs text-[#888780] py-1">whatsapp & automation</a>
-                <a href="/services/maps-optimization" className="text-xs text-[#888780] py-1">google maps optimization</a>
-                <a href="/services/design-branding" className="text-xs text-[#888780] py-1">design & branding</a>
+                <a href="/services/web-development" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">web development</a>
+                <a href="/services/app-development" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">app development</a>
+                <a href="/services/hospital-software-systems" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">hospital & software systems</a>
+                <a href="/services/whatsapp-automation" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">whatsapp & automation</a>
+                <a href="/services/maps-optimization" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">google maps optimization</a>
+                <a href="/services/design-branding" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">design & branding</a>
                 
                 <div className="border-t border-white/5 pt-2 flex flex-col gap-2">
-                  <a href="/services/social-media" className="text-xs text-[#f1efe8] py-1 flex items-center justify-between">
+                  <a href="/services/social-media" onClick={() => setOpen(false)} className="text-xs text-[#f1efe8] hover:text-[#378ADD] py-1 flex items-center justify-between">
                     social media
                     <ArrowRight size={12} />
                   </a>
                   <div className="pl-3 flex flex-col gap-2">
-                    <a href="/services/social-media/graphic-design" className="text-[11px] text-[#888780] py-0.5">graphic design</a>
-                    <a href="/services/social-media/video-editing" className="text-[11px] text-[#888780] py-0.5">video editing</a>
-                    <a href="/services/social-media/content-scripting" className="text-[11px] text-[#888780] py-0.5">content scripting</a>
+                    <a href="/services/social-media/graphic-design" onClick={() => setOpen(false)} className="text-[11px] text-[#888780] hover:text-[#378ADD] py-0.5">graphic design</a>
+                    <a href="/services/social-media/video-editing" onClick={() => setOpen(false)} className="text-[11px] text-[#888780] hover:text-[#378ADD] py-0.5">video editing</a>
+                    <a href="/services/social-media/content-scripting" onClick={() => setOpen(false)} className="text-[11px] text-[#888780] hover:text-[#378ADD] py-0.5">content scripting</a>
                   </div>
                 </div>
               </div>

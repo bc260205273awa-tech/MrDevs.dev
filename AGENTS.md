@@ -27,4 +27,27 @@ If you are asked to modify these components, respect these established rules:
 *When you make a structural change, log it here for the next AI.*
 
 - **Aug 27, 2026 (Previous AI)**: Created `AI_MEMORY.md`. Established seamless wrap-around for particles, automated eye-tracking fallback for mobile, and fixed Process timeline scroll trigger lengths.
-- **Aug 29, 2026 (Current AI)**: Added internal staff-only Cold Calling Readiness Survey at `/internal/cc-readiness-7f3k9pQ2xR` with Typeform UX, crawler disallow in `app/robots.ts`, Supabase integration in `lib/supabaseClient.ts`, and standalone branding layout.
+- **Aug 29, 2026 (Previous AI)**: Added internal staff-only Cold Calling Readiness Survey at `/internal/cc-readiness-7f3k9pQ2xR` with Typeform UX, crawler disallow in `app/robots.ts`, Supabase integration in `lib/supabaseClient.ts`, and standalone branding layout.
+- **Sep 3, 2026 (Current AI)**: Comprehensive site security hardening:
+  - Upgraded `.gitignore` to lock down all `.env*` variants, IDE artifacts, OS cache, and scratch scripts.
+  - Implemented enterprise HTTP security headers in `next.config.mjs` (X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS).
+  - Created server-side rate-limited authentication route `/api/internal/verify-admin` and removed plaintext passcodes from the client UI in `AdminDashboard.tsx`.
+  - Built production `firestore.rules` with strict schema validation, immutability, and default-deny permissions.
+  - Purged hardcoded fallback API credentials from `lib/firebase.ts` and sanitized local filesystem paths in `process_logo.js`.
+- **Sep 3, 2026 (Current AI)**: Device-wide responsiveness and typography overhaul:
+  - **Employee Farm (`ColdCallingSurvey.tsx`)**: Switched to `overflow-y-auto min-h-[100dvh]` so small phone screens and virtual keyboards never cut off form questions or action buttons; refined mobile card padding to `p-4 sm:p-6 md:p-10`; enforced 44px touch targets on rating tiles.
+  - **Admin Command Center (`AdminDashboard.tsx`)**: Enhanced top bar button wrapping on mobile; added direct delete action in mobile feed card view; upgraded detail modal to `max-h-[92dvh]` with mobile-safe padding.
+  - **Main Website**:
+    - `Navbar.tsx`: Upgraded mobile menu drawer to `max-h-[85dvh]` with auto-dismiss on sub-link clicks; adjusted mobile padding.
+    - `Hero.tsx`: Tuned headline font sizing (`text-3xl sm:text-5xl md:text-6xl...`) for narrow displays.
+    - `WhyMrDevs.tsx`: Adjusted card 1 visual spacing (`pt-36 sm:pt-32 lg:pt-0`) preventing overlap on mobile.
+    - `Work.tsx`: Optimized inner browser mockup padding (`p-4 sm:p-8 md:p-12`).
+    - `Process.tsx`: Aligned mobile SVG spine with indicator nodes (`left-[20px] sm:left-[36px]`) and expanded card content space (`pl-[40px] sm:pl-[72px]`).
+    - `FAQ.tsx` & `ServicePageLayout.tsx`: Replaced restrictive accordion max-heights with `max-h-96` to eliminate mobile text clipping.
+    - `Footer.tsx`: Enhanced multi-column responsiveness on narrow viewports (`grid-cols-1 sm:grid-cols-2 md:grid-cols-4`).
+    - Replaced all user-facing em-dashes (`—`) with clean punctuation across site metadata and service pages in compliance with Universal Rule 1.
+- **Sep 3, 2026 (Current AI)**: Unified Firebase Authentication across MrDevs.dev & mr-devs-crm:
+  - Both projects now share the same Firebase project `mr-devs` (`mr-devs.firebaseapp.com`).
+  - **mr-devs-crm**: Installed `firebase` SDK, created `src/lib/firebase.js` & `src/lib/authService.js`, upgraded `Login.jsx` with "Continue with Google" and Email/Password sign-in, switched `App.jsx` to `onAuthStateChanged` with Firestore `crm_profiles`, and wired `TeamPage.jsx` to Firestore.
+  - **MrDevs.dev**: Added `getGoogleAuthProvider()` in `lib/firebase.ts`, upgraded `/internal/admin` in `components/AdminDashboard.tsx` with multi-provider auth (Google popup + Email/Password + Passkey), added admin avatar chip to command header, and updated `firestore.rules` for `crm_profiles`.
+

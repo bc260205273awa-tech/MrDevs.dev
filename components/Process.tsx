@@ -169,18 +169,22 @@ export default function Process() {
       }
     };
 
-    // Run build initially
-    buildTimeline();
-
-    // Call after a small timeout to make sure Next.js finished page layout rendering
-    const timer = setTimeout(buildTimeline, 300);
+    // Run build when idle to prevent initial hydration reflow
+    let idleId: any = null;
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = (window as any).requestIdleCallback(buildTimeline, { timeout: 1500 });
+    } else {
+      buildTimeline();
+    }
 
     // Rebuild paths and layout heights dynamically on window resize
-    window.addEventListener('resize', buildTimeline);
+    window.addEventListener('resize', buildTimeline, { passive: true });
 
     return () => {
       if (tl) tl.kill();
-      clearTimeout(timer);
+      if (idleId && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        (window as any).cancelIdleCallback(idleId);
+      }
       window.removeEventListener('resize', buildTimeline);
     };
 
@@ -188,7 +192,7 @@ export default function Process() {
 
   return (
     <section id="process" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col items-center mb-24 scroll-reveal">
@@ -208,7 +212,7 @@ export default function Process() {
         <div className="relative" ref={timelineRef}>
           
           {/* SVG Connecting Spine Wrapper */}
-          <div className="absolute top-0 bottom-0 left-[24px] sm:left-[36px] md:left-1/2 w-[2px] md:w-[400px] -translate-x-1/2 z-0 pointer-events-none">
+          <div className="absolute top-0 bottom-0 left-[20px] sm:left-[36px] md:left-1/2 w-[2px] md:w-[400px] -translate-x-1/2 z-0 pointer-events-none">
             
             <svg className="w-0 h-0 absolute">
               <defs>
@@ -269,13 +273,13 @@ export default function Process() {
                 >
                   
                   {/* Mobile Node Indicator */}
-                  <div className="md:hidden absolute left-[24px] sm:left-[36px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-20">
+                  <div className="md:hidden absolute left-[20px] sm:left-[36px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-20">
                     <div className="gsap-center-dot w-3.5 h-3.5 rounded-full bg-bg-main border-2 border-accent-cyan opacity-0" />
                   </div>
                   
                   {/* Glass Card Half */}
-                  <div className={`gsap-card-content w-full md:w-1/2 pl-[48px] sm:pl-[72px] md:pl-0 ${isEven ? 'md:pr-16 lg:pr-24' : 'md:pl-16 lg:pl-24'} opacity-0`}>
-                    <div className="tilt-card bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 lg:p-10 hover:bg-white/10 transition-colors duration-500 relative group overflow-hidden">
+                  <div className={`gsap-card-content w-full md:w-1/2 pl-[40px] sm:pl-[72px] md:pl-0 ${isEven ? 'md:pr-16 lg:pr-24' : 'md:pl-16 lg:pl-24'} opacity-0`}>
+                    <div className="tilt-card bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-10 hover:bg-white/10 transition-colors duration-500 relative group overflow-hidden">
                       
                       {/* Massive Typographic Glow Watermark */}
                       <div className={`absolute -top-6 sm:-top-8 ${isEven ? 'md:-right-4 right-3' : 'md:-left-4 right-3'} text-[6rem] sm:text-[8rem] font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-accent-cyan/10 to-transparent select-none pointer-events-none group-hover:from-accent-cyan/20 transition-all duration-700`}>

@@ -30,91 +30,91 @@ export function use3DTilt(
     );
 
     if (isMobile) {
-      // Mobile-only autonomous sequential corner-tilting loop
-      const timelines: gsap.core.Timeline[] = [];
+      // Mobile: autonomous sequential corner-tilting loop ONLY when card is in view
+      const timelines = new Map<HTMLElement, gsap.core.Timeline>();
 
-      cards.forEach((el, index) => {
-        el.style.transformStyle = "preserve-3d";
-        el.style.willChange = "transform";
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const el = entry.target as HTMLElement;
+            if (entry.isIntersecting) {
+              if (!timelines.has(el)) {
+                el.style.transformStyle = "preserve-3d";
+                el.style.willChange = "transform";
 
-        // Create individual timeline with staggered initial delay (1 second gap)
-        const tl = gsap.timeline({
-          repeat: -1,
-          delay: index * 1.0,
-        });
+                const tl = gsap.timeline({ repeat: -1 });
+                const tiltX = maxTilt * 0.7;
+                const tiltY = maxTilt * 0.7;
+                const moveDur = 0.6;
+                const pauseDur = 0.8;
 
-        const tiltX = maxTilt * 0.7; // gentle move
-        const tiltY = maxTilt * 0.7;
-        const moveDur = 0.6; // smooth hover speed physics
-        const pauseDur = 0.8; // pause to show off the corner depth
+                tl.to(el, {
+                  rotationY: -tiltX,
+                  rotationX: tiltY,
+                  scale: scaleHover,
+                  transformPerspective: perspective,
+                  duration: moveDur,
+                  ease: "power2.out"
+                })
+                .to({}, { duration: pauseDur })
+                .to(el, {
+                  rotationY: tiltX,
+                  rotationX: tiltY,
+                  scale: scaleHover,
+                  transformPerspective: perspective,
+                  duration: moveDur,
+                  ease: "power2.out"
+                })
+                .to({}, { duration: pauseDur })
+                .to(el, {
+                  rotationY: tiltX,
+                  rotationX: -tiltY,
+                  scale: scaleHover,
+                  transformPerspective: perspective,
+                  duration: moveDur,
+                  ease: "power2.out"
+                })
+                .to({}, { duration: pauseDur })
+                .to(el, {
+                  rotationY: -tiltX,
+                  rotationX: -tiltY,
+                  scale: scaleHover,
+                  transformPerspective: perspective,
+                  duration: moveDur,
+                  ease: "power2.out"
+                })
+                .to({}, { duration: pauseDur })
+                .to(el, {
+                  rotationY: 0,
+                  rotationX: 0,
+                  scale: 1,
+                  duration: moveDur,
+                  ease: "power2.out"
+                })
+                .to({}, { duration: 3.0 });
 
-        // Rotate corners sequentially: Top-Left -> Top-Right -> Bottom-Right -> Bottom-Left -> Center
-        tl
-          // 1. Top-Left
-          .to(el, {
-            rotationY: -tiltX,
-            rotationX: tiltY,
-            scale: scaleHover,
-            transformPerspective: perspective,
-            duration: moveDur,
-            ease: "power2.out"
-          })
-          .to({}, { duration: pauseDur })
+                timelines.set(el, tl);
+              } else {
+                timelines.get(el)?.play();
+              }
+            } else {
+              timelines.get(el)?.pause();
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
 
-          // 2. Top-Right
-          .to(el, {
-            rotationY: tiltX,
-            rotationX: tiltY,
-            scale: scaleHover,
-            transformPerspective: perspective,
-            duration: moveDur,
-            ease: "power2.out"
-          })
-          .to({}, { duration: pauseDur })
-
-          // 3. Bottom-Right
-          .to(el, {
-            rotationY: tiltX,
-            rotationX: -tiltY,
-            scale: scaleHover,
-            transformPerspective: perspective,
-            duration: moveDur,
-            ease: "power2.out"
-          })
-          .to({}, { duration: pauseDur })
-
-          // 4. Bottom-Left
-          .to(el, {
-            rotationY: -tiltX,
-            rotationX: -tiltY,
-            scale: scaleHover,
-            transformPerspective: perspective,
-            duration: moveDur,
-            ease: "power2.out"
-          })
-          .to({}, { duration: pauseDur })
-
-          // 5. Back to Flat Center
-          .to(el, {
-            rotationY: 0,
-            rotationX: 0,
-            scale: 1,
-            duration: moveDur,
-            ease: "power2.out"
-          })
-          // 3 seconds pause before repeating
-          .to({}, { duration: 3.0 });
-
-        timelines.push(tl);
-      });
+      cards.forEach((el) => observer.observe(el));
 
       return () => {
+        observer.disconnect();
         timelines.forEach((tl) => tl.kill());
+        timelines.clear();
       };
     }
 
     // --- Desktop Hover Sizing & Logic ---
-    // Entrance 3D flip-in animation for desktop
     gsap.fromTo(
       Array.from(cards),
       {
@@ -142,33 +142,43 @@ export function use3DTilt(
       el.style.willChange = "transform";
 
       let initialTransition = "";
+      let cachedRect: DOMRect | null = null;
+      let rafId: number | null = null;
 
       const onEnter = () => {
         initialTransition = el.style.transition;
         el.style.transition = "none";
+        cachedRect = el.getBoundingClientRect();
       };
 
       const onMove = (e: MouseEvent) => {
-        const rect = el.getBoundingClientRect();
-        if (!rect.width || !rect.height) return;
+        if (!cachedRect) {
+          cachedRect = el.getBoundingClientRect();
+        }
+        if (!cachedRect.width || !cachedRect.height) return;
 
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width / 2);
-        const dy = (e.clientY - cy) / (rect.height / 2);
+        const cx = cachedRect.left + cachedRect.width / 2;
+        const cy = cachedRect.top + cachedRect.height / 2;
+        const dx = (e.clientX - cx) / (cachedRect.width / 2);
+        const dy = (e.clientY - cy) / (cachedRect.height / 2);
 
-        gsap.to(el, {
-          rotationY: dx * maxTilt,
-          rotationX: -dy * maxTilt,
-          scale: scaleHover,
-          transformPerspective: perspective,
-          ease: "power2.out",
-          duration: 0.22,
-          overwrite: "auto",
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          gsap.to(el, {
+            rotationY: dx * maxTilt,
+            rotationX: -dy * maxTilt,
+            scale: scaleHover,
+            transformPerspective: perspective,
+            ease: "power2.out",
+            duration: 0.22,
+            overwrite: "auto",
+          });
         });
       };
 
       const onLeave = () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        cachedRect = null;
         el.style.transition = initialTransition;
         gsap.to(el, {
           rotationY: 0,
@@ -185,6 +195,7 @@ export function use3DTilt(
       el.addEventListener("mouseleave", onLeave);
 
       cleanupList.push(() => {
+        if (rafId) cancelAnimationFrame(rafId);
         el.removeEventListener("mouseenter", onEnter);
         el.removeEventListener("mousemove", onMove);
         el.removeEventListener("mouseleave", onLeave);

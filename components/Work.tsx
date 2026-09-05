@@ -12,7 +12,7 @@ export default function Work() {
 
   return (
     <section id="work" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 flex flex-col items-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col items-center">
         
         {/* Section Header */}
         <div className="flex flex-col items-center mb-16 scroll-reveal">
@@ -53,7 +53,7 @@ export default function Work() {
           </div>
 
           {/* Browser Content Area (Dashboard Split) */}
-          <div className="p-5 sm:p-8 md:p-12 lg:p-16 flex flex-col xl:flex-row gap-8 lg:gap-16">
+          <div className="p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col xl:flex-row gap-8 lg:gap-16">
             
             {/* Left Column: The Narrative */}
             <div className="flex-1 flex flex-col gap-8">

@@ -70,3 +70,7 @@ If you are asked to modify these components, respect these established rules:
   - Re-compressed all 90 desktop animation frames in `public/frames/logo-reveal/` with quality 72, saving an additional 406 KB.
   - Implemented asynchronous `img.decode()` on off-thread worker pool, completely eliminating canvas paint freezes on scroll.
   - Added 2.5s idle background prefetching so frames preload invisibly before the user even begins scrolling to the section.
+- **Sep 5, 2026 (Current AI)**: GSAP ScrollTrigger Layout Restoration & Collision Fix:
+  - Removed `InViewSection` wrappers from `app/page.tsx` and deleted `components/InViewSection.tsx`. Wrapping dynamic and pinned GSAP sections in lazy conditional rendering collapsed section heights to 300px, which displaced ScrollTrigger pin calculations and caused `Process` to overlap directly over `LogoReveal`.
+  - Restored clean static DOM flow so all sections have their true physical heights and GSAP ScrollTrigger calculates pin offsets accurately.
+  - Decoupled `useGSAP` in `LogoReveal.tsx` from `isReady` state using `renderFrameRef`, preventing pin timeline recreation during initial frame decoding.

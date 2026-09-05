@@ -20,6 +20,7 @@ export default function LogoReveal() {
   const hasStartedLoading = useRef(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const renderFrameRef = useRef<((idx: number) => void) | null>(null);
 
   // Check prefers-reduced-motion on mount
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function LogoReveal() {
       } catch (_) {}
       imagesRef.current[0] = posterImg;
       setIsReady(true);
+      renderFrameRef.current?.(1);
     };
 
     const startLoading = () => {
@@ -212,12 +214,17 @@ export default function LogoReveal() {
       renderFrame(frameState.frame);
     };
 
+    renderFrameRef.current = renderFrame;
+
     window.addEventListener("resize", resizeCanvas, { passive: true });
     resizeCanvas();
 
     if (isReducedMotion) {
       renderFrame(45);
-      return () => window.removeEventListener("resize", resizeCanvas);
+      return () => {
+        window.removeEventListener("resize", resizeCanvas);
+        renderFrameRef.current = null;
+      };
     }
 
     const tl = gsap.timeline({
@@ -236,8 +243,11 @@ export default function LogoReveal() {
       onUpdate: () => renderFrame(frameState.frame)
     });
 
-    return () => window.removeEventListener("resize", resizeCanvas);
-  }, { scope: sectionRef, dependencies: [isReducedMotion, isReady] });
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      renderFrameRef.current = null;
+    };
+  }, { scope: sectionRef, dependencies: [isReducedMotion] });
 
   return (
     <section ref={sectionRef} className="relative bg-[#0a0f1a]">

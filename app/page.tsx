@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import InViewSection from "@/components/InViewSection";
 
 const WhyMrDevs = dynamic(() => import("@/components/WhyMrDevs"));
 const Work = dynamic(() => import("@/components/Work"));
@@ -69,37 +68,17 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <InViewSection rootMargin="600px">
-          <WhyMrDevs />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <Work />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <LogoReveal />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <CondensedCTA />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <Services />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <Process />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <Founder />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <Contact />
-        </InViewSection>
-        <InViewSection rootMargin="600px">
-          <FAQ />
-        </InViewSection>
+        <WhyMrDevs />
+        <Work />
+        <LogoReveal />
+        <CondensedCTA />
+        <Services />
+        <Process />
+        <Founder />
+        <Contact />
+        <FAQ />
       </main>
-      <InViewSection rootMargin="600px" minHeight="200px">
-        <Footer />
-      </InViewSection>
+      <Footer />
     </>
   );
 }

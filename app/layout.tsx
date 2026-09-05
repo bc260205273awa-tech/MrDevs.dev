@@ -97,6 +97,15 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/hero-glasses-frame.webp"
+          type="image/webp"
+          fetchPriority="high"
+        />
+      </head>
       <body className="bg-[#0a0f1a] text-[#f1efe8] antialiased font-sans overflow-x-hidden">
         <script
           type="application/ld+json"

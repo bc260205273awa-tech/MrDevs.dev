@@ -115,26 +115,6 @@ export function use3DTilt(
     }
 
     // --- Desktop Hover Sizing & Logic ---
-    gsap.fromTo(
-      Array.from(cards),
-      {
-        opacity: 0,
-        rotationX: 25,
-        y: 24,
-        transformOrigin: "center center",
-        transformPerspective: perspective,
-      },
-      {
-        opacity: 1,
-        rotationX: 0,
-        y: 0,
-        duration: 0.65,
-        stagger: 0.08,
-        ease: "power3.out",
-        clearProps: "opacity,y,transformOrigin",
-      }
-    );
-
     const cleanupList: (() => void)[] = [];
 
     cards.forEach((el) => {

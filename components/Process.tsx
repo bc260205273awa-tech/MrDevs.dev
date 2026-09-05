@@ -77,23 +77,31 @@ export default function Process() {
       const timelineHeight = timelineRef.current?.offsetHeight || 0;
       if (timelineHeight <= 0) return;
 
+      const cards = gsap.utils.toArray('.gsap-step-card') as HTMLDivElement[];
+      if (!cards.length) return;
+
+      // 2. Batch all DOM measurements upfront to eliminate layout thrashing & forced reflows
+      const cardData = cards.map(card => ({
+        dotY: card.offsetTop + card.offsetHeight / 2,
+        dots: card.querySelectorAll('.gsap-center-dot'),
+        content: card.querySelector('.gsap-card-content'),
+      }));
+
       // Set pixel-perfect viewBoxes based on actual layout heights
       desktopSvg.setAttribute('viewBox', `0 0 400 ${timelineHeight}`);
       mobileSvg.setAttribute('viewBox', `0 0 2 ${timelineHeight}`);
-
-      const cards = gsap.utils.toArray('.gsap-step-card') as HTMLDivElement[];
       
-      // 2. Generate the exact pixel path tracing perfectly through every dot
+      // 3. Generate the exact pixel path tracing perfectly through every dot
       let dDesktop = `M 200 0`;
       let lastY = 0;
       
-      if (cards.length > 0) {
-        const dot0Y = cards[0].offsetTop + cards[0].offsetHeight / 2;
+      if (cardData.length > 0) {
+        const dot0Y = cardData[0].dotY;
         dDesktop += ` C 200 ${dot0Y * 0.2}, 100 ${dot0Y * 0.7}, 200 ${dot0Y}`;
         lastY = dot0Y;
         
-        for (let i = 1; i < cards.length; i++) {
-          const dotY = cards[i].offsetTop + cards[i].offsetHeight / 2;
+        for (let i = 1; i < cardData.length; i++) {
+          const dotY = cardData[i].dotY;
           const isEven = (i % 2 === 0);
           const controlX = isEven ? 100 : 300;
           
@@ -110,7 +118,7 @@ export default function Process() {
       mobilePath.setAttribute('d', dMobile);
       mobilePathBg.setAttribute('d', dMobile);
 
-      // 3. Create the ScrollTrigger timeline
+      // 4. Create the ScrollTrigger timeline
       tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -131,27 +139,32 @@ export default function Process() {
         }
       });
 
-      // 4. Synchronize dots & cards to the progress line Y coordinates
-      const activePath = getComputedStyle(desktopPath).display !== 'none' ? desktopPath : mobilePath;
+      // 5. Synchronize dots & cards to the progress line Y coordinates with zero-jank math
+      const isMobileDevice = typeof window !== "undefined" && window.innerWidth < 768;
+      const activePath = isMobileDevice ? mobilePath : desktopPath;
       const pathLength = activePath.getTotalLength();
       if (pathLength > 0) {
-        const resolution = Math.max(1, pathLength / 500);
-
-        cards.forEach((card) => {
-          const cardY = card.offsetTop + (card.offsetHeight / 2);
-          
-          let targetLength = pathLength; 
-          for (let l = 0; l <= pathLength; l += resolution) {
-            if (activePath.getPointAtLength(l).y >= cardY) {
-              targetLength = l;
-              break;
+        cardData.forEach(({ dotY, dots, content }) => {
+          let targetLength = pathLength;
+          if (isMobileDevice) {
+            // Mobile path is a straight vertical line from Y=0 to Y=timelineHeight
+            targetLength = Math.max(0, Math.min(pathLength, dotY));
+          } else {
+            // Desktop binary search: 12 iterations achieves sub-pixel precision in microseconds
+            let low = 0;
+            let high = pathLength;
+            for (let iter = 0; iter < 12; iter++) {
+              const mid = (low + high) * 0.5;
+              if (activePath.getPointAtLength(mid).y >= dotY) {
+                targetLength = mid;
+                high = mid;
+              } else {
+                low = mid;
+              }
             }
           }
           
           const progress = targetLength / pathLength;
-          const dots = card.querySelectorAll('.gsap-center-dot');
-          const content = card.querySelector('.gsap-card-content');
-          
           tl!.fromTo(dots, 
             { scale: 0.3, opacity: 0, boxShadow: 'none' },
             { scale: 1.2, opacity: 1, boxShadow: '0 0 20px var(--accent-cyan)', duration: 0.1, ease: "back.out(2)" },
@@ -169,25 +182,39 @@ export default function Process() {
       }
     };
 
-    // Run build when idle to prevent initial hydration reflow
-    let idleId: any = null;
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      idleId = (window as any).requestIdleCallback(buildTimeline, { timeout: 1500 });
-    } else {
+    // Build timeline when scrolling near section to keep initial page load main thread 100% free
+    let hasBuilt = false;
+    const triggerBuild = () => {
+      if (hasBuilt) return;
+      hasBuilt = true;
       buildTimeline();
+    };
+
+    const approachObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          triggerBuild();
+          approachObserver.disconnect();
+        }
+      },
+      { rootMargin: "800px" }
+    );
+
+    if (containerRef.current) {
+      approachObserver.observe(containerRef.current);
     }
 
     // Rebuild paths and layout heights dynamically on window resize
-    window.addEventListener('resize', buildTimeline, { passive: true });
+    const handleResize = () => {
+      if (hasBuilt) buildTimeline();
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
 
     return () => {
       if (tl) tl.kill();
-      if (idleId && typeof window !== "undefined" && "cancelIdleCallback" in window) {
-        (window as any).cancelIdleCallback(idleId);
-      }
-      window.removeEventListener('resize', buildTimeline);
+      approachObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
     };
-
   }, { scope: containerRef });
 
   return (

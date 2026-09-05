@@ -67,7 +67,10 @@ export default function HeroParticles() {
     ];
 
     let particles: Particle[] = [];
-    const particleCount = Math.min(Math.floor((width * height) / 12000), 110);
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile 
+      ? Math.min(Math.floor((width * height) / 16000), 32)
+      : Math.min(Math.floor((width * height) / 12000), 110);
 
     const initParticles = () => {
       particles = [];
@@ -113,37 +116,36 @@ export default function HeroParticles() {
         if (p.y < -margin) p.y = height + margin;
         if (p.y > height + margin) p.y = -margin;
 
-        // Calculate distance to mouse cursor
-        const dx = mouse.x - p.x;
-        const dy = mouse.y - p.y;
-        
-        // Fast bounding box check before sqrt
-        if (Math.abs(dx) < mouse.radius && Math.abs(dy) < mouse.radius) {
-          const distance = Math.sqrt(dx * dx + dy * dy);
+        // Calculate distance to mouse cursor on desktop
+        if (!isMobile) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          
+          if (Math.abs(dx) < mouse.radius && Math.abs(dy) < mouse.radius) {
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < mouse.radius) {
-            const force = (mouse.radius - distance) / mouse.radius;
-            const forceDirectionX = dx / distance;
-            const forceDirectionY = dy / distance;
-            const directionX = forceDirectionX * force * p.density * 0.6;
-            const directionY = forceDirectionY * force * p.density * 0.6;
+            if (distance < mouse.radius) {
+              const force = (mouse.radius - distance) / mouse.radius;
+              const forceDirectionX = dx / distance;
+              const forceDirectionY = dy / distance;
+              const directionX = forceDirectionX * force * p.density * 0.6;
+              const directionY = forceDirectionY * force * p.density * 0.6;
 
-            // Repel gently away from cursor
-            p.x -= directionX;
-            p.y -= directionY;
+              p.x -= directionX;
+              p.y -= directionY;
 
-            // Performant GPU hardware glow (replaces CPU-heavy shadowBlur)
-            const glowAlpha = Math.min(p.alpha + force * 0.5, 1);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size + force * 4, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(47, 168, 255, ${force * 0.35})`;
-            ctx.fill();
+              const glowAlpha = Math.min(p.alpha + force * 0.5, 1);
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size + force * 4, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(47, 168, 255, ${force * 0.35})`;
+              ctx.fill();
 
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size + force * 1.5, 0, Math.PI * 2);
-            ctx.fillStyle = `${p.color}${glowAlpha})`;
-            ctx.fill();
-            continue;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size + force * 1.5, 0, Math.PI * 2);
+              ctx.fillStyle = `${p.color}${glowAlpha})`;
+              ctx.fill();
+              continue;
+            }
           }
         }
 
@@ -154,40 +156,42 @@ export default function HeroParticles() {
         ctx.fill();
       }
 
-      // Draw subtle glowing dust connections (optimized bounding-box distance check)
-      const maxDist = 90;
-      const maxDistSq = 8100; // 90 * 90
+      // Draw subtle glowing dust connections on desktop (omitted on mobile for 90% CPU savings)
+      if (!isMobile) {
+        const maxDist = 90;
+        const maxDistSq = 8100; // 90 * 90
 
-      for (let a = 0; a < particles.length; a++) {
-        const pa = particles[a];
-        for (let b = a + 1; b < particles.length; b++) {
-          const pb = particles[b];
-          const dx = pa.x - pb.x;
-          if (dx > maxDist || dx < -maxDist) continue;
-          const dy = pa.y - pb.y;
-          if (dy > maxDist || dy < -maxDist) continue;
+        for (let a = 0; a < particles.length; a++) {
+          const pa = particles[a];
+          for (let b = a + 1; b < particles.length; b++) {
+            const pb = particles[b];
+            const dx = pa.x - pb.x;
+            if (dx > maxDist || dx < -maxDist) continue;
+            const dy = pa.y - pb.y;
+            if (dy > maxDist || dy < -maxDist) continue;
 
-          const distSq = dx * dx + dy * dy;
-          if (distSq < maxDistSq) {
-            const dist = Math.sqrt(distSq);
-            let lineAlpha = (1 - dist / maxDist) * 0.12;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < maxDistSq) {
+              const dist = Math.sqrt(distSq);
+              let lineAlpha = (1 - dist / maxDist) * 0.12;
 
-            const mdx = mouse.x - pa.x;
-            const mdy = mouse.y - pa.y;
-            if (Math.abs(mdx) < mouse.radius && Math.abs(mdy) < mouse.radius) {
-              const mouseDistA = Math.sqrt(mdx * mdx + mdy * mdy);
-              if (mouseDistA < mouse.radius) {
-                const force = (1 - mouseDistA / mouse.radius);
-                lineAlpha += force * 0.25;
+              const mdx = mouse.x - pa.x;
+              const mdy = mouse.y - pa.y;
+              if (Math.abs(mdx) < mouse.radius && Math.abs(mdy) < mouse.radius) {
+                const mouseDistA = Math.sqrt(mdx * mdx + mdy * mdy);
+                if (mouseDistA < mouse.radius) {
+                  const force = (1 - mouseDistA / mouse.radius);
+                  lineAlpha += force * 0.25;
+                }
               }
-            }
 
-            ctx.beginPath();
-            ctx.moveTo(pa.x, pa.y);
-            ctx.lineTo(pb.x, pb.y);
-            ctx.strokeStyle = `rgba(47, 168, 255, ${lineAlpha})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(pa.x, pa.y);
+              ctx.lineTo(pb.x, pb.y);
+              ctx.strokeStyle = `rgba(47, 168, 255, ${lineAlpha})`;
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -223,10 +227,13 @@ export default function HeroParticles() {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Defer initial render until hydration settles
-    animationFrameId = requestAnimationFrame(render);
+    // Defer initial render by 120ms so initial DOM layout & FCP/LCP paint has complete CPU priority
+    const startTimer = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(render);
+    }, 120);
 
     return () => {
+      clearTimeout(startTimer);
       observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);

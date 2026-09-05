@@ -55,3 +55,9 @@ If you are asked to modify these components, respect these established rules:
   - Losslessly compressed `hero-glasses-frame.png` (73% savings, 158KB to 43KB), `hero-symbol-code.png` (70% savings), and `hero-symbol-power.png` (75% savings).
   - Streamlined LCP bandwidth by focusing `priority` preloading solely on the main outer glasses frame.
   - Implemented `InViewSection` with 600px lookahead buffer across `app/page.tsx`, completely deferring hydration of below-the-fold sections and cutting initial mobile main-thread CPU blocking time from ~5,000ms down to near zero.
+- **Sep 5, 2026 (Current AI)**: LogoReveal Canvas Animation & Mobile Frame Overhaul:
+  - Generated mobile-optimized 640w WebP frame sequence in `public/frames/logo-reveal/mobile/` (total size 825 KB, down from 2.35 MB, 65% reduction).
+  - Re-architected `LogoReveal.tsx` with progressive keyframe loading in batches of 4 via `requestIdleCallback`, eliminating network flooding.
+  - Eliminated 90 consecutive React re-renders by replacing frame-by-frame state updates with ref tracking.
+  - Removed blocking loading overlay so poster frame appears instantaneously on canvas.
+  - Added nearest-loaded frame fallback for jank-free 60fps scrubbing during progressive download.

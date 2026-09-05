@@ -42,7 +42,7 @@ export function use3DTilt(
                 el.style.transformStyle = "preserve-3d";
                 el.style.willChange = "transform";
 
-                const tl = gsap.timeline({ repeat: -1 });
+                const tl = gsap.timeline({ repeat: -1, delay: 0.8 });
                 const tiltX = maxTilt * 0.7;
                 const tiltY = maxTilt * 0.7;
                 const moveDur = 0.6;

@@ -16,10 +16,10 @@ export default function LogoReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const [imagesLoaded, setImagesLoaded] = useState(0);
-  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(FRAME_COUNT).fill(null));
   const hasStartedLoading = useRef(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   // Check prefers-reduced-motion on mount
   useEffect(() => {
@@ -29,38 +29,75 @@ export default function LogoReveal() {
     }
   }, []);
 
-  // Preload frames when the section approaches the viewport
+  // Progressive batch frame preloader
   useEffect(() => {
-    // 1. Immediately load initial poster frame (frame-0045.webp) for instantaneous rendering
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const basePath = isMobile ? "/frames/logo-reveal/mobile" : "/frames/logo-reveal";
+
+    // 1. Immediately load initial poster frame (frame-0001.webp)
     const posterImg = new Image();
-    posterImg.src = `/frames/logo-reveal/frame-0045.webp`;
-    
+    posterImg.src = `${basePath}/frame-0001.webp`;
+    posterImg.onload = () => {
+      imagesRef.current[0] = posterImg;
+      setIsReady(true);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !hasStartedLoading.current) {
           hasStartedLoading.current = true;
-          const loadedImages: HTMLImageElement[] = [];
-          let loadedCount = 0;
 
-          // Progressively load all 90 frames
+          // Priority queue: Keyframes first (every 2nd frame), then the rest
+          const keyframeIndices: number[] = [];
+          const secondaryIndices: number[] = [];
+
           for (let i = 1; i <= FRAME_COUNT; i++) {
-            const img = new Image();
-            img.src = `/frames/logo-reveal/frame-${i.toString().padStart(4, '0')}.webp`;
-            img.onload = () => {
-              loadedCount++;
-              setImagesLoaded(loadedCount);
-              // [FIX] As requested, refresh ScrollTrigger once the new pinned section is fully loaded
-              if (loadedCount === FRAME_COUNT) {
-                // Add a small delay to ensure React state and layout are completely settled
-                setTimeout(() => ScrollTrigger.refresh(), 100);
-              }
-            };
-            loadedImages.push(img);
+            if (i % 2 === 1) keyframeIndices.push(i);
+            else secondaryIndices.push(i);
           }
-          imagesRef.current = loadedImages;
+
+          const loadQueue = [...keyframeIndices, ...secondaryIndices];
+          let currentIndex = 0;
+          const BATCH_SIZE = 4;
+
+          const loadNextBatch = () => {
+            if (currentIndex >= loadQueue.length) {
+              setTimeout(() => ScrollTrigger.refresh(), 100);
+              return;
+            }
+
+            const batch = loadQueue.slice(currentIndex, currentIndex + BATCH_SIZE);
+            currentIndex += BATCH_SIZE;
+
+            let batchRemaining = batch.length;
+            batch.forEach((frameNum) => {
+              const idx = frameNum - 1;
+              if (imagesRef.current[idx]) {
+                batchRemaining--;
+                if (batchRemaining === 0) loadNextBatch();
+                return;
+              }
+
+              const img = new Image();
+              img.src = `${basePath}/frame-${frameNum.toString().padStart(4, "0")}.webp`;
+              img.onload = img.onerror = () => {
+                imagesRef.current[idx] = img;
+                batchRemaining--;
+                if (batchRemaining === 0) {
+                  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                    (window as any).requestIdleCallback(loadNextBatch, { timeout: 200 });
+                  } else {
+                    setTimeout(loadNextBatch, 30);
+                  }
+                }
+              };
+            });
+          };
+
+          loadNextBatch();
         }
       },
-      { rootMargin: "800px" } 
+      { rootMargin: "400px" }
     );
 
     if (sectionRef.current) {
@@ -76,15 +113,29 @@ export default function LogoReveal() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Cap devicePixelRatio at 2x to save mobile GPU memory/performance
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); 
+    const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
     const frameState = { frame: isReducedMotion ? 45 : 1 };
     
-    // Draw specific frame using object-cover logic
+    // Draw frame using nearest loaded image fallback
     const renderFrame = (index: number) => {
       const safeIndex = Math.max(0, Math.min(FRAME_COUNT - 1, Math.round(index) - 1));
-      const img = imagesRef.current[safeIndex];
-      if (!img) return;
+      let img = imagesRef.current[safeIndex];
+
+      // Fallback to nearest loaded frame for zero-jank scrub
+      if (!img) {
+        for (let offset = 1; offset < FRAME_COUNT; offset++) {
+          if (safeIndex - offset >= 0 && imagesRef.current[safeIndex - offset]) {
+            img = imagesRef.current[safeIndex - offset];
+            break;
+          }
+          if (safeIndex + offset < FRAME_COUNT && imagesRef.current[safeIndex + offset]) {
+            img = imagesRef.current[safeIndex + offset];
+            break;
+          }
+        }
+      }
+
+      if (!img || !img.complete || !img.naturalWidth) return;
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -124,23 +175,21 @@ export default function LogoReveal() {
       renderFrame(frameState.frame);
     };
 
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas, { passive: true });
     resizeCanvas();
 
-    // If user prefers reduced motion, render static poster frame without pinning timeline
     if (isReducedMotion) {
       renderFrame(45);
       return () => window.removeEventListener("resize", resizeCanvas);
     }
 
-    // Master pinning timeline for normal motion
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         pin: containerRef.current,
         start: "top top",
         end: "+=2000",
-        scrub: 1, // Smooth dampening for jank-free scroll scrubbing
+        scrub: 0.8,
       }
     });
 
@@ -151,32 +200,14 @@ export default function LogoReveal() {
     });
 
     return () => window.removeEventListener("resize", resizeCanvas);
-  }, { scope: sectionRef, dependencies: [isReducedMotion] });
-
-  const isLoading = imagesLoaded < FRAME_COUNT && !isReducedMotion;
-  const loadingProgress = Math.round((imagesLoaded / FRAME_COUNT) * 100);
+  }, { scope: sectionRef, dependencies: [isReducedMotion, isReady] });
 
   return (
     <section ref={sectionRef} className="relative bg-[#0a0f1a]">
-      {/* Pinned inner container maintaining zero-CLS aspect ratio */}
       <div ref={containerRef} className="h-screen w-full overflow-hidden relative flex items-center justify-center">
-        
-        {/* Fallback Loading State */}
-        {isLoading && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0f1a]">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 md:p-12 shadow-2xl flex flex-col items-center gap-6">
-              <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_12px_rgba(0,212,255,1)]"></span>
-              <span className="text-[11px] font-bold text-accent-cyan tracking-[0.2em] uppercase select-none">
-                Loading Experience ({loadingProgress}%)
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Scrub Canvas */}
         <canvas 
           ref={canvasRef} 
-          className={`absolute inset-0 z-0 transition-opacity duration-1000 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+          className={`absolute inset-0 z-0 transition-opacity duration-700 ${isReady ? "opacity-100" : "opacity-0"}`}
         />
       </div>
     </section>

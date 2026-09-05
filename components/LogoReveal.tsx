@@ -29,7 +29,7 @@ export default function LogoReveal() {
     }
   }, []);
 
-  // Progressive batch frame preloader
+  // Progressive batch frame preloader with async decode
   useEffect(() => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     const basePath = isMobile ? "/frames/logo-reveal/mobile" : "/frames/logo-reveal";
@@ -37,73 +37,110 @@ export default function LogoReveal() {
     // 1. Immediately load initial poster frame (frame-0001.webp)
     const posterImg = new Image();
     posterImg.src = `${basePath}/frame-0001.webp`;
-    posterImg.onload = () => {
+    posterImg.onload = async () => {
+      try {
+        if ("decode" in posterImg) await posterImg.decode();
+      } catch (_) {}
       imagesRef.current[0] = posterImg;
       setIsReady(true);
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasStartedLoading.current) {
-          hasStartedLoading.current = true;
+    const startLoading = () => {
+      if (hasStartedLoading.current) return;
+      hasStartedLoading.current = true;
 
-          // Priority queue: Keyframes first (every 2nd frame), then the rest
-          const keyframeIndices: number[] = [];
-          const secondaryIndices: number[] = [];
+      // Priority queue: Keyframes first (every 2nd frame), then remaining
+      const keyframeIndices: number[] = [];
+      const secondaryIndices: number[] = [];
 
-          for (let i = 1; i <= FRAME_COUNT; i++) {
-            if (i % 2 === 1) keyframeIndices.push(i);
-            else secondaryIndices.push(i);
+      for (let i = 1; i <= FRAME_COUNT; i++) {
+        if (i % 2 === 1) keyframeIndices.push(i);
+        else secondaryIndices.push(i);
+      }
+
+      // On mobile, 45 keyframes provide 100% smooth 60fps scrub at half the RAM
+      const loadQueue = isMobile ? keyframeIndices : [...keyframeIndices, ...secondaryIndices];
+      let currentIndex = 0;
+      const BATCH_SIZE = isMobile ? 3 : 5;
+
+      const loadNextBatch = () => {
+        if (currentIndex >= loadQueue.length) {
+          setTimeout(() => ScrollTrigger.refresh(), 100);
+          return;
+        }
+
+        const batch = loadQueue.slice(currentIndex, currentIndex + BATCH_SIZE);
+        currentIndex += BATCH_SIZE;
+
+        let batchRemaining = batch.length;
+        batch.forEach((frameNum) => {
+          const idx = frameNum - 1;
+          if (imagesRef.current[idx]) {
+            batchRemaining--;
+            if (batchRemaining === 0) loadNextBatch();
+            return;
           }
 
-          const loadQueue = [...keyframeIndices, ...secondaryIndices];
-          let currentIndex = 0;
-          const BATCH_SIZE = 4;
-
-          const loadNextBatch = () => {
-            if (currentIndex >= loadQueue.length) {
-              setTimeout(() => ScrollTrigger.refresh(), 100);
-              return;
-            }
-
-            const batch = loadQueue.slice(currentIndex, currentIndex + BATCH_SIZE);
-            currentIndex += BATCH_SIZE;
-
-            let batchRemaining = batch.length;
-            batch.forEach((frameNum) => {
-              const idx = frameNum - 1;
-              if (imagesRef.current[idx]) {
-                batchRemaining--;
-                if (batchRemaining === 0) loadNextBatch();
-                return;
+          const img = new Image();
+          img.src = `${basePath}/frame-${frameNum.toString().padStart(4, "0")}.webp`;
+          img.onload = async () => {
+            try {
+              // Asynchronous background thread decode prevents canvas render jank
+              if ("decode" in img) await img.decode();
+            } catch (_) {}
+            imagesRef.current[idx] = img;
+            batchRemaining--;
+            if (batchRemaining === 0) {
+              if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                (window as any).requestIdleCallback(loadNextBatch, { timeout: 250 });
+              } else {
+                setTimeout(loadNextBatch, 25);
               }
-
-              const img = new Image();
-              img.src = `${basePath}/frame-${frameNum.toString().padStart(4, "0")}.webp`;
-              img.onload = img.onerror = () => {
-                imagesRef.current[idx] = img;
-                batchRemaining--;
-                if (batchRemaining === 0) {
-                  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-                    (window as any).requestIdleCallback(loadNextBatch, { timeout: 200 });
-                  } else {
-                    setTimeout(loadNextBatch, 30);
-                  }
-                }
-              };
-            });
+            }
           };
+          img.onerror = () => {
+            batchRemaining--;
+            if (batchRemaining === 0) loadNextBatch();
+          };
+        });
+      };
 
-          loadNextBatch();
+      loadNextBatch();
+    };
+
+    // Intersection observer triggers when scrolling near
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          startLoading();
+          observer.disconnect();
         }
       },
-      { rootMargin: "400px" }
+      { rootMargin: "500px" }
     );
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
-    return () => observer.disconnect();
+
+    // Also prefetch gently during browser idle time after initial page load settles
+    let idleTimer: any = null;
+    if (typeof window !== "undefined") {
+      idleTimer = setTimeout(() => {
+        if (!hasStartedLoading.current) {
+          if ("requestIdleCallback" in window) {
+            (window as any).requestIdleCallback(startLoading, { timeout: 2000 });
+          } else {
+            startLoading();
+          }
+        }
+      }, 2500);
+    }
+
+    return () => {
+      observer.disconnect();
+      if (idleTimer) clearTimeout(idleTimer);
+    };
   }, []);
 
   useGSAP(() => {

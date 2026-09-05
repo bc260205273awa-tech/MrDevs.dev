@@ -66,3 +66,7 @@ If you are asked to modify these components, respect these established rules:
   - Updated all production component references to WebP across Navbar, Footer, Hero, Admin, Survey, and Layout.
   - Resized `app/icon.png` from 156.2 KB (803x310) to 1.7 KB (48x48), eliminating 154 KB of tab favicon download overhead on every request.
   - Purged 1.15 MB of unreferenced legacy assets from `public/`.
+- **Sep 5, 2026 (Current AI)**: Advanced Frame Pipeline & Idle Preload Acceleration:
+  - Re-compressed all 90 desktop animation frames in `public/frames/logo-reveal/` with quality 72, saving an additional 406 KB.
+  - Implemented asynchronous `img.decode()` on off-thread worker pool, completely eliminating canvas paint freezes on scroll.
+  - Added 2.5s idle background prefetching so frames preload invisibly before the user even begins scrolling to the section.

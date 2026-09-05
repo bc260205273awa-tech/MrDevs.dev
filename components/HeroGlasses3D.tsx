@@ -200,7 +200,6 @@ export default function HeroGlasses3D() {
             src="/hero-symbol-code.png"
             alt="Left Eye Pupil"
             fill
-            priority
             sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
             className="object-contain"
           />
@@ -215,7 +214,6 @@ export default function HeroGlasses3D() {
             src="/hero-symbol-power.png"
             alt="Right Eye Pupil"
             fill
-            priority
             sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 490px"
             className="object-contain"
           />

@@ -85,3 +85,10 @@ If you are asked to modify these components, respect these established rules:
   - Built `components/FounderVideoCard.tsx` featuring battery-saving IntersectionObserver auto-play muted preview with custom glass bezel, pulsing message indicator, and sound badge.
   - Designed full-screen cinema lightbox modal rendered in React Portal with unmuted high-definition audio, interactive seek scrubber, playback toggles, keyboard controls (Escape, Space, M), and direct project booking link.
   - Upgraded `WhyMrDevs.tsx` Card 1 (Direct Founder Access) with responsive two-column layout housing value props and the interactive founder video player.
+- **Sep 6, 2026 (Current AI)**: Fixed Founder Video Lag & Stutter Bottlenecks:
+  - Re-encoded `public/videos/founder-intro.mp4` with a tight 1-second GOP (`-g 30`, 64 keyframes across 64 seconds) and constant 30fps CFR, eliminating WhatsApp long-GOP decoder drift and seek stalls.
+  - Created dedicated lightweight `public/videos/founder-intro-preview.mp4` (5.0 MB, audio stripped with `-an`, 638 kbps) for the in-card loop, halving network download time and decoding workload.
+  - Removed `tilt-card` from Card 1 in `WhyMrDevs.tsx` to stop GSAP 3D matrix rotations (`rotateX`, `rotateY`) from forcing continuous GPU compositor re-rasterization while playing video.
+  - Removed 4 heavy `backdrop-blur` layers over the playing video in `FounderVideoCard.tsx` and removed live hover scaling on the video tag, eliminating frame-buffer GPU readbacks and fractional bilinear sampling.
+  - Added dedicated hardware compositor layers (`transform: translateZ(0)` and `willChange: transform`) to both preview and modal video players.
+

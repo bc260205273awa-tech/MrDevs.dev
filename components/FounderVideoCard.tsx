@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -7,6 +7,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize2, X, MessageSquare } from "luci
 interface FounderVideoCardProps {
   className?: string;
   videoSrc?: string;
+  previewVideoSrc?: string;
   posterSrc?: string;
   founderName?: string;
   founderRole?: string;
@@ -15,6 +16,7 @@ interface FounderVideoCardProps {
 export default function FounderVideoCard({
   className = "",
   videoSrc = "/videos/founder-intro.mp4",
+  previewVideoSrc = "/videos/founder-intro-preview.mp4",
   posterSrc = "/videos/founder-video-poster.webp",
   founderName = "Mubeen Ahmad",
   founderRole = "Founder & Lead Developer",
@@ -156,63 +158,64 @@ export default function FounderVideoCard({
       <div
         ref={cardContainerRef}
         onClick={() => setIsModalOpen(true)}
-        className={`group/videocard relative cursor-pointer select-none rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-accent-cyan/50 hover:shadow-[0_0_40px_rgba(0,212,255,0.25)] hover:scale-[1.015] active:scale-[0.99] ${className}`}
+        className={`group/videocard relative cursor-pointer select-none rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 bg-[#080d1a] shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-accent-cyan/50 hover:shadow-[0_0_35px_rgba(0,212,255,0.25)] ${className}`}
       >
         {/* Subtle glowing ambient aura */}
-        <div className="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-accent-primary/20 to-accent-cyan/20 blur-xl opacity-40 group-hover/videocard:opacity-90 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-accent-primary/20 to-accent-cyan/20 blur-xl opacity-30 group-hover/videocard:opacity-80 transition-opacity duration-500 pointer-events-none" />
 
-        {/* Outer Phone / Device Bezel */}
+        {/* Outer Phone / Device Frame */}
         <div className="relative w-full h-full overflow-hidden flex flex-col justify-between">
           
           {/* Top Info Bar Overlay */}
-          <div className="relative z-20 flex items-center justify-between p-3 sm:p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
-            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-2.5 py-1">
+          <div className="relative z-20 flex items-center justify-between p-3 sm:p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-none">
+            <div className="flex items-center gap-2 bg-black/75 border border-white/10 rounded-full px-2.5 py-1">
               <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,1)]" />
               <span className="text-[10px] sm:text-[11px] font-mono tracking-wider text-text-heading font-medium">
                 Founder Message
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/70 text-[10px]">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/75 border border-white/10 text-white/70 text-[10px]">
               <VolumeX size={12} className="text-accent-cyan" />
               <span className="hidden sm:inline font-mono">Muted</span>
             </div>
           </div>
 
           {/* Video Preview */}
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 overflow-hidden bg-black">
             <video
               ref={smallVideoRef}
-              src={videoSrc}
+              src={previewVideoSrc || videoSrc}
               poster={posterSrc}
               muted
               autoPlay
               loop
               playsInline
               preload="metadata"
-              className="w-full h-full object-cover object-center transform group-hover/videocard:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover object-center pointer-events-none"
+              style={{ transform: "translateZ(0)", willChange: "transform" }}
             />
-            {/* Dark glass tint so text/badges remain ultra sharp */}
+            {/* Dark gradient tint so text/badges remain ultra sharp */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-transparent to-black/30 pointer-events-none" />
           </div>
 
           {/* Center Hover Action Button */}
           <div className="relative z-20 my-auto flex flex-col items-center justify-center pointer-events-none">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-accent-primary/80 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-[0_0_25px_rgba(47,168,255,0.6)] transform group-hover/videocard:scale-115 group-hover/videocard:bg-accent-cyan transition-all duration-300">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-accent-primary border border-white/20 flex items-center justify-center text-white shadow-[0_0_25px_rgba(47,168,255,0.6)] transform group-hover/videocard:scale-110 group-hover/videocard:bg-accent-cyan transition-all duration-300">
               <Play size={20} className="ml-1 text-black fill-current" />
             </div>
-            <span className="mt-2.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-[11px] sm:text-xs text-text-heading font-medium tracking-wide shadow-lg group-hover/videocard:border-accent-cyan/50 group-hover/videocard:text-accent-cyan transition-colors">
+            <span className="mt-2.5 px-3 py-1 rounded-full bg-black/85 border border-white/10 text-[11px] sm:text-xs text-text-heading font-medium tracking-wide shadow-lg group-hover/videocard:border-accent-cyan/50 group-hover/videocard:text-accent-cyan transition-colors">
               Click to Open & Unmute
             </span>
           </div>
 
           {/* Bottom Caption Bar */}
-          <div className="relative z-20 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex items-center justify-between">
+          <div className="relative z-20 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex items-center justify-between pointer-events-none">
             <div className="flex flex-col">
               <span className="text-xs sm:text-sm font-semibold text-white tracking-tight">{founderName}</span>
               <span className="text-[10px] sm:text-[11px] text-accent-cyan font-mono">{founderRole}</span>
             </div>
-            <div className="w-7 h-7 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover/videocard:bg-accent-primary group-hover/videocard:text-black transition-colors">
+            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white group-hover/videocard:bg-accent-primary group-hover/videocard:text-black transition-colors">
               <Maximize2 size={14} />
             </div>
           </div>
@@ -268,6 +271,7 @@ export default function FounderVideoCard({
                 onTimeUpdate={handleTimeUpdate}
                 onClick={toggleBigPlay}
                 className="w-full h-full object-contain cursor-pointer"
+                style={{ transform: "translateZ(0)", willChange: "transform" }}
               />
 
               {/* Center Play Overlay Indicator (When Paused) */}

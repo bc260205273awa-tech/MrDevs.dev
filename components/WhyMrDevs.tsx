@@ -183,7 +183,7 @@ export default function WhyMrDevs() {
               return (
                 <div
                   key={index}
-                  className={`tilt-card spotlight-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 overflow-hidden ${pillar.gridClass}`}
+                  className={`spotlight-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 hover:border-accent-cyan/30 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 overflow-hidden transition-colors duration-300 ${pillar.gridClass}`}
                   style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   {/* Subtle Ambient Glow */}

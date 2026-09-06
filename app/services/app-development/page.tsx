@@ -40,7 +40,7 @@ const pageData: ServicePageProps = {
   whoThisIsFor: "For retail stores, food delivery businesses, clinic systems, and subscription businesses looking to build customer loyalty and command a professional presence on phone screens.",
   proof: {
     title: "Proven engineering background",
-    text: "Our team built KhanHub (khanhub.com.pk) — a massive custom web and mobile network serving over 50,000 users with full database integrations and real-time welfare updates."
+    text: "Our team built KhanHub (khanhub.com.pk), a massive custom web and mobile network serving over 50,000 users with full database integrations and real-time welfare updates."
   },
   faqs: [
     {

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { CheckCircle2, User } from "lucide-react";
 import Image from "next/image";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 interface FounderProps {
   name?: string;
@@ -20,6 +21,7 @@ export default function Founder({
 }: FounderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 12, 900);
 
   const TRUST_BADGES = [
     "Direct communication",
@@ -45,7 +47,7 @@ export default function Founder({
         </div>
 
         {/* Editorial Glass Container */}
-        <div className="scroll-reveal relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
+        <div className="tilt-card scroll-reveal relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
           
           {/* Left Side: Dramatic Vertical Portrait */}
           <div className="w-full md:w-2/5 shrink-0 relative aspect-[4/3] sm:aspect-square md:aspect-auto md:min-h-[500px]">

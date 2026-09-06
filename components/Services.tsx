@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Code2, Smartphone, Shield, Zap, MapPin, Palette, ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 interface ServiceItem {
   icon: LucideIcon;
@@ -75,10 +76,11 @@ const STEPS: Step[] = [
 export default function Services() {
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 8, 1500, 1.02); // Subtle but visible tilt on hover
 
   return (
     <section id="services" ref={containerRef} className="py-24 md:py-32 bg-bg-main font-sans overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col items-center mb-16 md:mb-24 scroll-reveal">
@@ -99,7 +101,7 @@ export default function Services() {
           {STEPS.map((step, idx) => (
             <div
               key={step.num}
-              className="scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-all duration-500 overflow-hidden"
+              className="tilt-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-5 sm:p-8 lg:p-12 hover:border-white/10 hover:bg-white/[0.07] transition-colors duration-500"
               style={{ transitionDelay: `${idx * 100}ms` }}
             >
               {/* Subtle background glow on hover */}
@@ -133,7 +135,7 @@ export default function Services() {
                       <a
                         key={sIdx}
                         href={service.href}
-                        className="group/link flex items-center justify-between w-full p-3.5 sm:p-4 lg:p-5 min-h-[44px] bg-white/[0.02] border border-white/5 hover:border-accent-primary/40 hover:bg-accent-primary/5 rounded-2xl transition-all duration-300"
+                        className="tilt-card group/link flex items-center justify-between w-full p-3.5 sm:p-4 lg:p-5 min-h-[44px] bg-white/[0.02] border border-white/5 hover:border-accent-primary/40 hover:bg-accent-primary/5 rounded-2xl transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 sm:gap-4">
                           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/link:bg-accent-primary/10 transition-colors shrink-0">

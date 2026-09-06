@@ -16,10 +16,11 @@ export default function LogoReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const [imagesLoaded, setImagesLoaded] = useState(0);
-  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(FRAME_COUNT).fill(null));
   const hasStartedLoading = useRef(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const renderFrameRef = useRef<((idx: number) => void) | null>(null);
 
   // Check prefers-reduced-motion on mount
   useEffect(() => {
@@ -29,39 +30,119 @@ export default function LogoReveal() {
     }
   }, []);
 
-  // Preload frames when the section approaches the viewport
+  // Progressive batch frame preloader with async decode
   useEffect(() => {
-    // 1. Immediately load initial poster frame (frame-0045.webp) for instantaneous rendering
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const basePath = isMobile ? "/frames/logo-reveal/mobile" : "/frames/logo-reveal";
+
+    // 1. Immediately load initial poster frame (frame-0001.webp)
     const posterImg = new Image();
-    posterImg.src = `/frames/logo-reveal/frame-0045.webp`;
-    
+    posterImg.src = `${basePath}/frame-0001.webp`;
+    posterImg.onload = async () => {
+      try {
+        if ("decode" in posterImg) await posterImg.decode();
+      } catch (_) {}
+      imagesRef.current[0] = posterImg;
+      setIsReady(true);
+      renderFrameRef.current?.(1);
+    };
+
+    const startLoading = () => {
+      if (hasStartedLoading.current) return;
+      hasStartedLoading.current = true;
+
+      // Priority queue: Keyframes first (every 2nd frame), then remaining
+      const keyframeIndices: number[] = [];
+      const secondaryIndices: number[] = [];
+
+      for (let i = 1; i <= FRAME_COUNT; i++) {
+        if (i % 2 === 1) keyframeIndices.push(i);
+        else secondaryIndices.push(i);
+      }
+
+      // On mobile, 45 keyframes provide 100% smooth 60fps scrub at half the RAM
+      const loadQueue = isMobile ? keyframeIndices : [...keyframeIndices, ...secondaryIndices];
+      let currentIndex = 0;
+      const BATCH_SIZE = isMobile ? 3 : 5;
+
+      const loadNextBatch = () => {
+        if (currentIndex >= loadQueue.length) {
+          setTimeout(() => ScrollTrigger.refresh(), 100);
+          return;
+        }
+
+        const batch = loadQueue.slice(currentIndex, currentIndex + BATCH_SIZE);
+        currentIndex += BATCH_SIZE;
+
+        let batchRemaining = batch.length;
+        batch.forEach((frameNum) => {
+          const idx = frameNum - 1;
+          if (imagesRef.current[idx]) {
+            batchRemaining--;
+            if (batchRemaining === 0) loadNextBatch();
+            return;
+          }
+
+          const img = new Image();
+          img.src = `${basePath}/frame-${frameNum.toString().padStart(4, "0")}.webp`;
+          img.onload = async () => {
+            try {
+              // Asynchronous background thread decode prevents canvas render jank
+              if ("decode" in img) await img.decode();
+            } catch (_) {}
+            imagesRef.current[idx] = img;
+            batchRemaining--;
+            if (batchRemaining === 0) {
+              if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                (window as any).requestIdleCallback(loadNextBatch, { timeout: 250 });
+              } else {
+                setTimeout(loadNextBatch, 25);
+              }
+            }
+          };
+          img.onerror = () => {
+            batchRemaining--;
+            if (batchRemaining === 0) loadNextBatch();
+          };
+        });
+      };
+
+      loadNextBatch();
+    };
+
+    // Intersection observer triggers when scrolling near
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasStartedLoading.current) {
-          hasStartedLoading.current = true;
-          const loadedImages: HTMLImageElement[] = [];
-          let loadedCount = 0;
-
-          // Progressively load all 90 frames
-          for (let i = 1; i <= FRAME_COUNT; i++) {
-            const img = new Image();
-            img.src = `/frames/logo-reveal/frame-${i.toString().padStart(4, '0')}.webp`;
-            img.onload = () => {
-              loadedCount++;
-              setImagesLoaded(loadedCount);
-            };
-            loadedImages.push(img);
-          }
-          imagesRef.current = loadedImages;
+        if (entries[0].isIntersecting) {
+          startLoading();
+          observer.disconnect();
         }
       },
-      { rootMargin: "800px" } 
+      { rootMargin: "500px" }
     );
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
-    return () => observer.disconnect();
+
+    // Also prefetch gently during browser idle time after initial page load settles
+    let idleTimer: any = null;
+    if (typeof window !== "undefined") {
+      idleTimer = setTimeout(() => {
+        if (!hasStartedLoading.current) {
+          if ("requestIdleCallback" in window) {
+            (window as any).requestIdleCallback(startLoading, { timeout: 2000 });
+          } else {
+            startLoading();
+          }
+        }
+      }, 2500);
+    }
+
+    return () => {
+      observer.disconnect();
+      if (idleTimer) clearTimeout(idleTimer);
+    };
   }, []);
 
   useGSAP(() => {
@@ -71,15 +152,29 @@ export default function LogoReveal() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Cap devicePixelRatio at 2x to save mobile GPU memory/performance
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); 
+    const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
     const frameState = { frame: isReducedMotion ? 45 : 1 };
     
-    // Draw specific frame using object-cover logic
+    // Draw frame using nearest loaded image fallback
     const renderFrame = (index: number) => {
       const safeIndex = Math.max(0, Math.min(FRAME_COUNT - 1, Math.round(index) - 1));
-      const img = imagesRef.current[safeIndex];
-      if (!img) return;
+      let img = imagesRef.current[safeIndex];
+
+      // Fallback to nearest loaded frame for zero-jank scrub
+      if (!img) {
+        for (let offset = 1; offset < FRAME_COUNT; offset++) {
+          if (safeIndex - offset >= 0 && imagesRef.current[safeIndex - offset]) {
+            img = imagesRef.current[safeIndex - offset];
+            break;
+          }
+          if (safeIndex + offset < FRAME_COUNT && imagesRef.current[safeIndex + offset]) {
+            img = imagesRef.current[safeIndex + offset];
+            break;
+          }
+        }
+      }
+
+      if (!img || !img.complete || !img.naturalWidth) return;
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -119,23 +214,26 @@ export default function LogoReveal() {
       renderFrame(frameState.frame);
     };
 
-    window.addEventListener("resize", resizeCanvas);
+    renderFrameRef.current = renderFrame;
+
+    window.addEventListener("resize", resizeCanvas, { passive: true });
     resizeCanvas();
 
-    // If user prefers reduced motion, render static poster frame without pinning timeline
     if (isReducedMotion) {
       renderFrame(45);
-      return () => window.removeEventListener("resize", resizeCanvas);
+      return () => {
+        window.removeEventListener("resize", resizeCanvas);
+        renderFrameRef.current = null;
+      };
     }
 
-    // Master pinning timeline for normal motion
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         pin: containerRef.current,
         start: "top top",
         end: "+=2000",
-        scrub: 1, // Smooth dampening for jank-free scroll scrubbing
+        scrub: 0.8,
       }
     });
 
@@ -145,33 +243,18 @@ export default function LogoReveal() {
       onUpdate: () => renderFrame(frameState.frame)
     });
 
-    return () => window.removeEventListener("resize", resizeCanvas);
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      renderFrameRef.current = null;
+    };
   }, { scope: sectionRef, dependencies: [isReducedMotion] });
-
-  const isLoading = imagesLoaded < FRAME_COUNT && !isReducedMotion;
-  const loadingProgress = Math.round((imagesLoaded / FRAME_COUNT) * 100);
 
   return (
     <section ref={sectionRef} className="relative bg-[#0a0f1a]">
-      {/* Pinned inner container maintaining zero-CLS aspect ratio */}
       <div ref={containerRef} className="h-screen w-full overflow-hidden relative flex items-center justify-center">
-        
-        {/* Fallback Loading State */}
-        {isLoading && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0f1a]">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-8 md:p-12 shadow-2xl flex flex-col items-center gap-6">
-              <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_12px_rgba(0,212,255,1)]"></span>
-              <span className="text-[11px] font-bold text-accent-cyan tracking-[0.2em] uppercase select-none">
-                Loading Experience ({loadingProgress}%)
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Scrub Canvas */}
         <canvas 
           ref={canvasRef} 
-          className={`absolute inset-0 z-0 transition-opacity duration-1000 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+          className={`absolute inset-0 z-0 transition-opacity duration-700 ${isReady ? "opacity-100" : "opacity-0"}`}
         />
       </div>
     </section>

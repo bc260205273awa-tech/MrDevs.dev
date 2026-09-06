@@ -10,7 +10,7 @@ interface GlassesGraphicProps {
   className?: string;
 }
 
-export default function GlassesGraphic({ imageSrc = "/logo.png", className = "" }: GlassesGraphicProps) {
+export default function GlassesGraphic({ imageSrc = "/logo.webp", className = "" }: GlassesGraphicProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const glassesRef = useRef<HTMLDivElement>(null);
   const reflectionRef = useRef<HTMLDivElement>(null);

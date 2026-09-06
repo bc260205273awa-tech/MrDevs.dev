@@ -13,22 +13,43 @@
 # production
 /build
 
-# misc
+# misc & OS
 .DS_Store
+Thumbs.db
 *.pem
+*.key
+*.cert
+*.crt
 
-# debug
+# debug & logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# env files
-.env*.local
-.env
+# environment files (ignore all except .env.example)
+.env*
+!.env.example
 
 # vercel
 .vercel
 
-# typescript
+# typescript & build caches
 *.tsbuildinfo
 next-env.d.ts
+.eslintcache
+
+# IDE and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-project
+*.sublime-workspace
+
+# local utility & processing scripts
+process_logo.js

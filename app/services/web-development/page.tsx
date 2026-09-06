@@ -40,7 +40,7 @@ const pageData: ServicePageProps = {
   whoThisIsFor: "For local store owners, professional doctors, consultants, and growing agencies who need a clean, premium online presence to build credibility and get more client leads.",
   proof: {
     title: "Tested for high performance and scale",
-    text: "We built KhanHub (khanhub.com.pk) — a custom website and web system that manages 16+ healthcare departments and serves over 50,000 people across Pakistan with high speed and zero downtime."
+    text: "We built KhanHub (khanhub.com.pk), a custom website and web system that manages 16+ healthcare departments and serves over 50,000 people across Pakistan with high speed and zero downtime."
   },
   faqs: [
     {

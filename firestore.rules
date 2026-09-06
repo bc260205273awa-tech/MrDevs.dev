@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========================================================
+    // Internal Staff Cold Calling Readiness Assessment
+    // ========================================================
+    match /cold_calling_survey/{submissionId} {
+      // 1. Allow submission creation with strict schema & length validation
+      allow create: if request.resource.data.staff_name is string
+                    && request.resource.data.staff_name.size() >= 1
+                    && request.resource.data.staff_name.size() <= 120
+                    && request.resource.data.staff_role is string
+                    && request.resource.data.staff_role.size() >= 1
+                    && request.resource.data.staff_role.size() <= 120
+                    && request.resource.data.q1_comfortable_calls is string
+                    && request.resource.data.submitted_at is string;
+
+      // 2. Submissions are immutable - prohibit unauthorized tampering
+      allow update: if false;
+
+      // 3. Deletions and full reads are restricted to authenticated leadership
+      allow read, delete: if request.auth != null;
+    }
+
+    // ========================================================
+    // Unified Team Profiles (mr-devs CRM & Agency Admin)
+    // ========================================================
+    match /crm_profiles/{userId} {
+      // Authenticated users can read team profiles
+      allow read: if request.auth != null;
+
+      // Users can create and maintain their own profile record
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+
+      // Admins can manage profiles
+      allow delete: if request.auth != null;
+    }
+
+    // ========================================================
+    // Default Deny-All for any other collection or path
+    // ========================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

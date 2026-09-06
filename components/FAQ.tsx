@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { use3DTilt } from "@/hooks/use3DTilt";
 
 interface FAQItem {
   question: string;
@@ -32,6 +33,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollReveal(containerRef);
+  use3DTilt(containerRef, ".tilt-card", 10, 900);
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -39,7 +41,7 @@ export default function FAQ() {
 
   return (
     <section id="faq" ref={containerRef} className="py-20 bg-[#0a0f1a] font-sans border-t border-[rgba(133,183,235,0.03)] overflow-hidden">
-      <div className="max-w-2xl mx-auto px-6">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col items-center mb-12 text-center scroll-reveal">
@@ -58,26 +60,26 @@ export default function FAQ() {
             return (
               <div
                 key={idx}
-                className="bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-lg overflow-hidden transition-all duration-200"
+                className="tilt-card bg-[#0f1729] border border-[rgba(133,183,235,0.12)] rounded-lg overflow-hidden transition-all duration-200"
               >
                 <button
                   onClick={() => toggle(idx)}
-                  className="w-full flex items-center justify-between p-5 text-left font-sans font-medium text-xs md:text-sm text-[#f1efe8] hover:text-[#378ADD] transition-colors"
+                  className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-sans font-medium text-xs md:text-sm text-[#f1efe8] hover:text-[#378ADD] transition-colors"
                 >
                   <span>{faq.question}</span>
                   <ChevronDown
                     size={16}
-                    className={`text-[#888780] transition-transform duration-200 ${
+                    className={`text-[#888780] transition-transform duration-200 shrink-0 ml-2 ${
                       isOpen ? "rotate-180 text-[#378ADD]" : ""
                     }`}
                   />
                 </button>
                 <div
-                  className={`transition-all duration-200 ease-in-out ${
-                    isOpen ? "max-h-40 border-t border-[rgba(133,183,235,0.06)]" : "max-h-0"
+                  className={`transition-all duration-300 ease-in-out ${
+                    isOpen ? "max-h-96 border-t border-[rgba(133,183,235,0.06)]" : "max-h-0"
                   } overflow-hidden`}
                 >
-                  <p className="p-5 text-xs text-[#888780] leading-relaxed">
+                  <p className="p-4 sm:p-5 text-xs text-[#888780] leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>

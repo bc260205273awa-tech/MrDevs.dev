@@ -40,7 +40,7 @@ const pageData: ServicePageProps = {
   whoThisIsFor: "For clinics, medium-scale private hospitals, pharmacy networks, and businesses looking to replace manual paper sheets with custom booking and database software.",
   proof: {
     title: "The engine behind KhanHub ERP",
-    text: "We are the creators of KhanHub (khanhub.com.pk) — a custom software platform running 16+ healthcare and welfare departments. It handles secure login, finance bookkeeping, and staff assignments for over 50,000 members daily."
+    text: "We are the creators of KhanHub (khanhub.com.pk), a custom software platform running 16+ healthcare and welfare departments. It handles secure login, finance bookkeeping, and staff assignments for over 50,000 members daily."
   },
   faqs: [
     {

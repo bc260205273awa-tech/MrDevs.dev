@@ -11,11 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "MrDevs — Premium digital agency | Web & app development",
+    default: "MrDevs | Premium digital agency, Web & app development",
     template: "%s | MrDevs"
   },
   description:
-    "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
+    "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome: your revenue.",
   keywords: [
     "mrdevs",
     "digital agency",
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
     canonical: "https://mrdevs.dev",
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.webp",
+    shortcut: "/logo.webp",
+    apple: "/logo.webp",
   },
   openGraph: {
-    title: "MrDevs — Premium digital agency | Web & app development",
+    title: "MrDevs | Premium digital agency, Web & app development",
     description:
-      "We craft premium websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
+      "We craft premium websites, mobile apps, and custom software systems engineered around one outcome: your revenue.",
     url: "https://mrdevs.dev",
     siteName: "mrdevs",
     locale: "en_US",
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MrDevs — Premium digital agency | Web & app development",
+    title: "MrDevs | Premium digital agency, Web & app development",
     description:
-      "We craft premium websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
+      "We craft premium websites, mobile apps, and custom software systems engineered around one outcome: your revenue.",
     creator: "@mrdevs",
   },
   robots: {
@@ -78,10 +78,10 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "MrDevs",
-    "image": "https://mrdevs.dev/logo.png",
+    "image": "https://mrdevs.dev/logo.webp",
     "url": "https://mrdevs.dev",
     "description":
-      "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome — your revenue.",
+      "MrDevs is a premium digital agency crafting top-tier websites, mobile apps, and custom software systems engineered around one outcome: your revenue.",
     "priceRange": "$$$",
     "telephone": "+923219565657",
     "address": {
@@ -97,6 +97,15 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/hero-glasses-frame.webp"
+          type="image/webp"
+          fetchPriority="high"
+        />
+      </head>
       <body className="bg-[#0a0f1a] text-[#f1efe8] antialiased font-sans overflow-x-hidden">
         <script
           type="application/ld+json"

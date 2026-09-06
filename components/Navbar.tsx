@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ArrowRight, Code2, Smartphone, Shield, Zap, MapPin, Palette } from "lucide-react";
 import Image from "next/image";
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,6 +19,7 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,6 +103,7 @@ export default function Navbar() {
 
   return (
     <header
+      ref={navRef}
       // [CHANGED] Added translate transform based on hidden state, increased duration
       className={`fixed inset-x-0 top-0 z-50 transition-transform duration-500 font-sans ${
         hidden ? "-translate-y-full" : "translate-y-0"
@@ -115,14 +118,14 @@ export default function Navbar() {
             : "py-6 bg-transparent border-b border-transparent"
         }`}
       >
-      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
         {/* Logo Image */}
         <a
           href="/"
-          className="flex items-center select-none"
+          className="tilt-nav flex items-center select-none"
         >
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="mrdevs logo"
             width={78}
             height={30}
@@ -135,7 +138,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           {/* Hover Dropdown for Services */}
           <div
-            className="relative services-dropdown-container"
+            className="tilt-nav relative services-dropdown-container"
             onMouseEnter={() => setDropdownOpen(true)}
             onMouseLeave={() => setDropdownOpen(false)}
           >
@@ -260,7 +263,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#work" : "/#work"}
             onClick={(e) => handleLinkClick(e, "#work")}
-            className={`text-sm font-medium transition-colors duration-200 relative py-1 ${
+            className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 ${
               isHome && activeSection === "work" ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
             }`}
           >
@@ -273,7 +276,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#process" : "/#process"}
             onClick={(e) => handleLinkClick(e, "#process")}
-            className={`text-sm font-medium transition-colors duration-200 relative py-1 ${
+            className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 ${
               isHome && activeSection === "process" ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
             }`}
           >
@@ -286,7 +289,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#contact" : "/#contact"}
             onClick={(e) => handleLinkClick(e, "#contact")}
-            className={`text-sm font-medium transition-colors duration-200 relative py-1 ${
+            className={`tilt-nav text-sm font-medium transition-colors duration-200 relative py-1 ${
               isHome && activeSection === "contact" ? "text-[#378ADD]" : "text-[#f1efe8]/85 hover:text-[#f1efe8]"
             }`}
           >
@@ -303,7 +306,7 @@ export default function Navbar() {
             href="https://mr-devs-crm.vercel.app/#leads"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#f1efe8]/80 hover:text-[#378ADD] hover:bg-white/[0.04] border border-white/10 rounded transition-all duration-200"
+            className="tilt-nav inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#f1efe8]/80 hover:text-[#378ADD] hover:bg-white/[0.04] border border-white/10 rounded transition-all duration-200"
           >
             <span>CRM Login</span>
             <span className="text-[10px] opacity-70">&rarr;</span>
@@ -311,7 +314,7 @@ export default function Navbar() {
           <a
             href={isHome ? "#contact" : "/#contact"}
             onClick={(e) => handleLinkClick(e, "#contact")}
-            className="inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-[#378ADD] text-[#042C53] rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow-sm"
+            className="tilt-nav inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-[#378ADD] text-[#042C53] rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow-sm"
           >
             let&apos;s talk
           </a>
@@ -344,10 +347,10 @@ export default function Navbar() {
       {/* Mobile dropdown panel */}
       <div
         className={`md:hidden overflow-y-auto transition-all duration-300 ease-in-out border-b border-[rgba(133,183,235,0.06)] bg-[#0a0f1a] ${
-          open ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
+          open ? "max-h-[85dvh] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-6 py-4 flex flex-col gap-1">
+        <div className="px-5 sm:px-6 py-4 flex flex-col gap-1">
           {/* Services Accordion */}
           <div>
             <button
@@ -360,22 +363,22 @@ export default function Navbar() {
 
             {mobileAccordionOpen && (
               <div className="pl-4 py-2 flex flex-col gap-3 border-l border-[rgba(133,183,235,0.1)] mb-2 mt-1">
-                <a href="/services/web-development" className="text-xs text-[#888780] py-1">web development</a>
-                <a href="/services/app-development" className="text-xs text-[#888780] py-1">app development</a>
-                <a href="/services/hospital-software-systems" className="text-xs text-[#888780] py-1">hospital & software systems</a>
-                <a href="/services/whatsapp-automation" className="text-xs text-[#888780] py-1">whatsapp & automation</a>
-                <a href="/services/maps-optimization" className="text-xs text-[#888780] py-1">google maps optimization</a>
-                <a href="/services/design-branding" className="text-xs text-[#888780] py-1">design & branding</a>
+                <a href="/services/web-development" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">web development</a>
+                <a href="/services/app-development" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">app development</a>
+                <a href="/services/hospital-software-systems" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">hospital & software systems</a>
+                <a href="/services/whatsapp-automation" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">whatsapp & automation</a>
+                <a href="/services/maps-optimization" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">google maps optimization</a>
+                <a href="/services/design-branding" onClick={() => setOpen(false)} className="text-xs text-[#888780] hover:text-[#378ADD] py-1">design & branding</a>
                 
                 <div className="border-t border-white/5 pt-2 flex flex-col gap-2">
-                  <a href="/services/social-media" className="text-xs text-[#f1efe8] py-1 flex items-center justify-between">
+                  <a href="/services/social-media" onClick={() => setOpen(false)} className="text-xs text-[#f1efe8] hover:text-[#378ADD] py-1 flex items-center justify-between">
                     social media
                     <ArrowRight size={12} />
                   </a>
                   <div className="pl-3 flex flex-col gap-2">
-                    <a href="/services/social-media/graphic-design" className="text-[11px] text-[#888780] py-0.5">graphic design</a>
-                    <a href="/services/social-media/video-editing" className="text-[11px] text-[#888780] py-0.5">video editing</a>
-                    <a href="/services/social-media/content-scripting" className="text-[11px] text-[#888780] py-0.5">content scripting</a>
+                    <a href="/services/social-media/graphic-design" onClick={() => setOpen(false)} className="text-[11px] text-[#888780] hover:text-[#378ADD] py-0.5">graphic design</a>
+                    <a href="/services/social-media/video-editing" onClick={() => setOpen(false)} className="text-[11px] text-[#888780] hover:text-[#378ADD] py-0.5">video editing</a>
+                    <a href="/services/social-media/content-scripting" onClick={() => setOpen(false)} className="text-[11px] text-[#888780] hover:text-[#378ADD] py-0.5">content scripting</a>
                   </div>
                 </div>
               </div>

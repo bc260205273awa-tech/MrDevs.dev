@@ -1,19 +1,19 @@
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import WhyMrDevs from "@/components/WhyMrDevs";
-import Work from "@/components/Work";
-import CondensedCTA from "@/components/CondensedCTA";
-import Services from "@/components/Services";
-import Process from "@/components/Process";
-import Founder from "@/components/Founder";
-import Contact from "@/components/Contact";
-import FAQ from "@/components/FAQ";
-import Footer from "@/components/Footer";
 
+const WhyMrDevs = dynamic(() => import("@/components/WhyMrDevs"));
+const Work = dynamic(() => import("@/components/Work"));
 const LogoReveal = dynamic(() => import("@/components/LogoReveal"), {
   ssr: false,
 });
+const CondensedCTA = dynamic(() => import("@/components/CondensedCTA"));
+const Services = dynamic(() => import("@/components/Services"));
+const Process = dynamic(() => import("@/components/Process"));
+const Founder = dynamic(() => import("@/components/Founder"));
+const Contact = dynamic(() => import("@/components/Contact"));
+const FAQ = dynamic(() => import("@/components/FAQ"));
+const Footer = dynamic(() => import("@/components/Footer"));
 
 export default function Home() {
   const faqSchema = {

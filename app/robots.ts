@@ -5,6 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
+      disallow: "/internal/",
     },
     sitemap: "https://mrdevs.dev/sitemap.xml",
   };

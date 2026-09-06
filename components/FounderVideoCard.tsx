@@ -59,14 +59,16 @@ export default function FounderVideoCard({
       (entries) => {
         const entry = entries[0];
         if (entry.isIntersecting) {
-          if (!isModalOpen) {
+          if (!isModalOpen && video.paused) {
             video.play().catch(() => {});
           }
         } else {
-          video.pause();
+          if (!video.paused) {
+            video.pause();
+          }
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     );
 
     observer.observe(container);
@@ -203,7 +205,7 @@ export default function FounderVideoCard({
               autoPlay
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
               className="w-full h-full object-cover object-center pointer-events-none"
               style={{ transform: "translateZ(0)", willChange: "transform" }}
             />

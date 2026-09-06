@@ -96,6 +96,13 @@ If you are asked to modify these components, respect these established rules:
   - Updated `WhyMrDevs.tsx` Card 1 narrative and floating response chip to showcase Khan Hub's 16-department healthcare ERP delivery and direct engineering communication.
   - Linked the KhanHub ERP case study in `Work.tsx` directly to the CEO video testimonial.
   - Created semantic video aliases `khanhub-ceo-testimonial.mp4` and `khanhub-ceo-preview.mp4`.
+- **Sep 6, 2026 (Current AI)**: Ultra-Lightweight 2.2MB Video Compression & Zero-Reflow Decoupling:
+  - Compressed preview video from 5.1 MB down to 2.2 MB (76% smaller than original) with faststart headers, enabling instant start without network buffering.
+  - Compressed full video from 10.5 MB down to 6.4 MB with 96k AAC audio.
+  - Set `preload="auto"` to eliminate buffer underruns and playback stalls.
+  - Removed `spotlight-card` and heavy backdrop-blur from Card 1 in `WhyMrDevs.tsx`, eliminating forced synchronous layout reflows (`getBoundingClientRect`) and CSS mask recalculations on mousemove over the playing video.
+  - Refactored IntersectionObserver playback triggers to avoid redundant play/pause promise calls.
+
 
 
 

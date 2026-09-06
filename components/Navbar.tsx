@@ -298,13 +298,24 @@ export default function Navbar() {
         </nav>
 
         {/* CTA */}
-        <a
-          href={isHome ? "#contact" : "/#contact"}
-          onClick={(e) => handleLinkClick(e, "#contact")}
-          className="hidden md:inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-[#378ADD] text-[#042C53] rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow-sm"
-        >
-          let&apos;s talk
-        </a>
+        <div className="hidden md:flex items-center gap-3">
+          <a
+            href="https://mr-devs-crm.vercel.app/#leads"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#f1efe8]/80 hover:text-[#378ADD] hover:bg-white/[0.04] border border-white/10 rounded transition-all duration-200"
+          >
+            <span>CRM Login</span>
+            <span className="text-[10px] opacity-70">&rarr;</span>
+          </a>
+          <a
+            href={isHome ? "#contact" : "/#contact"}
+            onClick={(e) => handleLinkClick(e, "#contact")}
+            className="inline-flex items-center justify-center px-4 py-2 text-xs font-medium bg-[#378ADD] text-[#042C53] rounded hover:bg-[#378ADD]/90 hover:scale-[0.98] active:scale-[0.95] transition-all duration-200 shadow-sm"
+          >
+            let&apos;s talk
+          </a>
+        </div>
 
         {/* Hamburger */}
         <button
@@ -393,6 +404,16 @@ export default function Navbar() {
             className="text-[15px] font-medium py-3 border-b border-white/5 text-[#f1efe8]/80 flex items-center justify-between"
           >
             contact
+          </a>
+
+          <a
+            href="https://mr-devs-crm.vercel.app/#leads"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[15px] font-medium py-3 border-b border-white/5 text-[#378ADD] flex items-center justify-between"
+          >
+            <span>CRM Login</span>
+            <span className="text-xs">&rarr;</span>
           </a>
 
           <a

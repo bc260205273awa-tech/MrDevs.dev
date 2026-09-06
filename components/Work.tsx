@@ -88,6 +88,16 @@ export default function Work() {
                     We engineered a custom, centralized healthcare ERP built from scratch. It handles staff management, secure patient check-ins, automated billing, and live hospital workflows in one unified dashboard.
                   </p>
                 </div>
+
+                {/* Client Testimonial Video Link */}
+                <a
+                  href="#why-us"
+                  className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 border border-accent-primary/30 text-accent-cyan text-xs font-medium transition-all group/vlink self-start"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                  <span>Watch Khan Hub CEO Video Review</span>
+                  <span className="text-accent-primary group-hover/vlink:translate-x-1 transition-transform">▶</span>
+                </a>
               </div>
             </div>
 

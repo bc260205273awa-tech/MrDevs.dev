@@ -91,4 +91,11 @@ If you are asked to modify these components, respect these established rules:
   - Removed `tilt-card` from Card 1 in `WhyMrDevs.tsx` to stop GSAP 3D matrix rotations (`rotateX`, `rotateY`) from forcing continuous GPU compositor re-rasterization while playing video.
   - Removed 4 heavy `backdrop-blur` layers over the playing video in `FounderVideoCard.tsx` and removed live hover scaling on the video tag, eliminating frame-buffer GPU readbacks and fractional bilinear sampling.
   - Added dedicated hardware compositor layers (`transform: translateZ(0)` and `willChange: transform`) to both preview and modal video players.
+- **Sep 6, 2026 (Current AI)**: Rebranded Video to Khan Hub CEO Client Testimonial:
+  - Rebranded all player badges, titles, and modals from founder branding to verified client testimonial: "CEO, Khan Hub Pvt Ltd (Khan Hub Private Limited)".
+  - Updated `WhyMrDevs.tsx` Card 1 narrative and floating response chip to showcase Khan Hub's 16-department healthcare ERP delivery and direct engineering communication.
+  - Linked the KhanHub ERP case study in `Work.tsx` directly to the CEO video testimonial.
+  - Created semantic video aliases `khanhub-ceo-testimonial.mp4` and `khanhub-ceo-preview.mp4`.
+
+
 

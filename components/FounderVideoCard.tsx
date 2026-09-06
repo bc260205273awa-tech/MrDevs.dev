@@ -9,18 +9,30 @@ interface FounderVideoCardProps {
   videoSrc?: string;
   previewVideoSrc?: string;
   posterSrc?: string;
+  clientName?: string;
+  clientRole?: string;
+  companyName?: string;
+  badgeText?: string;
   founderName?: string;
   founderRole?: string;
 }
 
 export default function FounderVideoCard({
   className = "",
-  videoSrc = "/videos/founder-intro.mp4",
-  previewVideoSrc = "/videos/founder-intro-preview.mp4",
-  posterSrc = "/videos/founder-video-poster.webp",
-  founderName = "Mubeen Ahmad",
-  founderRole = "Founder & Lead Developer",
+  videoSrc = "/videos/khanhub-ceo-testimonial.mp4",
+  previewVideoSrc = "/videos/khanhub-ceo-preview.mp4",
+  posterSrc = "/videos/khanhub-testimonial-poster.webp",
+  clientName = "CEO, Khan Hub Pvt Ltd",
+  clientRole = "Client Testimonial",
+  companyName = "Khan Hub Private Limited",
+  badgeText = "Client Testimonial",
+  founderName,
+  founderRole,
 }: FounderVideoCardProps) {
+  // Support legacy props if provided
+  const displayName = founderName || clientName;
+  const displayRole = founderRole || companyName;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBigPlaying, setIsBigPlaying] = useState(true);
   const [isBigMuted, setIsBigMuted] = useState(false);
@@ -169,9 +181,9 @@ export default function FounderVideoCard({
           {/* Top Info Bar Overlay */}
           <div className="relative z-20 flex items-center justify-between p-3 sm:p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-none">
             <div className="flex items-center gap-2 bg-black/75 border border-white/10 rounded-full px-2.5 py-1">
-              <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_rgba(0,212,255,1)]" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,1)]" />
               <span className="text-[10px] sm:text-[11px] font-mono tracking-wider text-text-heading font-medium">
-                Founder Message
+                {badgeText}
               </span>
             </div>
 
@@ -212,8 +224,8 @@ export default function FounderVideoCard({
           {/* Bottom Caption Bar */}
           <div className="relative z-20 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex items-center justify-between pointer-events-none">
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm font-semibold text-white tracking-tight">{founderName}</span>
-              <span className="text-[10px] sm:text-[11px] text-accent-cyan font-mono">{founderRole}</span>
+              <span className="text-xs sm:text-sm font-semibold text-white tracking-tight">{displayName}</span>
+              <span className="text-[10px] sm:text-[11px] text-accent-cyan font-mono">{displayRole}</span>
             </div>
             <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white group-hover/videocard:bg-accent-primary group-hover/videocard:text-black transition-colors">
               <Maximize2 size={14} />
@@ -228,7 +240,7 @@ export default function FounderVideoCard({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Founder Video Player"
+          aria-label="Client Testimonial Video Player"
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-2xl transition-all duration-300"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsModalOpen(false);
@@ -243,10 +255,10 @@ export default function FounderVideoCard({
             {/* Modal Header */}
             <div className="relative z-20 flex items-center justify-between px-4 py-3 bg-[#080c16]/90 backdrop-blur-md border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-ping" />
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                 <div className="flex flex-col">
-                  <h4 className="text-xs sm:text-sm font-semibold text-white">{founderName}</h4>
-                  <span className="text-[10px] sm:text-[11px] text-accent-cyan font-mono leading-tight">{founderRole}</span>
+                  <h4 className="text-xs sm:text-sm font-semibold text-white">{displayName}</h4>
+                  <span className="text-[10px] sm:text-[11px] text-accent-cyan font-mono leading-tight">{displayRole}</span>
                 </div>
               </div>
 

@@ -199,8 +199,8 @@ export default function WhyMrDevs() {
                     <div>
                       {/* Trust Tag */}
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-primary/10 border border-accent-primary/30 text-accent-cyan text-xs font-mono mb-4 sm:mb-6">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
-                        <span>Direct 1-on-1 Engineering</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                        <span>Client Verified Delivery</span>
                       </div>
 
                       <h3 className="font-sans font-semibold text-2xl sm:text-3xl lg:text-4xl text-text-heading mb-3 sm:mb-4 tracking-tight group-hover:text-white transition-colors duration-300">
@@ -208,22 +208,22 @@ export default function WhyMrDevs() {
                       </h3>
 
                       <p className="font-sans text-text-body text-[14px] sm:text-[15px] leading-relaxed group-hover:text-text-heading transition-colors duration-300 mb-6">
-                        {pillar.description}
+                        Speak directly to the engineer building your system. No middlemen or account managers. Hear directly from our client, the CEO of Khan Hub Private Limited, about how direct engineering made their nationwide healthcare ERP possible.
                       </p>
 
                       {/* Value Highlights */}
                       <div className="flex flex-col gap-2.5 mb-6 text-xs sm:text-[13px] text-text-heading">
                         <div className="flex items-center gap-2">
                           <CheckCircle2 size={16} className="text-accent-cyan shrink-0" />
-                          <span>Direct WhatsApp & phone line with founder</span>
+                          <span>Direct WhatsApp & phone line with senior engineer</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CheckCircle2 size={16} className="text-accent-cyan shrink-0" />
-                          <span>No account managers, sales reps, or junior developers</span>
+                          <span>Delivered Khan Hub&apos;s 16-department ERP with 100% uptime</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CheckCircle2 size={16} className="text-accent-cyan shrink-0" />
-                          <span>Same-day turnarounds and rapid iteration cycles</span>
+                          <span>Rapid iteration cycles and zero corporate delays</span>
                         </div>
                       </div>
                     </div>
@@ -231,7 +231,7 @@ export default function WhyMrDevs() {
                     {/* Hint to click video */}
                     <div className="text-xs text-text-body/80 flex items-center gap-2">
                       <span className="text-accent-cyan font-bold">▶</span>
-                      <span>Click the video to expand and listen with sound</span>
+                      <span>Click the video to watch Khan Hub CEO review with sound</span>
                     </div>
                   </div>
 
@@ -239,13 +239,18 @@ export default function WhyMrDevs() {
                   <div className="relative z-20 w-full sm:w-auto flex flex-col items-center lg:items-end shrink-0 mx-auto lg:mx-0">
                     {/* Floating Live Response Chat Bubble */}
                     <div className="hidden sm:flex self-end mb-3 bg-accent-primary/15 backdrop-blur-xl rounded-2xl rounded-tr-sm px-4 py-2.5 border border-accent-primary/30 shadow-[0_4px_20px_rgba(47,168,255,0.2)] flex-col gap-0.5 transform -rotate-1 hover:rotate-0 transition-transform">
-                      <p className="text-xs text-white font-medium">Already done. Live on your link right now! ⚡</p>
-                      <span className="text-[9px] text-accent-cyan self-end font-mono">Just now</span>
+                      <p className="text-xs text-white font-medium">Khan Hub runs on MrDevs code. Flawless execution! ⚡</p>
+                      <span className="text-[9px] text-accent-cyan self-end font-mono">CEO, Khan Hub Pvt Ltd</span>
                     </div>
 
                     {/* Video Card Player */}
                     <div className="w-[200px] sm:w-[220px] lg:w-[230px] aspect-[9/16] shrink-0">
-                      <FounderVideoCard className="w-full h-full" />
+                      <FounderVideoCard
+                        className="w-full h-full"
+                        clientName="CEO, Khan Hub Pvt Ltd"
+                        companyName="Khan Hub Private Limited"
+                        badgeText="Client Review"
+                      />
                     </div>
                   </div>
                 </div>

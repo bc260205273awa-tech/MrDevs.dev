@@ -80,3 +80,8 @@ If you are asked to modify these components, respect these established rules:
   - Tuned `HeroParticles.tsx` for mobile: capped particle density and omitted the O(N^2) connecting lines loop on mobile for a 90% CPU reduction, and deferred initial render start by 120ms to yield the main thread to FCP/LCP.
   - Added high-priority image preload in `app/layout.tsx` for the LCP hero glasses frame to eliminate resource load delay.
   - Added modern `browserslist` target in `package.json` to eliminate legacy polyfill overhead.
+- **Sep 6, 2026 (Current AI)**: Integrated Interactive Founder Video with Small Muted Preview & Unmuted Cinema Modal:
+  - Transferred and optimized WhatsApp founder video to `public/videos/founder-intro.mp4` with faststart web streaming headers and generated crisp WebP poster.
+  - Built `components/FounderVideoCard.tsx` featuring battery-saving IntersectionObserver auto-play muted preview with custom glass bezel, pulsing message indicator, and sound badge.
+  - Designed full-screen cinema lightbox modal rendered in React Portal with unmuted high-definition audio, interactive seek scrubber, playback toggles, keyboard controls (Escape, Space, M), and direct project booking link.
+  - Upgraded `WhyMrDevs.tsx` Card 1 (Direct Founder Access) with responsive two-column layout housing value props and the interactive founder video player.

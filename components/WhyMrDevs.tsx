@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { UserCheck, ShieldCheck, Database, Code, Terminal, Cpu, Palette, Rocket, Server } from "lucide-react";
+import { UserCheck, ShieldCheck, Database, Code, Terminal, Cpu, Palette, Rocket, Server, CheckCircle2 } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { use3DTilt } from "@/hooks/use3DTilt";
+import FounderVideoCard from "@/components/FounderVideoCard";
 
 export default function WhyMrDevs() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,19 +46,8 @@ export default function WhyMrDevs() {
       icon: UserCheck,
       title: "Direct Founder Access",
       description: "Speak directly to the developer building your system. No account managers or sales representatives. You get direct access and 5x faster iteration cycles.",
-      gridClass: "lg:col-span-2 lg:row-span-2 min-h-[350px] lg:min-h-[500px]",
+      gridClass: "lg:col-span-2 lg:row-span-2 min-h-[420px] lg:min-h-[520px]",
       iconSize: 140,
-      visual: () => (
-        <div className="absolute top-12 left-6 right-6 sm:left-12 sm:right-12 flex flex-col gap-4 pointer-events-none z-10 opacity-90">
-          <div className="self-start bg-white/5 backdrop-blur-xl rounded-2xl rounded-tl-sm px-4 py-3 border border-white/10 max-w-[85%] sm:max-w-[70%] shadow-xl transform hover:scale-[1.02] transition-transform">
-            <p className="text-[13px] sm:text-sm text-text-heading font-medium">Hey! Can we launch the new feature tomorrow?</p>
-          </div>
-          <div className="self-end bg-accent-primary/10 backdrop-blur-xl rounded-2xl rounded-tr-sm px-4 py-3 border border-accent-primary/30 max-w-[85%] sm:max-w-[70%] shadow-[0_4px_20px_rgba(47,168,255,0.15)] flex flex-col gap-1 transform hover:scale-[1.02] transition-transform">
-            <p className="text-[13px] sm:text-sm text-white font-medium">Already done. It's live on your link right now! ⚡</p>
-            <span className="text-[10px] text-accent-cyan/70 self-end">Just now</span>
-          </div>
-        </div>
-      )
     },
     {
       icon: ShieldCheck,
@@ -188,6 +178,80 @@ export default function WhyMrDevs() {
         <div ref={gridRef} className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-6 relative group/grid">
           {PILLARS.map((pillar, index) => {
             const Icon = pillar.icon;
+
+            if (index === 0) {
+              return (
+                <div
+                  key={index}
+                  className={`tilt-card spotlight-card scroll-reveal group relative bg-white/5 backdrop-blur-xl border border-white/5 border-t-white/10 rounded-3xl p-6 sm:p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 overflow-hidden ${pillar.gridClass}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  {/* Subtle Ambient Glow */}
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-accent-primary/10 rounded-full blur-3xl pointer-events-none z-0" />
+
+                  {/* Watermark Icon */}
+                  <div className="absolute top-8 right-8 text-accent-primary opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 group-hover:-rotate-3 transition-all duration-700 pointer-events-none z-0">
+                    <Icon size={pillar.iconSize} strokeWidth={1} />
+                  </div>
+
+                  {/* Left Column: Narrative Content */}
+                  <div className="relative z-20 flex flex-col justify-between max-w-md w-full">
+                    <div>
+                      {/* Trust Tag */}
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-primary/10 border border-accent-primary/30 text-accent-cyan text-xs font-mono mb-4 sm:mb-6">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
+                        <span>Direct 1-on-1 Engineering</span>
+                      </div>
+
+                      <h3 className="font-sans font-semibold text-2xl sm:text-3xl lg:text-4xl text-text-heading mb-3 sm:mb-4 tracking-tight group-hover:text-white transition-colors duration-300">
+                        {pillar.title}
+                      </h3>
+
+                      <p className="font-sans text-text-body text-[14px] sm:text-[15px] leading-relaxed group-hover:text-text-heading transition-colors duration-300 mb-6">
+                        {pillar.description}
+                      </p>
+
+                      {/* Value Highlights */}
+                      <div className="flex flex-col gap-2.5 mb-6 text-xs sm:text-[13px] text-text-heading">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 size={16} className="text-accent-cyan shrink-0" />
+                          <span>Direct WhatsApp & phone line with founder</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 size={16} className="text-accent-cyan shrink-0" />
+                          <span>No account managers, sales reps, or junior developers</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 size={16} className="text-accent-cyan shrink-0" />
+                          <span>Same-day turnarounds and rapid iteration cycles</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hint to click video */}
+                    <div className="text-xs text-text-body/80 flex items-center gap-2">
+                      <span className="text-accent-cyan font-bold">▶</span>
+                      <span>Click the video to expand and listen with sound</span>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Founder Video Card Preview with Floating Response */}
+                  <div className="relative z-20 w-full sm:w-auto flex flex-col items-center lg:items-end shrink-0 mx-auto lg:mx-0">
+                    {/* Floating Live Response Chat Bubble */}
+                    <div className="hidden sm:flex self-end mb-3 bg-accent-primary/15 backdrop-blur-xl rounded-2xl rounded-tr-sm px-4 py-2.5 border border-accent-primary/30 shadow-[0_4px_20px_rgba(47,168,255,0.2)] flex-col gap-0.5 transform -rotate-1 hover:rotate-0 transition-transform">
+                      <p className="text-xs text-white font-medium">Already done. Live on your link right now! ⚡</p>
+                      <span className="text-[9px] text-accent-cyan self-end font-mono">Just now</span>
+                    </div>
+
+                    {/* Video Card Player */}
+                    <div className="w-[200px] sm:w-[220px] lg:w-[230px] aspect-[9/16] shrink-0">
+                      <FounderVideoCard className="w-full h-full" />
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div
                 key={index}
